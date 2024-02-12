@@ -5248,9 +5248,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ps: {fileID: 1008460231}
   initialSpacing: 0.2
-  nbParticles: 2000
+  nbParticles: 4000
   seed: 43243215
-  substeps: 1
+  substeps: 2
   heatGradient:
     serializedVersion: 2
     key0: {r: 0, g: 0, b: 0, a: 1}
@@ -5281,7 +5281,7 @@ MonoBehaviour:
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
   particleScaleMultiplier: 5
-  stupidColCheck: 0
+  parallelCollision: 0
   settings:
     simulationBound:
       m_Center: {x: 0, y: 0, z: 0}
@@ -5293,13 +5293,16 @@ MonoBehaviour:
     colisionVelocityResolution: 1
     maxSpeed: 3
     wallBounceIntensity: 0.2
-    heatAtBottomPerSec: 10
-    heatRange: 0.5
     fireGravity: -5
     temperatureDropPerSec: 1.2
     temperatureUpwardForce: 1.2
     maxTemperature: 10
-    heatTransferPercent: 0.3
+    heatTransferPercent: 0.5
+    heatAtBottomRange: 0.1
+    heatAtBottomPerSec: 15
+    heatAtBottomNoiseRatio: 0.712
+    heatAtBottomNoiseSize: 1.12
+    heatAtBottomNoiseSpeed: 1
     minParticleSize: 0.05
     maxParticleSize: 0.3
 --- !u!4 &2054115753

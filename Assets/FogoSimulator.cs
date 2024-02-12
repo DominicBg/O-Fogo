@@ -19,11 +19,11 @@ public class FogoSimulator : MonoBehaviour
 
     [SerializeField] Gradient heatGradient;
     [SerializeField] float particleScaleMultiplier = 1;
-
-    Unity.Mathematics.Random rng;
-    public bool stupidColCheck;
+    [SerializeField] bool parallelCollision;
 
     [SerializeField] SimulationSettings settings;
+
+    Unity.Mathematics.Random rng;
 
     [System.Serializable]
     public struct SimulationSettings
@@ -37,13 +37,19 @@ public class FogoSimulator : MonoBehaviour
         public float wallBounceIntensity;
 
         [Header("Heat")]
-        public float heatAtBottomPerSec;
-        public float heatRange;
         public float fireGravity;
         public float temperatureDropPerSec;
         public float temperatureUpwardForce;
         public float maxTemperature;
         public float heatTransferPercent;
+
+        [Header("Bottom heat")]
+        public float heatAtBottomRange;
+        public float heatAtBottomPerSec;
+        [Range(0, 1)]
+        public float heatAtBottomNoiseRatio;
+        public float heatAtBottomNoiseSize;
+        public float heatAtBottomNoiseSpeed;
 
         public float minParticleSize;
         public float maxParticleSize;
@@ -61,7 +67,6 @@ public class FogoSimulator : MonoBehaviour
         public int indexA;
         public int indexB;
         public float distSq;
-        //add penetration
 
         public FireParticleCollision(int indexA, int indexB, float distSq)
         {
@@ -90,7 +95,7 @@ public class FogoSimulator : MonoBehaviour
             nativeHashingGrid = new NativeArray<T>(size.x * size.y, allocator);
         }
 
-        int ToIndex(int2 pos) => pos.x + pos.y * size.x;
+        int ToIndex(int2 pos) => pos.y * size.x + pos.x;
 
         public T this[int2 pos]
         {
@@ -118,7 +123,7 @@ public class FogoSimulator : MonoBehaviour
         main.maxParticles = nbParticles;
         fireParticles = new NativeArray<FireParticle>(main.maxParticles, Allocator.Persistent);
         renderParticles = new NativeArray<ParticleSystem.Particle>(main.maxParticles, Allocator.Persistent);
-        fireParticleCollisionPair = new NativeList<FireParticleCollision>(Allocator.Persistent);
+        fireParticleCollisionPair = new NativeList<FireParticleCollision>(main.maxParticles * 10, Allocator.Persistent);
         hashingGrid = new NativeList<int>[settings.hashingGridLength.x, settings.hashingGridLength.y];
         nativeHashingGrid = new NativeGrid<UnsafeList<int>>(settings.hashingGridLength, Allocator.Persistent);
 
@@ -127,7 +132,7 @@ public class FogoSimulator : MonoBehaviour
             for (int y = 0; y < settings.hashingGridLength.y; y++)
             {
                 hashingGrid[x, y] = new NativeList<int>(Allocator.Persistent);
-                nativeHashingGrid[x, y] = new UnsafeList<int>(16, Allocator.Persistent);
+                nativeHashingGrid[x, y] = new UnsafeList<int>(32, Allocator.Persistent);
             }
         }
 
@@ -175,6 +180,7 @@ public class FogoSimulator : MonoBehaviour
     public struct UpdateSimulationJob : IJobParallelFor
     {
         public float dt;
+        public float time;
         public NativeArray<FireParticle> fireParticles;
         public SimulationSettings settings;
         public float3 simPos;
@@ -188,7 +194,15 @@ public class FogoSimulator : MonoBehaviour
             fireParticle.temperature -= settings.temperatureDropPerSec * dt;
             fireParticle.temperature = math.max(fireParticle.temperature, 0f);
 
-            float heat = (1f - math.smoothstep(minSimulationY, minSimulationY + settings.heatRange, fireParticle.position.y)) * settings.heatAtBottomPerSec;
+            float heightSmoothStep = 1f - math.smoothstep(minSimulationY, minSimulationY + settings.heatAtBottomRange, fireParticle.position.y);
+
+            if(settings.heatAtBottomNoiseRatio > 0)
+            {
+                float heatNoise = noise.cnoise(new float2(time, fireParticle.position.x * settings.heatAtBottomNoiseSize));
+                heightSmoothStep *= math.lerp(1, heatNoise, settings.heatAtBottomNoiseRatio);
+            }
+
+            float heat = heightSmoothStep * settings.heatAtBottomPerSec;
             fireParticle.temperature += heat * dt;
             fireParticle.temperature = math.clamp(fireParticle.temperature, 0, settings.maxTemperature);
 
@@ -203,10 +217,70 @@ public class FogoSimulator : MonoBehaviour
             fireParticle.position += fireParticle.velocity * dt;
 
             //clamp
-            //fireParticle.position = settings.simulationBound.ClosestPoint(fireParticle.position);
             ApplyConstraintBounce(ref fireParticle, settings);
-            //fireParticle.position = settings.simulationBound.ClosestPoint(fireParticle.position);
             fireParticles[index] = fireParticle;
+        }
+    }
+
+
+    [BurstCompile]
+    public struct FindCollisionPairParallelJob : IJobParallelFor
+    {
+        [ReadOnly]
+        public NativeArray<FireParticle> fireParticles;
+        public SimulationSettings settings;
+
+        [ReadOnly]
+        public NativeGrid<UnsafeList<int>> nativeHashingGrid;
+
+        [WriteOnly]
+        public NativeList<FireParticleCollision>.ParallelWriter fireParticleCollisionPair;
+
+        public void Execute(int index)
+        {
+            NativeList<FireParticleCollision> collisionBuffer = new NativeList<FireParticleCollision>(16, Allocator.Temp);
+            HashParticle(fireParticles[index].position, in settings, out int2 hash);
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    CheckCollisionPair(hash, index, x, y, fireParticles, nativeHashingGrid, settings, ref collisionBuffer);
+                }
+            }
+            fireParticleCollisionPair.AddRangeNoResize(collisionBuffer);
+            collisionBuffer.Dispose();
+        }
+    }
+
+    [BurstCompile]
+    public struct FindCollisionPairJob : IJob
+    {
+        [ReadOnly]
+        public NativeArray<FireParticle> fireParticles;
+        public SimulationSettings settings;
+
+        [ReadOnly]
+        public NativeGrid<UnsafeList<int>> nativeHashingGrid;
+
+        [WriteOnly]
+        public NativeList<FireParticleCollision> fireParticleCollisionPair;
+
+        public void Execute()
+        {
+            NativeList<FireParticleCollision> collisionBuffer = new NativeList<FireParticleCollision>(16, Allocator.Temp);
+            for (int i = 0; i < fireParticles.Length; i++)
+            {
+                HashParticle(fireParticles[i].position, in settings, out int2 hash);
+                for (int x = -1; x <= 1; x++)
+                {
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        CheckCollisionPair(hash, i, x, y, fireParticles, nativeHashingGrid, settings, ref collisionBuffer);
+                    }
+                }
+            }
+            fireParticleCollisionPair.AddRange(collisionBuffer);
+            collisionBuffer.Dispose();
         }
     }
 
@@ -253,12 +327,8 @@ public class FogoSimulator : MonoBehaviour
                 particleA.velocity += delta * settings.colisionVelocityResolution;
                 particleB.velocity -= delta * settings.colisionVelocityResolution;
 
-                //particleA.position = settings.simulationBound.ClosestPoint(particleA.position);
-                //particleB.position = settings.simulationBound.ClosestPoint(particleB.position);
                 ApplyConstraintBounce(ref particleA, settings);
                 ApplyConstraintBounce(ref particleB, settings);
-                //particleA.position = math.clamp(particleA.position, simulationBound.min, simulationBound.max);
-                //particleB.position = math.clamp(particleB.position, simulationBound.min, simulationBound.max);
 
                 fireParticles[pair.indexA] = particleA;
                 fireParticles[pair.indexB] = particleB;
@@ -301,10 +371,11 @@ public class FogoSimulator : MonoBehaviour
         new UpdateSimulationJob()
         {
             fireParticles = fireParticles,
+            time = Time.time * settings.heatAtBottomNoiseSpeed,
             dt = dt,
             settings = settings,
             simPos = ps.transform.position
-        }.Schedule(fireParticles.Length, 8).Complete();
+        }.Schedule(fireParticles.Length, fireParticles.Length / 16).Complete();
 
 
         fireParticleCollisionPair.Clear();
@@ -314,56 +385,40 @@ public class FogoSimulator : MonoBehaviour
             for (int y = 0; y < settings.hashingGridLength.y; y++)
             {
                 hashingGrid[x, y].Clear();
-                nativeHashingGrid[x, y].Clear();
+                var list = nativeHashingGrid[x, y];
+                list.Clear();
+                nativeHashingGrid[x, y] = list;
             }
         }
         for (int i = 0; i < fireParticles.Length; i++)
         {
             HashParticle(fireParticles[i].position, in settings, out int2 hash);
 
-            if (hash.x >= settings.hashingGridLength.x || hash.y >= settings.hashingGridLength.y || hash.x < 0 || hash.y < 0)
-            {
-                Debug.Log("heck " + hash);
-            }
             hashingGrid[hash.x, hash.y].Add(i);
             var list = nativeHashingGrid[hash];
             list.Add(i);
             nativeHashingGrid[hash] = list;
         }
 
-        if (stupidColCheck)
+        if (parallelCollision)
         {
-            for (int i = 0; i < fireParticles.Length; i++)
+            new FindCollisionPairParallelJob()
             {
-                for (int j = 0; j < fireParticles.Length; j++)
-                {
-                    if (i == j)
-                    {
-                        continue;
-                    }
-
-                    float distSq = math.distancesq(fireParticles[i].position, fireParticles[j].position);
-                    float radiusSqSum = Pow2(fireParticles[i].radius + fireParticles[j].radius);
-                    //precompute penetration?
-                    if (distSq < radiusSqSum)
-                    {
-                        fireParticleCollisionPair.Add(new FireParticleCollision(i, j, distSq));
-                    }
-                }
-            }
+                fireParticles = fireParticles,
+                fireParticleCollisionPair = fireParticleCollisionPair.AsParallelWriter(),
+                nativeHashingGrid = nativeHashingGrid,
+                settings = settings
+            }.Schedule(fireParticles.Length, fireParticles.Length / 16).Complete();
         }
         else
         {
-            for (int i = 0; i < fireParticles.Length; i++)
+            new FindCollisionPairJob()
             {
-                for (int x = -1; x <= 1; x++)
-                {
-                    for (int y = -1; y <= 1; y++)
-                    {
-                        CheckCollisionPair(i, x, y);
-                    }
-                }
-            }
+                fireParticles = fireParticles,
+                fireParticleCollisionPair = fireParticleCollisionPair,
+                nativeHashingGrid = nativeHashingGrid,
+                settings = settings
+            }.Run();
         }
 
         var rngRef = new NativeReference<Unity.Mathematics.Random>(rng, Allocator.TempJob);
@@ -385,33 +440,35 @@ public class FogoSimulator : MonoBehaviour
         }.Run();
     }
 
-    private void CheckCollisionPair(int i, int x, int y)
+    public static void CheckCollisionPair(int2 hash, int i, int x, int y,
+    in NativeArray<FireParticle> fireParticles, in NativeGrid<UnsafeList<int>> nativeHashingGrid,
+    in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer)
     {
-        HashParticle(fireParticles[i].position, in settings, out int2 hash);
         int2 pos = new int2(x + hash.x, y + hash.y);
 
         if (pos.x < 0 || pos.x >= settings.hashingGridLength.x || pos.y < 0 || pos.y >= settings.hashingGridLength.y)
         {
             return;
         }
-        //pos = math.clamp(pos, 0, settings.hashingGridLength - 1);
 
-        var gridList = hashingGrid[pos.x, pos.y];
+        var gridList = nativeHashingGrid[pos.x, pos.y];
 
         for (int k = 0; k < gridList.Length; k++)
         {
             int j = gridList[k];
-            if (i == j)
+            //same particle or already processed the collision when i -> j,  don't need j -> i
+            if (i >= j)
             {
                 continue;
             }
+
             float distSq = math.distancesq(fireParticles[i].position, fireParticles[j].position);
             float radiusSqSum = Pow2(fireParticles[i].radius + fireParticles[j].radius);
 
             //precompute penetration?
             if (distSq < radiusSqSum)
             {
-                fireParticleCollisionPair.Add(new FireParticleCollision(i, j, distSq));
+                collisionBuffer.Add(new FireParticleCollision(i, j, distSq));
             }
         }
     }
@@ -426,10 +483,9 @@ public class FogoSimulator : MonoBehaviour
         hash = math.clamp((int2)(t.xy * settings.hashingGridLength), 0, settings.hashingGridLength - 1);
     }
 
-
     public static void ApplyConstraintBounce(ref FireParticle fireParticles, in SimulationSettings settings)
     {
-        if(!settings.simulationBound.Contains(fireParticles.position))
+        if (!settings.simulationBound.Contains(fireParticles.position))
         {
             bool3 outOfBounds = new bool3(
                 fireParticles.position.x < settings.simulationBound.min.x || fireParticles.position.x > settings.simulationBound.max.x,
@@ -439,31 +495,6 @@ public class FogoSimulator : MonoBehaviour
 
             fireParticles.velocity = math.select(fireParticles.velocity, -fireParticles.velocity * settings.wallBounceIntensity, outOfBounds);
             fireParticles.position = settings.simulationBound.ClosestPoint(fireParticles.position);
-            //if (outOfBounds.x)
-            //{
-            //    fireParticles.velocity.x = -fireParticles.velocity.x;
-            //}
-            //if (outOfBounds.y)
-            //{
-            //    fireParticles.velocity.y = -fireParticles.velocity.y;
-            //}
-            //if(fireParticles.position.x < settings.simulationBound.min.x)
-            //{
-
-            //    return;
-            //}
-            //if (fireParticles.position.x > settings.simulationBound.max.x)
-            //{
-            //    return;
-            //}
-            //if (fireParticles.position.y < settings.simulationBound.min.y)
-            //{
-            //    return;
-            //}
-            //if (fireParticles.position.y > settings.simulationBound.max.y)
-            //{
-            //    return;
-            //}
         }
     }
 
@@ -499,8 +530,8 @@ public class FogoSimulator : MonoBehaviour
             Debug.DrawLine(start, end, Color.cyan * 0.25f);
         }
 
-        float3 heatLeft = bottomLeft + math.up() * settings.heatRange;
-        float3 heatRight = bottomRight + math.up() * settings.heatRange;
+        float3 heatLeft = bottomLeft + math.up() * settings.heatAtBottomRange;
+        float3 heatRight = bottomRight + math.up() * settings.heatAtBottomRange;
         Debug.DrawLine(heatLeft, heatRight, Color.red);
     }
 
