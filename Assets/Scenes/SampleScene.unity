@@ -199,6 +199,74 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &655174613
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 655174614}
+  - component: {fileID: 655174616}
+  - component: {fileID: 655174615}
+  m_Layer: 0
+  m_Name: VectorField
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &655174614
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655174613}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.944043, y: 3.5545208, z: 9.298527}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &655174615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655174613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c22030bb51b57fa4a9e12779a27f3dbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &655174616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655174613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f98f598e61098ad4fa3a70fc5119a04c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scale: 0.1
+  vectorFieldSize:
+    x: 35
+    y: 35
+  strength: 1.09
+  offset:
+    x: 0
+    y: 0
+  offsetOverTime:
+    x: -1
+    y: -1.7
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -5326,8 +5394,9 @@ MonoBehaviour:
   particleCount: 4000
   seed: 43243215
   substeps: 1
-  parallelCollision: 0
+  parallelCollision: 1
   fogoRenderer: {fileID: 305926068}
+  vectorFieldGenerator: {fileID: 655174616}
   settings:
     simulationBound:
       m_Center: {x: 0, y: 0, z: 0}
@@ -5340,13 +5409,13 @@ MonoBehaviour:
     maxSpeed: 3
     wallBounceIntensity: 0.2
     fireGravity: -5
-    temperatureDropPerSec: 1.2
+    temperatureDropPerSec: 0.6
     temperatureUpwardForce: 1.2
     maxTemperature: 10
     heatTransferPercent: 0.5
     heatAtBottomRange: 0.1
-    heatAtBottomPerSec: 15
-    heatAtBottomNoiseRatio: 0.712
+    heatAtBottomPerSec: 35
+    heatAtBottomNoiseRatio: 0.731
     heatAtBottomNoiseSize: 1.12
     heatAtBottomNoiseSpeed: 1
     minParticleSize: 0.05
