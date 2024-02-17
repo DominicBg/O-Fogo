@@ -79,6 +79,7 @@ namespace OFogo
                 fireParticles[i] = fireParticle;
             }
             fogoRenderer.Init(particleCount);
+            vectorFieldGenerator.Init();
             vectorField = vectorFieldGenerator.CreateVectorField(in settings.simulationBound);
         }
 
@@ -516,7 +517,9 @@ namespace OFogo
 
         private void OnDestroy()
         {
+            vectorFieldGenerator.Dispose();
             fogoRenderer.Dispose();
+
             if (fireParticles.IsCreated)
             {
                 fireParticles.Dispose();

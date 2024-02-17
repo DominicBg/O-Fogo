@@ -209,6 +209,7 @@ GameObject:
   m_Component:
   - component: {fileID: 655174614}
   - component: {fileID: 655174616}
+  - component: {fileID: 655174617}
   - component: {fileID: 655174615}
   m_Layer: 0
   m_Name: VectorField
@@ -244,6 +245,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c22030bb51b57fa4a9e12779a27f3dbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vectorFieldSize:
+    x: 0
+    y: 0
 --- !u!114 &655174616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,17 +260,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f98f598e61098ad4fa3a70fc5119a04c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scale: 0.1
   vectorFieldSize:
     x: 35
     y: 35
-  strength: 1.09
+  scale: 0.05
+  strength: 1
   offset:
     x: 0
     y: 0
   offsetOverTime:
-    x: -1
+    x: -0.48
     y: -1.7
+--- !u!114 &655174617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655174613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88ecdbd5a63d1b748af7f8e9b04b8e3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vectorFieldSize:
+    x: 35
+    y: 35
+  mainCam: {fileID: 963194227}
+  strength: 2
+  sampleInterval: 0.01
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -5410,12 +5432,12 @@ MonoBehaviour:
     wallBounceIntensity: 0.2
     fireGravity: -5
     temperatureDropPerSec: 0.6
-    temperatureUpwardForce: 1.2
+    temperatureUpwardForce: 0.8
     maxTemperature: 10
     heatTransferPercent: 0.5
     heatAtBottomRange: 0.1
-    heatAtBottomPerSec: 35
-    heatAtBottomNoiseRatio: 0.731
+    heatAtBottomPerSec: 15
+    heatAtBottomNoiseRatio: 0.297
     heatAtBottomNoiseSize: 1.12
     heatAtBottomNoiseSpeed: 1
     minParticleSize: 0.05

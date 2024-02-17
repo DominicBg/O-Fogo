@@ -6,15 +6,9 @@ using UnityEngine;
 public class TurbulenceVectorField : VectorFieldGenerator
 {
     [SerializeField] float scale;
-    [SerializeField] int2 vectorFieldSize;
     [SerializeField] float strength;
     [SerializeField] float2 offset;
     [SerializeField] float2 offsetOverTime;
-
-    public override NativeGrid<float3> CreateVectorField(in Bounds bounds, Allocator allocator = Allocator.Persistent)
-    {
-        return new NativeGrid<float3>(vectorFieldSize, allocator);
-    }
 
     public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds)
     {
