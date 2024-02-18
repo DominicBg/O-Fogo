@@ -25,6 +25,15 @@ Shader "PostProcessing/Magic"
 		CBUFFER_START(UnityPerMaterial)
 			float _Threshold;
 			float _LumPow;
+			float _Quantize;
+			int _Diamondize;
+
+			float4 _ColArray[10];
+			int _ColArrayCount;
+			/*float4 _Col1;
+			float4 _Col2;
+			float4 _Col3;
+			float4 _Col4;*/
 		CBUFFER_END
 
 		struct appdata
@@ -56,13 +65,28 @@ Shader "PostProcessing/Magic"
 			float rel = invLerp(origFrom, origTo, value);
 			return lerp(targetFrom, targetTo, rel);
 		}
-		float luminosity(float3 col)
+
+		float2 Rotate(float2 p, float a)
 		{
-			return col.r * 0.216 + col.g * 0.7152 + col.b * 0.0722;
+			float c = cos(a);
+			float s = sin(a);
+			return float2(
+				p.x * c - p.y * s,
+				p.x * s + p.y * c);
 		}
+		float2 DiamondUV(float2 uv)
+		{
+			float2 diamondUV = Rotate(uv, radians(45.));
+			diamondUV = floor(diamondUV * _Quantize) / _Quantize;
+			diamondUV = Rotate(diamondUV, -radians(45.));
+
+			return diamondUV;
+		}
+
+
 		ENDHLSL
 
-		Pass
+			Pass
 		{
 			Name "MAGIC"
 
@@ -71,17 +95,34 @@ Shader "PostProcessing/Magic"
 			#pragma fragment frag_magic
 
 			float4 frag_magic(v2f i) : SV_Target
-			{		
-				float4 col = tex2D(_MainTex, i.uv);
-				float lum = pow(luminosity(col), _LumPow);
-				if (lum < _Threshold)
+			{
+				if(_Diamondize == 1)
 				{
-					col = 0;
+					i.uv = DiamondUV(i.uv);
 				}
 				else
 				{
-					//lum = remap(_Threshold, 1., 0., 1., lum);
-					//col *= lum;
+					i.uv = floor(i.uv * _Quantize) / _Quantize;
+				}
+
+				float4 col = tex2D(_MainTex, i.uv);
+				float lum = col.x;
+				if (lum < _Threshold)
+				{
+					return 0;
+				}
+				else
+				{
+					lum = remap(_Threshold, 1., 0., 1., lum);
+					lum = pow(lum, _LumPow);
+					float invCount = 1 / (float)_ColArrayCount;
+					for (int i = _ColArrayCount - 1; i >= 0; i--)
+					{
+						if (lum > i * invCount)
+						{
+							return _ColArray[_ColArrayCount- i - 1];
+						}
+					}
 				}
 
 				return col;

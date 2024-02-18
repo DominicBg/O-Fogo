@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -11,6 +12,8 @@ public class MagicRenderPass : ScriptableRenderPass
 
     private RenderTargetHandle magicTex;
     private int magicTexID;
+
+    List<Color> colorsBuffer = new List<Color>();
 
     public bool Setup(ScriptableRenderer renderer)
     {
@@ -54,6 +57,25 @@ public class MagicRenderPass : ScriptableRenderPass
 
         material.SetFloat("_Threshold", magicSettings.alphaThreshold.value);
         material.SetFloat("_LumPow", magicSettings.luminocityPower.value);
+        material.SetFloat("_Quantize", magicSettings.quantize.value);
+        material.SetInt("_Diamondize", magicSettings.diamondize.value ? 1 : 0);
+
+        colorsBuffer.Clear();
+
+        colorsBuffer.Add(magicSettings.col0.value);
+        colorsBuffer.Add(magicSettings.col1.value);
+        colorsBuffer.Add(magicSettings.col2.value);
+        colorsBuffer.Add(magicSettings.col3.value);
+        colorsBuffer.Add(magicSettings.col4.value);
+        colorsBuffer.Add(magicSettings.col5.value);
+        colorsBuffer.Add(magicSettings.col6.value);
+        colorsBuffer.Add(magicSettings.col7.value);
+        colorsBuffer.Add(magicSettings.col8.value);
+        colorsBuffer.Add(magicSettings.col9.value);
+
+        material.SetColorArray("_ColArray", colorsBuffer);
+        material.SetInt("_ColArrayCount", magicSettings.colorCount.value);
+
 
         cmd.Blit(source, magicTexID, material, 0);
         cmd.Blit(magicTexID, source);

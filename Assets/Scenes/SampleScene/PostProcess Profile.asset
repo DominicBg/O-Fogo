@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66f335fb1ffd8684294ad653bf1c7564, type: 3}
   m_Name: ColorAdjustments
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   postExposure:
     m_OverrideState: 1
     m_Value: 2.25
@@ -84,10 +84,49 @@ MonoBehaviour:
   active: 1
   alphaThreshold:
     m_OverrideState: 1
-    m_Value: 0.111
+    m_Value: 0.098
   luminocityPower:
     m_OverrideState: 1
-    m_Value: 0.85
+    m_Value: 0.16
+  quantize:
+    m_OverrideState: 1
+    m_Value: 150
+  diamondize:
+    m_OverrideState: 1
+    m_Value: 1
+  colorCount:
+    m_OverrideState: 1
+    m_Value: 6
+  col0:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  col1:
+    m_OverrideState: 1
+    m_Value: {r: 0.61066335, g: 0.5509434, b: 1, a: 1}
+  col2:
+    m_OverrideState: 1
+    m_Value: {r: 0.47613144, g: 0, b: 1, a: 1}
+  col3:
+    m_OverrideState: 1
+    m_Value: {r: 0.29379702, g: 0, b: 1, a: 1}
+  col4:
+    m_OverrideState: 1
+    m_Value: {r: 0.10199163, g: 0, b: 0.2735849, a: 1}
+  col5:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0.027276473, b: 0.1792453, a: 1}
+  col6:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  col7:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  col8:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  col9:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &3946406993011049063
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -100,10 +139,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c177c3d5f55b47f4ab3f6f12b665f6e6, type: 3}
   m_Name: BlurSettings
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   strength:
     m_OverrideState: 1
-    m_Value: 5.14
+    m_Value: 15
 --- !u!114 &5377890408480631067
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -135,10 +174,10 @@ MonoBehaviour:
   active: 1
   threshold:
     m_OverrideState: 1
-    m_Value: 0.45
+    m_Value: 0.68
   intensity:
     m_OverrideState: 1
-    m_Value: 1.2
+    m_Value: 2.01
   scatter:
     m_OverrideState: 1
     m_Value: 0.713
