@@ -23,10 +23,15 @@ Shader "PostProcessing/Magic"
 		sampler2D _MainTex;
 
 		CBUFFER_START(UnityPerMaterial)
-			float _Threshold;
+			//float _Threshold;
+			float _MinRemap;
+			float _MaxRemap;
+
 			float _LumPow;
 			float _Quantize;
+			float _DitherRange;
 			int _Diamondize;
+			int _UseDither;
 
 			float4 _ColArray[10];
 			int _ColArrayCount;
@@ -84,9 +89,35 @@ Shader "PostProcessing/Magic"
 		}
 
 
+		bool sampleDither4x4(float intensity, uint2 pixelId)
+		{
+			float dither4x4[4 * 4] = {
+				0, 8, 2, 10,
+				12, 4, 14, 6,
+				3, 11, 1, 9,
+				15, 7, 13, 5
+			};
+
+			const uint width = 4;
+			const uint size = 16;//4*4
+			uint i = pixelId.x + pixelId.y * width;
+			i = i % size;
+
+			float dither = dither4x4[i] / float(size);
+			return intensity <= dither;
+		}
+
+		float3 sampleDither4x4(float3 color, uint2 pixelId)
+		{
+			return color * float3(
+				sampleDither4x4(color.r, pixelId),
+				sampleDither4x4(color.g, pixelId),
+				sampleDither4x4(color.b, pixelId));
+		}
+
 		ENDHLSL
 
-			Pass
+		Pass
 		{
 			Name "MAGIC"
 
@@ -94,34 +125,51 @@ Shader "PostProcessing/Magic"
 			#pragma vertex vert
 			#pragma fragment frag_magic
 
-			float4 frag_magic(v2f i) : SV_Target
+			float4 frag_magic(v2f input) : SV_Target
 			{
 				if(_Diamondize == 1)
 				{
-					i.uv = DiamondUV(i.uv);
+					input.uv = DiamondUV(input.uv);
 				}
 				else
 				{
-					i.uv = floor(i.uv * _Quantize) / _Quantize;
+					input.uv = floor(input.uv * _Quantize) / _Quantize;
 				}
 
-				float4 col = tex2D(_MainTex, i.uv);
+				float4 col = tex2D(_MainTex, input.uv);
 				float lum = col.x;
-				if (lum < _Threshold)
+				//if (lum < _Threshold)
 				{
-					return 0;
+					//return 0;
 				}
-				else
+				//else
 				{
-					lum = remap(_Threshold, 1., 0., 1., lum);
+					lum = remap(_MinRemap, _MaxRemap, 0., 1., lum);
+
 					lum = pow(lum, _LumPow);
 					float invCount = 1 / (float)_ColArrayCount;
-					for (int i = _ColArrayCount - 1; i >= 0; i--)
+
+					int iterationCount = _ColArrayCount - _UseDither;
+
+					for (int i = 0; i < iterationCount; i++)
 					{
-						if (lum > i * invCount)
+						float threshold = 1. - ((float)i + 1.) * invCount;
+						if (lum > threshold)
 						{
-							return _ColArray[_ColArrayCount- i - 1];
+							if (_UseDither == 1)
+							{
+								float ditherValue = remap(threshold, threshold + invCount, 0, 1, lum);
+								int i0 = i;
+								int i1 = i + 1;
+								bool sampleDither = sampleDither4x4(ditherValue, (int2)(input.uv  * _Quantize));
+								return sampleDither ? _ColArray[i1] : _ColArray[i0];
+							}
+							else
+							{
+								return _ColArray[i];
+							}
 						}
+		
 					}
 				}
 

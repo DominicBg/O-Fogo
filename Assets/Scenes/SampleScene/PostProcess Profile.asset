@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5485954d14dfb9a4c8ead8edb0ded5b1, type: 3}
   m_Name: LiftGammaGain
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   lift:
     m_OverrideState: 1
     m_Value: {x: 1, y: 0.79546636, z: 0.9794533, w: 0}
@@ -82,15 +82,21 @@ MonoBehaviour:
   m_Name: MagicSettings
   m_EditorClassIdentifier: 
   active: 1
-  alphaThreshold:
+  minRemap:
     m_OverrideState: 1
-    m_Value: 0.098
+    m_Value: 0
+  maxRemap:
+    m_OverrideState: 1
+    m_Value: 0.125
   luminocityPower:
     m_OverrideState: 1
-    m_Value: 0.16
+    m_Value: 0.59
   quantize:
     m_OverrideState: 1
-    m_Value: 150
+    m_Value: 300
+  useDither:
+    m_OverrideState: 1
+    m_Value: 1
   diamondize:
     m_OverrideState: 1
     m_Value: 1
@@ -102,19 +108,19 @@ MonoBehaviour:
     m_Value: {r: 1, g: 1, b: 1, a: 1}
   col1:
     m_OverrideState: 1
-    m_Value: {r: 0.61066335, g: 0.5509434, b: 1, a: 1}
+    m_Value: {r: 1, g: 0.9111074, b: 0.51320755, a: 1}
   col2:
     m_OverrideState: 1
-    m_Value: {r: 0.47613144, g: 0, b: 1, a: 1}
+    m_Value: {r: 1, g: 0.3806531, b: 0, a: 1}
   col3:
     m_OverrideState: 1
-    m_Value: {r: 0.29379702, g: 0, b: 1, a: 1}
+    m_Value: {r: 0.9056604, g: 0.19964409, b: 0.020505492, a: 1}
   col4:
     m_OverrideState: 1
-    m_Value: {r: 0.10199163, g: 0, b: 0.2735849, a: 1}
+    m_Value: {r: 0.27450982, g: 0.0026848966, b: 0, a: 1}
   col5:
     m_OverrideState: 1
-    m_Value: {r: 0, g: 0.027276473, b: 0.1792453, a: 1}
+    m_Value: {r: 0.18039216, g: 0, b: 0.029164469, a: 1}
   col6:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}
@@ -142,7 +148,7 @@ MonoBehaviour:
   active: 1
   strength:
     m_OverrideState: 1
-    m_Value: 15
+    m_Value: 10.2
 --- !u!114 &5377890408480631067
 MonoBehaviour:
   m_ObjectHideFlags: 3

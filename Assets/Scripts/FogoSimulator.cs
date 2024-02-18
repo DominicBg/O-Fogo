@@ -14,6 +14,7 @@ namespace OFogo
         [SerializeField] int particleCount;
         [SerializeField] uint seed = 43243215;
         [SerializeField] int substeps = 4;
+        [SerializeField] float simulationSpeed = 1;
         [SerializeField] bool parallelCollision;
 
         [SerializeField] FogoRenderer fogoRenderer;
@@ -72,6 +73,7 @@ namespace OFogo
                 FireParticle fireParticle = new FireParticle()
                 {
                     position = pos,
+                    prevPosition = pos,
                     radius = settings.minParticleSize,
                     temperature = 0,
                     velocity = 0
@@ -89,7 +91,7 @@ namespace OFogo
             // if i hit j, we skip j hit i
             // n(n+1)/2 
             // we remove self particle hit
-            return (particleCount * particleCount) / 2;
+            return (particleCount * (particleCount - 1)) / 2;
         }
 
         void Update()
@@ -102,6 +104,7 @@ namespace OFogo
         private void FixedUpdate()
         {
             float dt = Time.fixedDeltaTime / substeps;
+            dt *= simulationSpeed;
             vectorFieldGenerator.UpdateVectorField(ref vectorField, in settings.simulationBound);
             for (int i = 0; i < substeps; i++)
             {
@@ -144,15 +147,33 @@ namespace OFogo
 
                 fireParticle.radius = math.lerp(settings.minParticleSize, settings.maxParticleSize, fireParticle.temperature / settings.maxTemperature);
 
-                fireParticle.velocity += math.up() * (settings.fireGravity + fireParticle.temperature * settings.temperatureUpwardForce) * dt;
-                if (math.lengthsq(fireParticle.velocity) > Pow2(settings.maxSpeed))
-                {
-                    fireParticle.velocity = math.normalize(fireParticle.velocity) * settings.maxSpeed;
-                }
-
                 float3 heatTurbulence = vectorField[HashPosition(fireParticle.position, settings.simulationBound, vectorField.Size)];
+                float3 acceleration = math.up() * (settings.fireGravity + fireParticle.temperature * settings.temperatureUpwardForce);
+                acceleration += heatTurbulence;
 
-                fireParticle.position += (fireParticle.velocity + heatTurbulence) * dt;
+                switch (settings.integrationType)
+                {
+                    case IntegrationType.Euler:
+
+                        fireParticle.velocity += acceleration * dt;
+                        if (math.lengthsq(fireParticle.velocity) > Pow2(settings.maxSpeed))
+                        {
+                            fireParticle.velocity = math.normalize(fireParticle.velocity) * settings.maxSpeed;
+                        }
+                        fireParticle.position += fireParticle.velocity * dt;
+
+                        break;
+                    case IntegrationType.Verlet:
+
+                        float3 velocity = fireParticle.position - fireParticle.prevPosition;
+                        if (math.lengthsq(velocity) > Pow2(settings.maxSpeed))
+                        {
+                            velocity = math.normalize(velocity) * settings.maxSpeed;
+                        }
+                        fireParticle.prevPosition = fireParticle.position;
+                        fireParticle.position += velocity + acceleration * dt * dt;
+                        break;
+                }
 
                 //clamp
                 ApplyConstraintBounce(ref fireParticle, settings);

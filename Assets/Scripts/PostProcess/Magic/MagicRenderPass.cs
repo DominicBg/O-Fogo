@@ -55,10 +55,14 @@ public class MagicRenderPass : ScriptableRenderPass
 
         CommandBuffer cmd = CommandBufferPool.Get("Magic Post Process");
 
-        material.SetFloat("_Threshold", magicSettings.alphaThreshold.value);
+        //material.SetFloat("_Threshold", magicSettings.alphaThreshold.value);
+        material.SetFloat("_MinRemap", magicSettings.minRemap.value);
+        material.SetFloat("_MaxRemap", magicSettings.maxRemap.value);
+
         material.SetFloat("_LumPow", magicSettings.luminocityPower.value);
         material.SetFloat("_Quantize", magicSettings.quantize.value);
         material.SetInt("_Diamondize", magicSettings.diamondize.value ? 1 : 0);
+        material.SetInt("_UseDither", magicSettings.useDither.value ? 1 : 0);
 
         colorsBuffer.Clear();
 

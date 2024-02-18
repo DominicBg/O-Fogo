@@ -38,7 +38,8 @@ namespace OFogo
 
         public override void Dispose()
         {
-            renderParticles.Dispose();
+            if(renderParticles.IsCreated)
+                renderParticles.Dispose();
         }
     }
 }

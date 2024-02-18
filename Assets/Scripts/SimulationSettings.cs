@@ -3,10 +3,13 @@ using UnityEngine;
 
 namespace OFogo
 {
+    public enum IntegrationType { Euler, Verlet }
+
     [System.Serializable]
     public struct SimulationSettings
     {
         [Header("Simulation")]
+        public IntegrationType integrationType;
         public Bounds simulationBound;
         public int2 hashingGridLength;
         public float resolutionStepRatio;

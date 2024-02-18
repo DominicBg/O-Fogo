@@ -79,7 +79,7 @@ public class DrawingVectorField : VectorFieldGenerator
                 float3 mousePos = ray.origin + ray.direction * hitDist;
 
                 //float3 mousePos = mainCam.ScreenToWorldPoint(new float3(Input.mousePosition.x, Input.mousePosition.y, mainCam.nearClipPlane));
-                Debug.Log(Input.mousePosition + " " + mousePos);
+                //Debug.Log(Input.mousePosition + " " + mousePos);
                 stroke.Add(mousePos);
             }
         }
