@@ -5,8 +5,6 @@ using UnityEngine.Rendering.Universal;
 [System.Serializable, VolumeComponentMenu("Magic")]
 public class MagicSettings : VolumeComponent, IPostProcessComponent
 {
-    //public ClampedFloatParameter alphaThreshold = new ClampedFloatParameter(0.0f, 0.0f, 1.0f);
-
     public ClampedFloatParameter minRemap = new ClampedFloatParameter(0.0f, 0.0f, 1.0f);
     public ClampedFloatParameter maxRemap = new ClampedFloatParameter(1.0f, 0.0f, 1.0f);
 
@@ -38,5 +36,4 @@ public class MagicSettings : VolumeComponent, IPostProcessComponent
     {
         return false;
     }
-
 }

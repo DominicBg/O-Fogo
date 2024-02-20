@@ -5509,9 +5509,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initialSpacing: 0.2
-  particleCount: 1500
+  particleCount: 2000
   seed: 43243215
-  substeps: 8
+  substeps: 6
   simulationSpeed: 2
   parallelCollision: 1
   fogoRenderer: {fileID: 305926068}
@@ -5520,7 +5520,7 @@ MonoBehaviour:
     integrationType: 1
     simulationBound:
       m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 8.11, y: 5, z: 0}
+      m_Extent: {x: 7, y: 5, z: 0}
     hashingGridLength:
       x: 50
       y: 25
@@ -5528,15 +5528,15 @@ MonoBehaviour:
     colisionVelocityResolution: 0
     maxSpeed: 3
     wallBounceIntensity: 0.2
-    fireGravity: -10
-    temperatureDropPerSec: 0.6
-    temperatureUpwardForce: 10
-    maxTemperature: 10
+    fireGravity: -3.87
+    temperatureDropPerSec: 15.37
+    temperatureUpwardForce: 18.5
+    maxTemperature: 15
     heatTransferPercent: 0.5
-    heatAtBottomRange: 0.2
-    heatAtBottomPerSec: 45
-    heatAtBottomNoiseRatio: 0.78
-    heatAtBottomNoiseSize: 1.12
+    heatAtBottomRange: 0.8
+    heatAtBottomPerSec: 102.8
+    heatAtBottomNoiseRatio: 0.796
+    heatAtBottomNoiseSize: 1
     heatAtBottomNoiseSpeed: 1
     minParticleSize: 0.05
     maxParticleSize: 0.4

@@ -7,6 +7,7 @@ using UnityEngine;
 public class DrawingVectorField : VectorFieldGenerator
 {
     bool requestWipe;
+    bool requestSmooth;
     bool isStrokeFinised;
 
     List<float3> stroke = new List<float3>();
@@ -56,6 +57,33 @@ public class DrawingVectorField : VectorFieldGenerator
             }
             requestWipe = false;
         }
+
+        if (requestSmooth)
+        {
+            for (int x = 0; x < vectorField.Size.x; x++)
+            {
+                for (int y = 0; y < vectorField.Size.y; y++)
+                {
+                    float3 sum = 0;
+                    int sumCount = 0;
+                    for (int xx = -1; xx <= 1; xx++)
+                    {
+                        for (int yy = -1; yy <= 1; yy++)
+                        {
+                            int2 pos = new int2(x + xx, y + yy);
+                            
+                            if(vectorField.InBound(pos))
+                            { 
+                                sum += vectorField[pos];
+                                sumCount++;
+                            }
+                        }
+                    }
+                    vectorField[x, y] = sum / sumCount;
+                }
+            }
+            requestSmooth = false;
+        }
     }
 
     private void Update()
@@ -93,7 +121,10 @@ public class DrawingVectorField : VectorFieldGenerator
         {
             requestWipe = true;
         }
-
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            requestSmooth = true;
+        }
         DebugStroke();
     }
 

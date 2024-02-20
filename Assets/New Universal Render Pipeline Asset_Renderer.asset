@@ -13,6 +13,19 @@ MonoBehaviour:
   m_Name: Blur
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &-3103548135156821160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34e775589b7c30f4bae60d28899dc123, type: 3}
+  m_Name: Frame Blur
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &-837012657257816160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43,7 +56,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: -5108879062127804327}
   - {fileID: -837012657257816160}
-  m_RendererFeatureMap: 5900719d8f9d19b9a05fa4436c5562f4
+  - {fileID: -3103548135156821160}
+  m_RendererFeatureMap: 5900719d8f9d19b9a05fa4436c5562f458d3a6146afbedd4
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}

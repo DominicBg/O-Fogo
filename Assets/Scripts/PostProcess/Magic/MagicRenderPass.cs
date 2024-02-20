@@ -11,7 +11,7 @@ public class MagicRenderPass : ScriptableRenderPass
     private RenderTargetIdentifier source;
 
     private RenderTargetHandle magicTex;
-    private int magicTexID;
+    private int magicTexID; 
 
     List<Color> colorsBuffer = new List<Color>();
 
@@ -37,7 +37,6 @@ public class MagicRenderPass : ScriptableRenderPass
             return;
         }
 
-
         magicTexID = Shader.PropertyToID("_MagicTex");
         magicTex = new RenderTargetHandle();
         magicTex.id = magicTexID;
@@ -55,7 +54,6 @@ public class MagicRenderPass : ScriptableRenderPass
 
         CommandBuffer cmd = CommandBufferPool.Get("Magic Post Process");
 
-        //material.SetFloat("_Threshold", magicSettings.alphaThreshold.value);
         material.SetFloat("_MinRemap", magicSettings.minRemap.value);
         material.SetFloat("_MaxRemap", magicSettings.maxRemap.value);
 
@@ -64,8 +62,8 @@ public class MagicRenderPass : ScriptableRenderPass
         material.SetInt("_Diamondize", magicSettings.diamondize.value ? 1 : 0);
         material.SetInt("_UseDither", magicSettings.useDither.value ? 1 : 0);
 
+        //I'm really proud
         colorsBuffer.Clear();
-
         colorsBuffer.Add(magicSettings.col0.value);
         colorsBuffer.Add(magicSettings.col1.value);
         colorsBuffer.Add(magicSettings.col2.value);
@@ -79,7 +77,6 @@ public class MagicRenderPass : ScriptableRenderPass
 
         material.SetColorArray("_ColArray", colorsBuffer);
         material.SetInt("_ColArrayCount", magicSettings.colorCount.value);
-
 
         cmd.Blit(source, magicTexID, material, 0);
         cmd.Blit(magicTexID, source);

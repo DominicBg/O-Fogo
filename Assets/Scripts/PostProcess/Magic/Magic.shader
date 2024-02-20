@@ -3,6 +3,7 @@ Shader "PostProcessing/Magic"
     Properties
     {
 		_MainTex("Texture", 2D) = "white" {}
+		_MainTexBlur("Texture", 2D) = "white" {}
 		_Spread("Standard Deviation (Spread)", Float) = 0
 		_GridSize("Grid Size", Integer) = 1
     }
@@ -23,7 +24,6 @@ Shader "PostProcessing/Magic"
 		sampler2D _MainTex;
 
 		CBUFFER_START(UnityPerMaterial)
-			//float _Threshold;
 			float _MinRemap;
 			float _MaxRemap;
 
@@ -35,10 +35,6 @@ Shader "PostProcessing/Magic"
 
 			float4 _ColArray[10];
 			int _ColArrayCount;
-			/*float4 _Col1;
-			float4 _Col2;
-			float4 _Col3;
-			float4 _Col4;*/
 		CBUFFER_END
 
 		struct appdata
@@ -125,7 +121,7 @@ Shader "PostProcessing/Magic"
 			#pragma vertex vert
 			#pragma fragment frag_magic
 
-			float4 frag_magic(v2f input) : SV_Target
+			float4 GetMagicColor(v2f input)
 			{
 				if(_Diamondize == 1)
 				{
@@ -138,42 +134,40 @@ Shader "PostProcessing/Magic"
 
 				float4 col = tex2D(_MainTex, input.uv);
 				float lum = col.x;
-				//if (lum < _Threshold)
+	
+				lum = remap(_MinRemap, _MaxRemap, 0., 1., lum);
+
+				lum = pow(abs(lum), _LumPow);
+				float invCount = 1 / (float)_ColArrayCount;
+
+				int iterationCount = _ColArrayCount - _UseDither;
+
+				for (int i = 0; i < iterationCount; i++)
 				{
-					//return 0;
-				}
-				//else
-				{
-					lum = remap(_MinRemap, _MaxRemap, 0., 1., lum);
-
-					lum = pow(lum, _LumPow);
-					float invCount = 1 / (float)_ColArrayCount;
-
-					int iterationCount = _ColArrayCount - _UseDither;
-
-					for (int i = 0; i < iterationCount; i++)
+					float threshold = 1. - ((float)i + 1.) * invCount;
+					if (lum > threshold)
 					{
-						float threshold = 1. - ((float)i + 1.) * invCount;
-						if (lum > threshold)
+						if (_UseDither == 1)
 						{
-							if (_UseDither == 1)
-							{
-								float ditherValue = remap(threshold, threshold + invCount, 0, 1, lum);
-								int i0 = i;
-								int i1 = i + 1;
-								bool sampleDither = sampleDither4x4(ditherValue, (int2)(input.uv  * _Quantize));
-								return sampleDither ? _ColArray[i1] : _ColArray[i0];
-							}
-							else
-							{
-								return _ColArray[i];
-							}
+							float ditherValue = remap(threshold, threshold + invCount, 0, 1, lum);
+							int i0 = i;
+							int i1 = i + 1;
+							bool sampleDither = sampleDither4x4(ditherValue, (int2)(input.uv  * _Quantize));
+							return sampleDither ? _ColArray[i1] : _ColArray[i0];
 						}
-		
+						else
+						{
+							return _ColArray[i];
+						}
 					}
+	
 				}
-
 				return col;
+			}
+
+			float4 frag_magic(v2f input) : SV_Target
+			{
+				return GetMagicColor(input);
 			}
             ENDHLSL
         }

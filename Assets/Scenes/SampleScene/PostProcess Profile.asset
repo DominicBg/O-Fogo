@@ -41,6 +41,7 @@ MonoBehaviour:
   m_Name: PostProcess Profile
   m_EditorClassIdentifier: 
   components:
+  - {fileID: 7117311051929835630}
   - {fileID: 3946406993011049063}
   - {fileID: 3900579633801875675}
   - {fileID: 8367976965437951557}
@@ -59,7 +60,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5485954d14dfb9a4c8ead8edb0ded5b1, type: 3}
   m_Name: LiftGammaGain
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   lift:
     m_OverrideState: 1
     m_Value: {x: 1, y: 0.79546636, z: 0.9794533, w: 0}
@@ -93,7 +94,7 @@ MonoBehaviour:
     m_Value: 0.59
   quantize:
     m_OverrideState: 1
-    m_Value: 300
+    m_Value: 200
   useDither:
     m_OverrideState: 1
     m_Value: 1
@@ -114,13 +115,13 @@ MonoBehaviour:
     m_Value: {r: 1, g: 0.3806531, b: 0, a: 1}
   col3:
     m_OverrideState: 1
-    m_Value: {r: 0.9056604, g: 0.19964409, b: 0.020505492, a: 1}
+    m_Value: {r: 1, g: 0.20353982, b: 0, a: 1}
   col4:
     m_OverrideState: 1
-    m_Value: {r: 0.27450982, g: 0.0026848966, b: 0, a: 1}
+    m_Value: {r: 0.20754719, g: 0.025514653, b: 0.0223211, a: 1}
   col5:
     m_OverrideState: 1
-    m_Value: {r: 0.18039216, g: 0, b: 0.029164469, a: 1}
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
   col6:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}
@@ -165,6 +166,22 @@ MonoBehaviour:
   mode:
     m_OverrideState: 1
     m_Value: 2
+--- !u!114 &7117311051929835630
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d96efc81c2193f4fade53a9350f921d, type: 3}
+  m_Name: FrameBlurSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  blend:
+    m_OverrideState: 1
+    m_Value: 0.202
 --- !u!114 &8367976965437951557
 MonoBehaviour:
   m_ObjectHideFlags: 3
