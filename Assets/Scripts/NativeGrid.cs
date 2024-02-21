@@ -9,6 +9,7 @@ namespace OFogo
         int2 size;
 
         public int2 Size => size;
+        public bool IsCreated => nativeHashingGrid.IsCreated;
 
         public NativeGrid(int2 size, Allocator allocator)
         {
@@ -16,7 +17,7 @@ namespace OFogo
             nativeHashingGrid = new NativeArray<T>(size.x * size.y, allocator);
         }
 
-        int ToIndex(int2 pos) => pos.y * size.x + pos.x;
+        public int ToIndex(int2 pos) => pos.y * size.x + pos.x;
 
         public T this[int2 pos]
         {

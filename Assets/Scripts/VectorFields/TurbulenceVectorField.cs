@@ -3,7 +3,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class TurbulenceVectorField : VectorFieldGenerator
+public class TurbulenceVectorField : SimpleVectorFieldGenerator
 {
     [SerializeField] float scale;
     [SerializeField] float strength;
