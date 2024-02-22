@@ -8,6 +8,7 @@ namespace OFogo
     {
         bool requestWipe;
         bool requestSmooth;
+        bool requestNormalize;
         bool isStrokeFinised;
 
         NativeList<float3> stroke;
@@ -97,6 +98,25 @@ namespace OFogo
                 }
                 requestSmooth = false;
             }
+
+            if (requestNormalize)
+            {
+                for (int x = 0; x < vectorField.Size.x; x++)
+                {
+                    for (int y = 0; y < vectorField.Size.y; y++)
+                    {
+                        if(math.lengthsq(vectorField[x, y]) < 0.001)
+                        {
+                            vectorField[x, y] = 0;
+                        }
+                        else
+                        { 
+                            vectorField[x, y] = math.normalize(vectorField[x, y]);
+                        }
+                    }
+                }
+                requestNormalize = false;
+            }
         }
 
         private void Update()
@@ -139,6 +159,10 @@ namespace OFogo
             if (Input.GetKeyDown(KeyCode.C))
             {
                 requestSmooth = true;
+            }
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                requestNormalize = true;
             }
             DebugStroke();
         }

@@ -290,7 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 583c7e80a5c51ab419e95570952775d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snapShot: {fileID: 11400000, guid: 47c1e36908e654747bd1a3a6c010f615, type: 2}
+  snapShot: {fileID: 11400000, guid: a4b56b7ba6d975a439738df973ce369f, type: 2}
 --- !u!1 &574612066
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,6 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   force: -1
+  angle: 0
 --- !u!1 &655174613
 GameObject:
   m_ObjectHideFlags: 0
@@ -5516,6 +5517,7 @@ MonoBehaviour:
   - {fileID: 2005421256}
   - {fileID: 574612068}
   - {fileID: 1561617337}
+  - {fileID: 460166900}
   morphSpeed: 0.5
   timeOffset: 0
   forceMultiplier: 1
@@ -5702,7 +5704,7 @@ MonoBehaviour:
   vectorFieldSize:
     x: 35
     y: 35
-  vectorFieldGenerator: {fileID: 1294766511}
+  vectorFieldGenerator: {fileID: 32407747}
   settings:
     integrationType: 1
     simulationBound:
@@ -5728,6 +5730,7 @@ MonoBehaviour:
     heatAtBottomNoiseSpeed: 1
     minParticleSize: 0.05
     maxParticleSize: 0.4
+  debugRayDist: 0.2
 --- !u!4 &2054115753
 Transform:
   m_ObjectHideFlags: 0

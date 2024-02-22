@@ -21,6 +21,7 @@ namespace OFogo
         [SerializeField] int2 vectorFieldSize = 35;
         [SerializeField] VectorFieldGenerator vectorFieldGenerator;
         [SerializeField] SimulationSettings settings;
+        [SerializeField] float debugRayDist = 5;
 
         Unity.Mathematics.Random rng;
         public NativeGrid<float3> vectorField;
@@ -526,7 +527,7 @@ namespace OFogo
                     float3 t = new float3(pos, 0);
                     float3 gridCenter = math.lerp(min, max, t);
                     float3 force = vectorField[x, y];
-                    Debug.DrawRay(gridCenter, force * 0.2f, Color.white);
+                    Debug.DrawRay(gridCenter, force * debugRayDist, Color.white);
                 }
             }
         }
