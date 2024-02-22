@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OFogo
 {
-    public class SerializedVectorField : ScriptableObject
+    public class VectorFieldSnapshot : ScriptableObject
     {
         public int2 size;
         public float3[] vectors;

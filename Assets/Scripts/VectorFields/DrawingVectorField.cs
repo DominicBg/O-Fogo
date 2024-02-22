@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OFogo
 {
-    public class DrawingVectorField : SimpleVectorFieldGenerator
+    public class DrawingVectorField : VectorFieldGenerator
     {
         bool requestWipe;
         bool requestSmooth;

@@ -18,11 +18,12 @@ namespace OFogo
         [SerializeField] bool parallelCollision;
 
         [SerializeField] FogoRenderer fogoRenderer;
+        [SerializeField] int2 vectorFieldSize = 35;
         [SerializeField] VectorFieldGenerator vectorFieldGenerator;
         [SerializeField] SimulationSettings settings;
 
         Unity.Mathematics.Random rng;
-        NativeGrid<float3> vectorField;
+        public NativeGrid<float3> vectorField;
 
         public struct FireParticleCollision
         {
@@ -82,7 +83,7 @@ namespace OFogo
             }
             fogoRenderer.Init(particleCount);
             vectorFieldGenerator.Init();
-            vectorField = vectorFieldGenerator.CreateVectorField(in settings.simulationBound);
+            vectorField = vectorFieldGenerator.CreateVectorField(vectorFieldSize, in settings.simulationBound);
         }
 
         private int GetMaxCollisionCount()
@@ -134,7 +135,7 @@ namespace OFogo
                 fireParticle.temperature = math.max(fireParticle.temperature, 0f);
 
                 float heightSmoothStep = 1f - math.smoothstep(minSimulationY, minSimulationY + settings.heatAtBottomRange, fireParticle.position.y);
-
+                
                 if (settings.heatAtBottomNoiseRatio > 0)
                 {
                     float heatNoise = noise.cnoise(new float2(time, fireParticle.position.x * settings.heatAtBottomNoiseSize));
@@ -148,8 +149,18 @@ namespace OFogo
                 fireParticle.radius = math.lerp(settings.minParticleSize, settings.maxParticleSize, fireParticle.temperature / settings.maxTemperature);
 
                 float3 heatTurbulence = vectorField[HashPosition(fireParticle.position, settings.simulationBound, vectorField.Size)];
-                float3 acceleration = math.up() * (settings.fireGravity + fireParticle.temperature * settings.temperatureUpwardForce);
-                acceleration += heatTurbulence;
+                float3 acceleration = 0;
+
+                if (settings.useVectorFieldAsGravity)
+                {
+                    acceleration += heatTurbulence * (settings.fireGravity + fireParticle.temperature * settings.temperatureUpwardForce);
+                }
+                else
+                {
+                    acceleration += math.up() * (settings.fireGravity + fireParticle.temperature * settings.temperatureUpwardForce);
+                    acceleration += heatTurbulence;
+                }
+
 
                 switch (settings.integrationType)
                 {
@@ -198,7 +209,6 @@ namespace OFogo
             public void Execute(int index)
             {
                 NativeList<FireParticleCollision> collisionBuffer = new NativeList<FireParticleCollision>(16, Allocator.Temp);
-                //HashParticle(fireParticles[index].position, in settings, out int2 hash);
                 int2 hash = HashPosition(fireParticles[index].position, in settings.simulationBound, settings.hashingGridLength);
 
                 for (int x = -1; x <= 1; x++)
@@ -231,7 +241,6 @@ namespace OFogo
                 NativeList<FireParticleCollision> collisionBuffer = new NativeList<FireParticleCollision>(16, Allocator.Temp);
                 for (int i = 0; i < fireParticles.Length; i++)
                 {
-                    //HashParticle(fireParticles[i].position, in settings, out int2 hash);
                     int2 hash = HashPosition(fireParticles[i].position, in settings.simulationBound, settings.hashingGridLength);
 
                     for (int x = -1; x <= 1; x++)
@@ -356,7 +365,6 @@ namespace OFogo
             }
             for (int i = 0; i < fireParticles.Length; i++)
             {
-                //HashParticle(fireParticles[i].position, in settings, out int2 hash);
                 int2 hash = HashPosition(fireParticles[i].position, in settings.simulationBound, settings.hashingGridLength);
 
                 hashingGrid[hash.x, hash.y].Add(i);
@@ -438,16 +446,6 @@ namespace OFogo
             }
         }
 
-        //[BurstCompile]
-        //public static void HashParticle(in float3 position, in SimulationSettings settings, out int2 hash)
-        //{
-        //    float3 min = settings.simulationBound.min;
-        //    float3 max = settings.simulationBound.max;
-        //    float3 positionClamp = math.clamp(position, min, max);
-        //    float3 t = math.unlerp(min, max, positionClamp);
-        //    hash = math.clamp((int2)(t.xy * settings.hashingGridLength), 0, settings.hashingGridLength - 1);
-        //}
-
         public static int2 HashPosition(in float3 position, in Bounds bounds, int2 sizes)
         {
             float3 min = bounds.min;
@@ -457,12 +455,10 @@ namespace OFogo
             return math.clamp((int2)(t.xy * sizes), 0, sizes - 1);
         }
 
-
         public static int2 quantize(int2 v, int2 cellSize)
         {
             return new int2(math.floor(v / (float2)cellSize));
         }
-
 
         public static void ApplyConstraintBounce(ref FireParticle fireParticles, in SimulationSettings settings)
         {

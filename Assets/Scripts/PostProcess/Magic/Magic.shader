@@ -19,8 +19,6 @@ Shader "PostProcessing/Magic"
 
 		#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-		#define E 2.71828f
-
 		sampler2D _MainTex;
 
 		CBUFFER_START(UnityPerMaterial)

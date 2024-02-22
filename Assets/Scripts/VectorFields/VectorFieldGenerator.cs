@@ -8,7 +8,10 @@ namespace OFogo
     {
         public virtual void Init() { }
         public virtual void Dispose() { }
-        public abstract NativeGrid<float3> CreateVectorField(in Bounds bounds, Allocator allocator = Allocator.Persistent);
+        public virtual NativeGrid<float3> CreateVectorField(int2 size, in Bounds bounds, Allocator allocator = Allocator.Persistent)
+        {
+            return new NativeGrid<float3>(size, allocator);
+        }
         public abstract void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds);
     }
 }

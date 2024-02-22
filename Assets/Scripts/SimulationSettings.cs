@@ -16,6 +16,7 @@ namespace OFogo
         public float colisionVelocityResolution;
         public float maxSpeed;
         public float wallBounceIntensity;
+        public bool useVectorFieldAsGravity;
 
         [Header("Heat")]
         public float fireGravity;

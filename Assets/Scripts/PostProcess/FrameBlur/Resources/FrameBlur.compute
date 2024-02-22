@@ -7,6 +7,5 @@ float _Blend;
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    //_SourceTexture[id.xy] = _SourceTexture[id.xy] * 0.5;
     _CacheTexture[id.xy] = lerp(_CacheTexture[id.xy], _SourceTexture[id.xy], _Blend);
 }

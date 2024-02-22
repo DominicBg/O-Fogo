@@ -6,12 +6,13 @@ namespace OFogo
 {
     public class MorphingVectorField : VectorFieldGenerator
     {
-        [SerializeField] SerializedVectorField[] fields;
+        [SerializeField] VectorFieldGenerator[] fields;
         [SerializeField] float morphSpeed = 0.5f;
         [SerializeField] float timeOffset;
         [SerializeField] float forceMultiplier = 1;
+
         NativeGrid<float3>[] vectorFields;
-        int2 size;
+
         public override void Init()
         {
             base.Init();
@@ -22,22 +23,23 @@ namespace OFogo
                 Debug.LogError(nameof(fields) + " can't be null.");
                 return;
             }
-
-            size = fields[0].size;
-            for (int i = 0; i < fields.Length; i++)
-            {
-                vectorFields[i] = fields[i].Deserialize(Allocator.Persistent);
-                if (math.any(vectorFields[i].Size != size))
-                {
-                    Debug.LogError("Vector fields aren't the same size.");
-                    return;
-                }
-            }
         }
 
-        public override NativeGrid<float3> CreateVectorField(in Bounds bounds, Allocator allocator = Allocator.Persistent)
+        public override NativeGrid<float3> CreateVectorField(int2 size, in Bounds bounds, Allocator allocator = Allocator.Persistent)
         {
-            return new NativeGrid<float3>(size, allocator);
+            vectorFields[0] = fields[0].CreateVectorField(size, in bounds, allocator);
+            size = vectorFields[0].Size;
+
+            for (int i = 1; i < fields.Length; i++)
+            {
+                vectorFields[i] = fields[i].CreateVectorField(size, in bounds, allocator);
+                if (math.any(vectorFields[i].Size != size))
+                {
+                    Debug.LogError("Vector fields aren't the same size. Will cause errors");
+                }
+            }
+
+            return base.CreateVectorField(size, bounds, allocator);
         }
 
         public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds)
@@ -50,6 +52,9 @@ namespace OFogo
 
             NativeGrid<float3> v1 = vectorFields[currentIndex];
             NativeGrid<float3> v2 = vectorFields[nextIndex];
+
+            fields[currentIndex].UpdateVectorField(ref v1, in bounds);
+            fields[nextIndex].UpdateVectorField(ref v2, in bounds);
 
             for (int x = 0; x < v1.Size.x; x++)
             {
