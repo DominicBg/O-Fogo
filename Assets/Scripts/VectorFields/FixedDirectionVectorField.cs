@@ -8,6 +8,7 @@ namespace OFogo
 
         public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds)
         {
+            //todo optim this 
             foreach(int2 pos in vectorField.GetIterator())
             {
                 vectorField[pos] = force;

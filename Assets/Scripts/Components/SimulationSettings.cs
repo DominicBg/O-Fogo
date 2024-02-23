@@ -24,15 +24,9 @@ namespace OFogo
         public float temperatureUpwardForce;
         public float maxTemperature;
         public float heatTransferPercent;
+        public float heatingPerSec;
 
-        [Header("Bottom heat")]
-        public float heatAtBottomRange;
-        public float heatAtBottomPerSec;
-        [Range(0, 1)]
-        public float heatAtBottomNoiseRatio;
-        public float heatAtBottomNoiseSize;
-        public float heatAtBottomNoiseSpeed;
-
+        [Header("Particles")]
         public float minParticleSize;
         public float maxParticleSize;
     }

@@ -52,7 +52,7 @@ namespace OFogo
             {
                 for (int i = 1; i < stroke.Length; i++)
                 {
-                    int2 hashPos = FogoSimulator.HashPosition(stroke[i], bounds, vectorField.Size);
+                    int2 hashPos = OFogoHelper.HashPosition(stroke[i], bounds, vectorField.Size);
                     float3 delta = stroke[i] - stroke[i - 1];
                     vectorField[hashPos] += delta * strength;
                 }

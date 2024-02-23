@@ -347,7 +347,7 @@ GameObject:
   m_Component:
   - component: {fileID: 655174614}
   m_Layer: 0
-  m_Name: VectorField
+  m_Name: VectorFields
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5521,6 +5521,87 @@ MonoBehaviour:
   morphSpeed: 0.5
   timeOffset: 0
   forceMultiplier: 1
+--- !u!1 &1442316740
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1442316741}
+  m_Layer: 0
+  m_Name: Calentadores
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1442316741
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442316740}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.944043, y: 3.5545208, z: 9.298527}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1532565391}
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1532565390
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1532565391}
+  - component: {fileID: 1532565392}
+  m_Layer: 0
+  m_Name: El Piso Es Lava
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1532565391
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532565390}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1442316741}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1532565392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532565390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6eed62fa4657cd6448917985990fa1ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  heatSettings:
+    heatAtBottomHeight: 0.5
+    heatAtBottomNoiseRatio: 0.5
+    heatAtBottomNoiseSize: 1
+    heatAtBottomNoiseSpeed: 1
 --- !u!1 &1561617335
 GameObject:
   m_ObjectHideFlags: 0
@@ -5700,11 +5781,12 @@ MonoBehaviour:
   substeps: 6
   simulationSpeed: 2
   parallelCollision: 1
-  fogoRenderer: {fileID: 305926068}
   vectorFieldSize:
     x: 35
     y: 35
-  vectorFieldGenerator: {fileID: 32407747}
+  calentador: {fileID: 1532565392}
+  vectorFieldGenerator: {fileID: 1294766511}
+  fogoRenderer: {fileID: 305926068}
   settings:
     integrationType: 1
     simulationBound:
@@ -5723,11 +5805,7 @@ MonoBehaviour:
     temperatureUpwardForce: 18.5
     maxTemperature: 15
     heatTransferPercent: 0.5
-    heatAtBottomRange: 0.8
-    heatAtBottomPerSec: 102.8
-    heatAtBottomNoiseRatio: 0.796
-    heatAtBottomNoiseSize: 1
-    heatAtBottomNoiseSpeed: 1
+    heatingPerSec: 0
     minParticleSize: 0.05
     maxParticleSize: 0.4
   debugRayDist: 0.2
