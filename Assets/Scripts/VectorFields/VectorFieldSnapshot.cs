@@ -17,7 +17,7 @@ namespace OFogo
             {
                 for (int y = 0; y < vectorField.Size.y; y++)
                 {
-                    vectors[vectorField.ToIndex(new int2(x, y))] = vectorField[x, y];
+                    vectors[vectorField.PosToIndex(new int2(x, y))] = vectorField[x, y];
                 }
             }
         }
@@ -28,7 +28,7 @@ namespace OFogo
             {
                 for (int y = 0; y < vectorField.Size.y; y++)
                 {
-                    vectorField[x, y] = vectors[vectorField.ToIndex(new int2(x, y))];
+                    vectorField[x, y] = vectors[vectorField.PosToIndex(new int2(x, y))];
                 }
             }
             return vectorField;

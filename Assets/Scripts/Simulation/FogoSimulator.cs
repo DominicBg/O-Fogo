@@ -21,6 +21,7 @@ namespace OFogo
         [SerializeField] Calentador calentador;
         [SerializeField] VectorFieldGenerator vectorFieldGenerator;
         [SerializeField] FogoRenderer fogoRenderer;
+        [SerializeField] VectorFieldRenderer vectorFieldRenderer;
         [SerializeField] SimulationSettings settings;
         [SerializeField] float debugRayDist = 5;
 
@@ -66,8 +67,12 @@ namespace OFogo
                 fireParticles[i] = fireParticle;
             }
             fogoRenderer.Init(particleCount);
+
             vectorFieldGenerator.Init();
             vectorField = vectorFieldGenerator.CreateVectorField(vectorFieldSize, in settings.simulationBound);
+
+            vectorFieldRenderer.Init(vectorField);
+
         }
 
         private int GetMaxCollisionCount()
@@ -82,6 +87,8 @@ namespace OFogo
         void Update()
         {
             fogoRenderer.Render(in fireParticles, in settings);
+            vectorFieldRenderer.Render(in vectorField, in settings);
+
             DrawDebugBounds();
             DrawVectorField();
             calentador.DrawDebug(in simData, in settings);
@@ -223,7 +230,7 @@ namespace OFogo
             {
                 for (int y = 0; y < vectorField.Size.y; y++)
                 {
-                    float2 pos = new float2(x, y) * invSize;
+                    float2 pos = new float2(x + 0.5f, y + 0.5f) * invSize;
                     float3 t = new float3(pos, 0);
                     float3 gridCenter = math.lerp(min, max, t);
                     float3 force = vectorField[x, y];
@@ -235,6 +242,7 @@ namespace OFogo
         {
             vectorFieldGenerator.Dispose();
             fogoRenderer.Dispose();
+            vectorFieldRenderer.Dispose();
 
             if (fireParticles.IsCreated)
             {
@@ -245,7 +253,6 @@ namespace OFogo
                 {
                     for (int y = 0; y < settings.hashingGridLength.y; y++)
                     {
-                        //hashingGrid[x, y].Dispose();
                         nativeHashingGrid[x, y].Dispose();
                     }
                 }

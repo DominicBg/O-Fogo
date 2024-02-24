@@ -11,6 +11,7 @@ namespace OFogo
         int2 size;
 
         public int2 Size => size;
+        public int TotalLength => size.x * size.y;
         public bool IsCreated => nativeHashingGrid.IsCreated;
 
         public NativeGrid(int2 size, Allocator allocator)
@@ -19,18 +20,26 @@ namespace OFogo
             nativeHashingGrid = new NativeArray<T>(size.x * size.y, allocator);
         }
 
-        public int ToIndex(int2 pos) => pos.y * size.x + pos.x;
+        public int PosToIndex(int2 pos) => pos.y * size.x + pos.x;
+        public int2 IndexToPos(int index) => new int2(index % size.x, index / size.x);
 
         public T this[int2 pos]
         {
-            get { return nativeHashingGrid[ToIndex(pos)]; }
-            set { nativeHashingGrid[ToIndex(pos)] = value; }
+            get { return nativeHashingGrid[PosToIndex(pos)]; }
+            set { nativeHashingGrid[PosToIndex(pos)] = value; }
         }
         public T this[int x, int y]
         {
-            get { return nativeHashingGrid[ToIndex(new int2(x, y))]; }
-            set { nativeHashingGrid[ToIndex(new int2(x, y))] = value; }
+            get { return nativeHashingGrid[PosToIndex(new int2(x, y))]; }
+            set { nativeHashingGrid[PosToIndex(new int2(x, y))] = value; }
         }
+
+        public T this[int i]
+        {
+            get { return nativeHashingGrid[i]; }
+            set { nativeHashingGrid[i] = value; }
+        }
+
 
         public void Dispose()
         {

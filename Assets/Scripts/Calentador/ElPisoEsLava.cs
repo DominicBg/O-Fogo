@@ -8,14 +8,6 @@ namespace OFogo
 {
     public class ElPisoEsLava : Calentador
     {
-        public HeatSettings heatSettings = new HeatSettings()
-        {
-            heatAtBottomHeight = 0.5f,
-            heatAtBottomNoiseRatio = 0.5f,
-            heatAtBottomNoiseSize = 1,
-            heatAtBottomNoiseSpeed = 1,
-        };
-
         [System.Serializable]
         public struct HeatSettings
         {
@@ -25,6 +17,14 @@ namespace OFogo
             public float heatAtBottomNoiseSize;
             public float heatAtBottomNoiseSpeed;
         }
+
+        public HeatSettings heatSettings = new HeatSettings()
+        {
+            heatAtBottomHeight = 0.5f,
+            heatAtBottomNoiseRatio = 0.5f,
+            heatAtBottomNoiseSize = 1,
+            heatAtBottomNoiseSpeed = 1,
+        };
 
         public override void HeatParticles(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in SimulationSettings settings)
         {
@@ -38,7 +38,7 @@ namespace OFogo
         }
 
         [BurstCompile]
-        public struct ElPisoEsLavaJob : IJobParallelFor, ICalentadorJobParralel
+        public struct ElPisoEsLavaJob : IJobParallelFor, ICalentador
         {
             public SimulationData simData;
             public NativeArray<FireParticle> fireParticles;

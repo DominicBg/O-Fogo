@@ -21,8 +21,6 @@ namespace OFogo
 
             fireParticle.temperature -= settings.temperatureDropPerSec * simulationData.dt;
             fireParticle.temperature = math.clamp(fireParticle.temperature, 0, settings.maxTemperature);
-
-
             fireParticle.radius = math.lerp(settings.minParticleSize, settings.maxParticleSize, fireParticle.temperature / settings.maxTemperature);
 
             float3 heatTurbulence = vectorField[OFogoHelper.HashPosition(fireParticle.position, settings.simulationBound, vectorField.Size)];
@@ -37,7 +35,6 @@ namespace OFogo
                 acceleration += math.up() * (settings.fireGravity + fireParticle.temperature * settings.temperatureUpwardForce);
                 acceleration += heatTurbulence;
             }
-
 
             switch (settings.integrationType)
             {

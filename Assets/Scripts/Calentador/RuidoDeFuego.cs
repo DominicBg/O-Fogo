@@ -4,7 +4,7 @@ using Unity.Collections;
 namespace OFogo
 {
     [BurstCompile]
-    public struct RuidoDeFuego : ICalentadorJobParralel
+    public struct RuidoDeFuego : ICalentador
     {
         public NativeArray<FireParticle> fireParticles;
         public SimulationSettings settings;
