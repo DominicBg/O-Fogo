@@ -11,22 +11,20 @@ namespace OFogo
         [SerializeField] float timeOffset;
         [SerializeField] float forceMultiplier = 1;
 
+        [SerializeField] MagicController hackParceQueJmenCriss;
+
         NativeGrid<float3>[] vectorFields;
 
-        public override void Init()
+        public override NativeGrid<float3> CreateVectorField(int2 size, in Bounds bounds, Allocator allocator = Allocator.Persistent)
         {
-            base.Init();
             vectorFields = new NativeGrid<float3>[fields.Length];
 
             if (fields.Length == 0)
             {
                 Debug.LogError(nameof(fields) + " can't be null.");
-                return;
+                return default;
             }
-        }
 
-        public override NativeGrid<float3> CreateVectorField(int2 size, in Bounds bounds, Allocator allocator = Allocator.Persistent)
-        {
             vectorFields[0] = fields[0].CreateVectorField(size, in bounds, allocator);
             size = vectorFields[0].Size;
 
@@ -63,6 +61,8 @@ namespace OFogo
                     vectorField[x, y] = math.lerp(v1[x, y], v2[x, y], t) * forceMultiplier;
                 }
             }
+
+            hackParceQueJmenCriss?.LerpGradient(currentIndex, nextIndex, t);
         }
 
         public override void Dispose()

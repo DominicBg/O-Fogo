@@ -1,5 +1,33 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-3178046139336137060
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bd0fd610d5cbb14488ad6329a38aab9, type: 3}
+  m_Name: HeatEffectSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  blend:
+    m_OverrideState: 1
+    m_Value: 0.202
+  sinAmplitude:
+    m_OverrideState: 1
+    m_Value: {x: 0.01, y: 107.6}
+  sinFrequency:
+    m_OverrideState: 1
+    m_Value: {x: 5, y: 7.26}
+  waveEffect:
+    m_OverrideState: 1
+    m_Value: {x: 26.44, y: 2.67}
+  verticalScroll:
+    m_OverrideState: 1
+    m_Value: 100
 --- !u!114 &-3170939189557537221
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -45,6 +73,7 @@ MonoBehaviour:
   - {fileID: 3946406993011049063}
   - {fileID: 3900579633801875675}
   - {fileID: 8367976965437951557}
+  - {fileID: -3178046139336137060}
   - {fileID: 5377890408480631067}
   - {fileID: -3170939189557537221}
   - {fileID: 1682172432939191772}

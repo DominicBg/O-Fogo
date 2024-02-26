@@ -3,9 +3,6 @@ Shader "PostProcessing/Magic"
     Properties
     {
 		_MainTex("Texture", 2D) = "white" {}
-		_MainTexBlur("Texture", 2D) = "white" {}
-		_Spread("Standard Deviation (Spread)", Float) = 0
-		_GridSize("Grid Size", Integer) = 1
     }
     SubShader
     {

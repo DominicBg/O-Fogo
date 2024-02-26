@@ -18,36 +18,21 @@ namespace OFogo
         [SerializeField] float sampleInterval = 0.1f;
         float currentSampleInterval;
 
-        NativeGrid<float3> tempVectorField;
-        public NativeGrid<float3> vectorFieldCopy; //nasty
-
-        public override void Init()
-        {
-            base.Init();
-            stroke = new NativeList<float3>(100, Allocator.Persistent);
-        }
-
         public override void Dispose()
         {
             base.Dispose();
             stroke.Dispose();
         }
 
+        public override NativeGrid<float3> CreateVectorField(int2 size, in Bounds bounds, Allocator allocator = Allocator.Persistent)
+        {
+            stroke = new NativeList<float3>(100, Allocator.Persistent);
+
+            return base.CreateVectorField(size, bounds, allocator);
+        }
+
         public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds)
         {
-            vectorFieldCopy = vectorField;
-            if (tempVectorField.IsCreated)
-            {
-                for (int x = 0; x < vectorField.Size.x; x++)
-                {
-                    for (int y = 0; y < vectorField.Size.y; y++)
-                    {
-                        vectorField[x, y] = tempVectorField[x, y];
-                    }
-                }
-                tempVectorField.Dispose();
-            }
-
             if (stroke.Length > 0 && isStrokeFinised)
             {
                 for (int i = 1; i < stroke.Length; i++)
@@ -173,11 +158,6 @@ namespace OFogo
             {
                 Debug.DrawLine(stroke[i], stroke[i - 1], Color.white);
             }
-        }
-
-        public void ImposeVectorField(NativeGrid<float3> tempVectorField)
-        {
-            this.tempVectorField = tempVectorField;
         }
     }
 }

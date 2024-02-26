@@ -11,7 +11,6 @@ namespace OFogo
         public NativeArray<FireParticle> fireParticles;
         public NativeList<FireParticleCollision> fireParticleCollisionPair;
         public SimulationSettings settings;
-        public int subSteps;
 
         public void Execute()
         {
@@ -23,7 +22,7 @@ namespace OFogo
 
                 float tempA = particleA.temperature;
                 float tempB = particleB.temperature;
-                float t = settings.heatTransferPercent / subSteps;
+                float t = settings.heatTransferPercent;
                 particleA.temperature = math.lerp(tempA, tempB, t);
                 particleB.temperature = math.lerp(tempB, tempA, t);
 

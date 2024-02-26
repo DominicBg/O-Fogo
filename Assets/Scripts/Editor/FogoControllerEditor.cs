@@ -6,19 +6,18 @@ using System.Collections.Generic;
 
 namespace OFogo
 {
-    [CustomEditor(typeof(FogoSimulator))]
-    public class FogoSimulatorEditor : Editor
+    [CustomEditor(typeof(OFogoController))]
+    public class FogoControllerEditor : Editor
     {
         const string k_fileName = "VectorField";
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
-            var fogoSimulator = (FogoSimulator)target;
+            var fogoController = (OFogoController)target;
 
-            //fileName = EditorGUILayout.TextField("Save File Name", fileName);
             if (GUILayout.Button("Save VectorField"))
             {
-                CreateAsset(fogoSimulator.vectorField, k_fileName + GetNextVectorFieldIndex());
+                CreateAsset(fogoController.VectorField, k_fileName + GetNextVectorFieldIndex());
             }
 
             string[] guids = GetSnapshotGuids();
@@ -29,10 +28,10 @@ namespace OFogo
                 if (GUILayout.Button("Load " + fileName))
                 {
                     var serializedVectorField = AssetDatabase.LoadAssetAtPath<VectorFieldSnapshot>(assetPath);
-                    if (fogoSimulator.vectorField.IsCreated)
-                        fogoSimulator.vectorField.Dispose();
+                    if (fogoController.VectorField.IsCreated)
+                        fogoController.VectorField.Dispose();
 
-                    fogoSimulator.vectorField = serializedVectorField.Deserialize(Unity.Collections.Allocator.Persistent);
+                    fogoController.VectorField = serializedVectorField.Deserialize(Unity.Collections.Allocator.Persistent);
                 }
             }
         }

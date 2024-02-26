@@ -8,32 +8,22 @@ using UnityEngine;
 namespace OFogo
 {
     [BurstCompile]
-    public class FogoSimulator : MonoBehaviour
+    public class OFogoSimulator : MonoBehaviour
     {
-        [SerializeField] float initialSpacing = 0.5f; //move initiation in interface?
-        [SerializeField] int particleCount;
-        [SerializeField] uint seed = 43243215;
-        [SerializeField] int substeps = 4;
-        [SerializeField] float simulationSpeed = 1;
-        [SerializeField] bool parallelCollision;
+        public float initialSpacing = 0.5f;
+        public int particleCount;
+        public uint seed = 43243215;
+        public bool parallelCollision;
 
-        [SerializeField] int2 vectorFieldSize = 35;
-        [SerializeField] Calentador calentador;
-        [SerializeField] VectorFieldGenerator vectorFieldGenerator;
-        [SerializeField] FogoRenderer fogoRenderer;
-        [SerializeField] VectorFieldRenderer vectorFieldRenderer;
-        [SerializeField] SimulationSettings settings;
-        [SerializeField] float debugRayDist = 5;
-
-        //public for the editor lol, this is stupid
+        public SimulationSettings settings;
         public NativeGrid<float3> vectorField;
-        NativeArray<FireParticle> fireParticles;
+        public NativeArray<FireParticle> fireParticles;
+
         NativeList<FireParticleCollision> fireParticleCollisionPair;
         NativeGrid<UnsafeList<int>> nativeHashingGrid;
-        SimulationData simData;
         Unity.Mathematics.Random rng;
 
-        void Start()
+        public void Init()
         {
             rng = Unity.Mathematics.Random.CreateFromIndex(seed);
 
@@ -66,13 +56,6 @@ namespace OFogo
                 };
                 fireParticles[i] = fireParticle;
             }
-            fogoRenderer.Init(particleCount);
-
-            vectorFieldGenerator.Init();
-            vectorField = vectorFieldGenerator.CreateVectorField(vectorFieldSize, in settings.simulationBound);
-
-            vectorFieldRenderer.Init(vectorField);
-
         }
 
         private int GetMaxCollisionCount()
@@ -84,37 +67,13 @@ namespace OFogo
             return (particleCount * (particleCount - 1)) / 2;
         }
 
-        void Update()
+        public void TickSimulation(in SimulationData simData)
         {
-            fogoRenderer.Render(in fireParticles, in settings);
-            vectorFieldRenderer.Render(in vectorField, in settings);
-
-            DrawDebugBounds();
-            DrawVectorField();
-            calentador.DrawDebug(in simData, in settings);
-        }
-
-        private void FixedUpdate()
-        {
-            simData = new SimulationData()
-            {
-                time = (Time.fixedDeltaTime * simulationSpeed),
-                dt = (Time.fixedDeltaTime * simulationSpeed) / substeps,
-                pos = transform.position,
-            };
-
-            vectorFieldGenerator.UpdateVectorField(ref vectorField, in settings.simulationBound);
-
-            for (int i = 0; i < substeps; i++)
-            {
-                UpdateSimulation(in simData);
-            }
+            UpdateSimulation(in simData);
         }
 
         void UpdateSimulation(in SimulationData simulationData)
         {
-            calentador.HeatParticles(in simulationData, ref fireParticles, settings);
-
             new UpdateSimulationJob()
             {
                 simulationData = simulationData,
@@ -129,7 +88,6 @@ namespace OFogo
             {
                 for (int y = 0; y < settings.hashingGridLength.y; y++)
                 {
-                    //hashingGrid[x, y].Clear();
                     var list = nativeHashingGrid[x, y];
                     list.Clear();
                     nativeHashingGrid[x, y] = list;
@@ -140,7 +98,6 @@ namespace OFogo
             {
                 int2 hash = OFogoHelper.HashPosition(fireParticles[i].position, in settings.simulationBound, settings.hashingGridLength);
 
-                //hashingGrid[hash.x, hash.y].Add(i);
                 var list = nativeHashingGrid[hash];
                 list.Add(i);
                 nativeHashingGrid[hash] = list;
@@ -182,68 +139,12 @@ namespace OFogo
                 fireParticleCollisionPair = fireParticleCollisionPair,
                 fireParticles = fireParticles,
                 settings = settings,
-                subSteps = substeps
             }.Run();
         }
 
 
-        private void DrawDebugBounds()
-        {
-            float3 min = transform.position + settings.simulationBound.min;
-            float3 max = transform.position + settings.simulationBound.max;
-            float3 bottomLeft = new float3(min.x, min.y, 0f);
-            float3 bottomRight = new float3(max.x, min.y, 0f);
-            float3 topLeft = new float3(min.x, max.y, 0f);
-            float3 topRight = new float3(max.x, max.y, 0f);
-            Debug.DrawLine(bottomLeft, topLeft, Color.white);
-            Debug.DrawLine(topLeft, topRight, Color.white);
-            Debug.DrawLine(topRight, bottomRight, Color.white);
-            Debug.DrawLine(bottomRight, bottomLeft, Color.white);
-
-            float2 invLength = 1f / (float2)settings.hashingGridLength;
-            for (int i = 0; i < settings.hashingGridLength.x; i++)
-            {
-                float yRatio = i * invLength.y;
-                float y = math.lerp(min.y, max.y, yRatio);
-                float3 start = new float3(min.x, y, min.z);
-                float3 end = new float3(max.x, y, max.z);
-                Debug.DrawLine(start, end, Color.cyan * 0.25f);
-            }
-
-            for (int i = 0; i < settings.hashingGridLength.y; i++)
-            {
-                float xRatio = i * invLength.x;
-                float x = math.lerp(min.x, max.x, xRatio);
-                float3 start = new float3(x, min.y, min.z);
-                float3 end = new float3(x, max.y, max.z);
-                Debug.DrawLine(start, end, Color.cyan * 0.25f);
-            }
-        }
-
-        private void DrawVectorField()
-        {
-            float3 min = transform.position + settings.simulationBound.min;
-            float3 max = transform.position + settings.simulationBound.max;
-
-            float2 invSize = 1f / (float2)vectorField.Size;
-            for (int x = 0; x < vectorField.Size.x; x++)
-            {
-                for (int y = 0; y < vectorField.Size.y; y++)
-                {
-                    float2 pos = new float2(x + 0.5f, y + 0.5f) * invSize;
-                    float3 t = new float3(pos, 0);
-                    float3 gridCenter = math.lerp(min, max, t);
-                    float3 force = vectorField[x, y];
-                    Debug.DrawRay(gridCenter, force * debugRayDist, Color.white);
-                }
-            }
-        }
-        private void OnDestroy()
-        {
-            vectorFieldGenerator.Dispose();
-            fogoRenderer.Dispose();
-            vectorFieldRenderer.Dispose();
-
+        public void Dispose()
+        {            
             if (fireParticles.IsCreated)
             {
                 fireParticles.Dispose();
