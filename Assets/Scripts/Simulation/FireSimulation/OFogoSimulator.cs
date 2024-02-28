@@ -18,9 +18,9 @@ namespace OFogo
         public SimulationSettings settings;
         public NativeGrid<float3> vectorField;
         public NativeArray<FireParticle> fireParticles;
+        public NativeGrid<UnsafeList<int>> nativeHashingGrid;
 
         NativeList<FireParticleCollision> fireParticleCollisionPair;
-        NativeGrid<UnsafeList<int>> nativeHashingGrid;
         Unity.Mathematics.Random rng;
 
         public void Init()
@@ -82,27 +82,9 @@ namespace OFogo
                 vectorField = vectorField
             }.Schedule(fireParticles.Length, fireParticles.Length / 16).Complete();
 
+            FillHashGrid();
+
             fireParticleCollisionPair.Clear();
-
-            for (int x = 0; x < settings.hashingGridLength.x; x++)
-            {
-                for (int y = 0; y < settings.hashingGridLength.y; y++)
-                {
-                    var list = nativeHashingGrid[x, y];
-                    list.Clear();
-                    nativeHashingGrid[x, y] = list;
-                }
-            }
-
-            for (int i = 0; i < fireParticles.Length; i++)
-            {
-                int2 hash = OFogoHelper.HashPosition(fireParticles[i].position, in settings.simulationBound, settings.hashingGridLength);
-
-                var list = nativeHashingGrid[hash];
-                list.Add(i);
-                nativeHashingGrid[hash] = list;
-            }
-
             if (parallelCollision)
             {
                 new FindCollisionPairParallelJob()
@@ -133,6 +115,7 @@ namespace OFogo
                 settings = settings
             }.Run();
             rng = rngRef.Value;
+            rngRef.Dispose();
 
             new ResolveTemperatureTransferJob()
             {
@@ -142,6 +125,65 @@ namespace OFogo
             }.Run();
         }
 
+        public void FillHashGrid()
+        {
+            new FillHashGridJob()
+            {
+                fireParticles = fireParticles,
+                nativeHashingGrid = nativeHashingGrid,
+                settings = settings
+            }.Run();
+            //fireParticleCollisionPair.Clear();
+
+            //for (int x = 0; x < settings.hashingGridLength.x; x++)
+            //{
+            //    for (int y = 0; y < settings.hashingGridLength.y; y++)
+            //    {
+            //        var list = nativeHashingGrid[x, y];
+            //        list.Clear();
+            //        nativeHashingGrid[x, y] = list;
+            //    }
+            //}
+
+            //for (int i = 0; i < fireParticles.Length; i++)
+            //{
+            //    int2 hash = OFogoHelper.HashPosition(fireParticles[i].position, in settings.simulationBound, settings.hashingGridLength);
+
+            //    var list = nativeHashingGrid[hash];
+            //    list.Add(i);
+            //    nativeHashingGrid[hash] = list;
+            //}
+        }
+
+        [BurstCompile]
+        public struct FillHashGridJob : IJob
+        {
+            public NativeArray<FireParticle> fireParticles;
+            public NativeGrid<UnsafeList<int>> nativeHashingGrid;
+            public SimulationSettings settings;
+
+            public void Execute()
+            {
+                for (int x = 0; x < settings.hashingGridLength.x; x++)
+                {
+                    for (int y = 0; y < settings.hashingGridLength.y; y++)
+                    {
+                        var list = nativeHashingGrid[x, y];
+                        list.Clear();
+                        nativeHashingGrid[x, y] = list;
+                    }
+                }
+
+                for (int i = 0; i < fireParticles.Length; i++)
+                {
+                    int2 hash = OFogoHelper.HashPosition(fireParticles[i].position, in settings.simulationBound, settings.hashingGridLength);
+
+                    var list = nativeHashingGrid[hash];
+                    list.Add(i);
+                    nativeHashingGrid[hash] = list;
+                }
+            }
+        }
 
         public void Dispose()
         {            
@@ -158,6 +200,7 @@ namespace OFogo
                     }
                 }
                 nativeHashingGrid.Dispose();
+                vectorField.Dispose();
             }
         }
     }

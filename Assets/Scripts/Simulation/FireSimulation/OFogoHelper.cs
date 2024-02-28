@@ -38,10 +38,24 @@ namespace OFogo
             }
         }
 
+        public static void CheckCollisionPairAtPosition(int particleIndex,
+            in NativeArray<FireParticle> fireParticles, in NativeGrid<UnsafeList<int>> nativeHashingGrid,
+            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, int maxCollision = int.MaxValue)       
+        {
+            int2 hash = HashPosition(fireParticles[particleIndex].position, in settings.simulationBound, settings.hashingGridLength);
+
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    CheckCollisionPair(hash, particleIndex, x, y, fireParticles, nativeHashingGrid, settings, ref collisionBuffer, maxCollision);
+                }
+            }
+        }
 
         public static void CheckCollisionPair(int2 hash, int i, int x, int y,
             in NativeArray<FireParticle> fireParticles, in NativeGrid<UnsafeList<int>> nativeHashingGrid,
-            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer)
+            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, int maxCollision = int.MaxValue)
         {
             int2 pos = new int2(x + hash.x, y + hash.y);
 
@@ -62,12 +76,17 @@ namespace OFogo
                 }
 
                 float distSq = math.distancesq(fireParticles[i].position, fireParticles[j].position);
-                float radiusSqSum = OFogoHelper.Pow2(fireParticles[i].radius + fireParticles[j].radius);
+                float radiusSqSum = Pow2(fireParticles[i].radius + fireParticles[j].radius);
 
                 //precompute penetration?
                 if (distSq < radiusSqSum)
                 {
                     collisionBuffer.Add(new FireParticleCollision(i, j, distSq));
+
+                    if(collisionBuffer.Length > maxCollision)
+                    {
+                        return;
+                    }
                 }
             }
         }
