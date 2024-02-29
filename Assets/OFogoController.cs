@@ -15,6 +15,7 @@ namespace OFogo
         [SerializeField] VectorFieldRenderer vectorFieldRenderer;
 
         [Header("Simulation")]
+        [SerializeField] int numberThreadJob = 16;
         [SerializeField] int2 vectorFieldSize = 35;
         [SerializeField] float simulationSpeed = 1;
         [SerializeField] int substeps = 4;
@@ -50,6 +51,8 @@ namespace OFogo
 
         private void FixedUpdate()
         {
+            JobUtility.numberOfThread = numberThreadJob;
+
             for (int i = 0; i < substeps; i++)
             {
                 float dt = (Time.fixedDeltaTime * simulationSpeed) / substeps;

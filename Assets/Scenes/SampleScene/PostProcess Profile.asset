@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bd0fd610d5cbb14488ad6329a38aab9, type: 3}
   m_Name: HeatEffectSettings
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   blend:
     m_OverrideState: 1
     m_Value: 0.202

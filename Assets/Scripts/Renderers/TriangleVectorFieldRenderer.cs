@@ -39,7 +39,7 @@ namespace OFogo
                 maxForce = maxForce,
                 offsetRotationDeg = offsetRotationDeg,
                 baseColor = baseColor
-            }.Schedule(renderParticles.Length, renderParticles.Length / 8).Complete();
+            }.RunParralel(renderParticles.Length);
 
             ps.SetParticles(renderParticles);
         }

@@ -80,7 +80,7 @@ namespace OFogo
                 fireParticles = fireParticles,
                 settings = settings,
                 vectorField = vectorField
-            }.Schedule(fireParticles.Length, fireParticles.Length / 16).Complete();
+            }.RunParralel(fireParticles.Length);
 
             FillHashGrid();
 
@@ -93,7 +93,7 @@ namespace OFogo
                     fireParticleCollisionPair = fireParticleCollisionPair.AsParallelWriter(),
                     nativeHashingGrid = nativeHashingGrid,
                     settings = settings
-                }.Schedule(fireParticles.Length, fireParticles.Length / 16).Complete();
+                }.RunParralel(fireParticles.Length);
             }
             else
             {
@@ -133,26 +133,6 @@ namespace OFogo
                 nativeHashingGrid = nativeHashingGrid,
                 settings = settings
             }.Run();
-            //fireParticleCollisionPair.Clear();
-
-            //for (int x = 0; x < settings.hashingGridLength.x; x++)
-            //{
-            //    for (int y = 0; y < settings.hashingGridLength.y; y++)
-            //    {
-            //        var list = nativeHashingGrid[x, y];
-            //        list.Clear();
-            //        nativeHashingGrid[x, y] = list;
-            //    }
-            //}
-
-            //for (int i = 0; i < fireParticles.Length; i++)
-            //{
-            //    int2 hash = OFogoHelper.HashPosition(fireParticles[i].position, in settings.simulationBound, settings.hashingGridLength);
-
-            //    var list = nativeHashingGrid[hash];
-            //    list.Add(i);
-            //    nativeHashingGrid[hash] = list;
-            //}
         }
 
         [BurstCompile]

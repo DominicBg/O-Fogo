@@ -28,7 +28,7 @@ namespace OFogo
                 vectorField = vectorField,
                 settings = settings,
                 maxCollision = maxCollision,
-            }.Schedule(fireParticles.Length, fireParticles.Length / 16).Complete();
+            }.RunParralel(fireParticles.Length);
 
             new ParticleSimulationFindDesiredForceJob()
             {
@@ -40,14 +40,14 @@ namespace OFogo
                 separationForce = separationForce,
                 vectorField = vectorField,
                 desiredForce = desiredForce
-            }.Schedule(fireParticles.Length, fireParticles.Length / 16).Complete();
+            }.RunParralel(fireParticles.Length);
 
             new ParticleSimulationApplyDesiredForceJob()
             {
                 fireParticles = fireParticles,
                 settings = settings,
                 desiredForce = desiredForce
-            }.Schedule(fireParticles.Length, fireParticles.Length / 16).Complete();
+            }.RunParralel(fireParticles.Length);
         }
 
         public void Dispose()
@@ -134,8 +134,20 @@ namespace OFogo
                 {
                     int indexA = collisionBuffer[j].indexA;
                     int indexB = collisionBuffer[j].indexB;
-                    float dist = math.sqrt(collisionBuffer[j].distSq);
-                    float3 dir = (fireParticles[indexA].position - fireParticles[indexB].position) / dist;
+
+                    float3 dir;
+
+                    if(collisionBuffer[j].distSq < 0.001f)
+                    {
+                        var rng = Unity.Mathematics.Random.CreateFromIndex((uint)i);
+                        dir = rng.NextFloat3Direction();
+                    }
+                    else
+                    {
+                        float dist = math.sqrt(collisionBuffer[j].distSq);
+                        dir = (fireParticles[indexB].position - fireParticles[indexA].position) / dist;
+                    }
+
                     sperationDirectionSum += dir;
                 }
 
