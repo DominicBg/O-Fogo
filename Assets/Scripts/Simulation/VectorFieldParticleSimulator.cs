@@ -7,19 +7,23 @@ using UnityEngine;
 
 namespace OFogo
 {
-    public class VectorFieldParticleSimulation : MonoBehaviour
+    public class VectorFieldParticleSimulator : MonoBehaviour, IFireParticleSimulator
     {
+        public bool CanResolveCollision() => true;
+        public bool IsHandlingParticleHeating() => true;
+        public bool NeedsVectorField() => true;
+
         public float separationForce;
         public int maxCollision = 100;
 
         NativeArray<float3> desiredForce;
 
-        public void Init(int particleCount)
+        public void Init(in SimulationSettings settings)
         {
-            desiredForce = new NativeArray<float3>(particleCount, Allocator.Persistent);
+            desiredForce = new NativeArray<float3>(settings.particleCount, Allocator.Persistent);
         }
 
-        public void TickSimulation(in SimulationData simulationData, NativeArray<FireParticle> fireParticles, NativeGrid<float3> vectorField, NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
+        public void UpdateSimulation(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             new ParticleSimulationJob()
             {
@@ -29,7 +33,10 @@ namespace OFogo
                 settings = settings,
                 maxCollision = maxCollision,
             }.RunParralel(fireParticles.Length);
+        }
 
+        public void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
+        {
             new ParticleSimulationFindDesiredForceJob()
             {
                 fireParticles = fireParticles,

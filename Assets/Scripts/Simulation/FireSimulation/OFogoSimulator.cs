@@ -8,57 +8,25 @@ using UnityEngine;
 namespace OFogo
 {
     [BurstCompile]
-    public class OFogoSimulator : MonoBehaviour
+    public class OFogoSimulator : MonoBehaviour, IFireParticleSimulator
     {
-        public float initialSpacing = 0.5f;
-        public int particleCount;
+        public bool CanResolveCollision() => true;
+        public bool IsHandlingParticleHeating() => false;
+        public bool NeedsVectorField() => true;
+
         public uint seed = 43243215;
         public bool parallelCollision;
-
-        public SimulationSettings settings;
-        public NativeGrid<float3> vectorField;
-        public NativeArray<FireParticle> fireParticles;
-        public NativeGrid<UnsafeList<int>> nativeHashingGrid;
 
         NativeList<FireParticleCollision> fireParticleCollisionPair;
         Unity.Mathematics.Random rng;
 
-        public void Init()
+        public void Init(in SimulationSettings settings)
         {
             rng = Unity.Mathematics.Random.CreateFromIndex(seed);
-
-            fireParticles = new NativeArray<FireParticle>(particleCount, Allocator.Persistent);
-            fireParticleCollisionPair = new NativeList<FireParticleCollision>(GetMaxCollisionCount(), Allocator.Persistent);
-            nativeHashingGrid = new NativeGrid<UnsafeList<int>>(settings.hashingGridLength, Allocator.Persistent);
-
-            for (int x = 0; x < settings.hashingGridLength.x; x++)
-            {
-                for (int y = 0; y < settings.hashingGridLength.y; y++)
-                {
-                    nativeHashingGrid[x, y] = new UnsafeList<int>(32, Allocator.Persistent);
-                }
-            }
-
-            int particlePerCol = (int)math.sqrt(particleCount);
-            for (int i = 0; i < particleCount; i++)
-            {
-                int2 xy = new int2(i % particlePerCol, i / particlePerCol);
-                float3 pos = new float3((float2)xy * initialSpacing, 0f);
-                pos.x += (xy.y % 2 == 0) ? 0.5f * initialSpacing : 0f;
-
-                FireParticle fireParticle = new FireParticle()
-                {
-                    position = pos,
-                    prevPosition = pos,
-                    radius = settings.minParticleSize,
-                    temperature = 0,
-                    velocity = 0
-                };
-                fireParticles[i] = fireParticle;
-            }
+            fireParticleCollisionPair = new NativeList<FireParticleCollision>(GetMaxCollisionCount(settings.particleCount), Allocator.Persistent);
         }
 
-        private int GetMaxCollisionCount()
+        private int GetMaxCollisionCount(int particleCount)
         {
             // each particle can collid with every other particle n^2
             // if i hit j, we skip j hit i
@@ -67,12 +35,7 @@ namespace OFogo
             return (particleCount * (particleCount - 1)) / 2;
         }
 
-        public void TickSimulation(in SimulationData simData)
-        {
-            UpdateSimulation(in simData);
-        }
-
-        void UpdateSimulation(in SimulationData simulationData)
+        public void UpdateSimulation(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             new UpdateSimulationJob()
             {
@@ -81,9 +44,10 @@ namespace OFogo
                 settings = settings,
                 vectorField = vectorField
             }.RunParralel(fireParticles.Length);
+        }
 
-            FillHashGrid();
-
+        public void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
+        {
             fireParticleCollisionPair.Clear();
             if (parallelCollision)
             {
@@ -125,63 +89,9 @@ namespace OFogo
             }.Run();
         }
 
-        public void FillHashGrid()
-        {
-            new FillHashGridJob()
-            {
-                fireParticles = fireParticles,
-                nativeHashingGrid = nativeHashingGrid,
-                settings = settings
-            }.Run();
-        }
-
-        [BurstCompile]
-        public struct FillHashGridJob : IJob
-        {
-            public NativeArray<FireParticle> fireParticles;
-            public NativeGrid<UnsafeList<int>> nativeHashingGrid;
-            public SimulationSettings settings;
-
-            public void Execute()
-            {
-                for (int x = 0; x < settings.hashingGridLength.x; x++)
-                {
-                    for (int y = 0; y < settings.hashingGridLength.y; y++)
-                    {
-                        var list = nativeHashingGrid[x, y];
-                        list.Clear();
-                        nativeHashingGrid[x, y] = list;
-                    }
-                }
-
-                for (int i = 0; i < fireParticles.Length; i++)
-                {
-                    int2 hash = OFogoHelper.HashPosition(fireParticles[i].position, in settings.simulationBound, settings.hashingGridLength);
-
-                    var list = nativeHashingGrid[hash];
-                    list.Add(i);
-                    nativeHashingGrid[hash] = list;
-                }
-            }
-        }
-
         public void Dispose()
-        {            
-            if (fireParticles.IsCreated)
-            {
-                fireParticles.Dispose();
-                fireParticleCollisionPair.Dispose();
-
-                for (int x = 0; x < settings.hashingGridLength.x; x++)
-                {
-                    for (int y = 0; y < settings.hashingGridLength.y; y++)
-                    {
-                        nativeHashingGrid[x, y].Dispose();
-                    }
-                }
-                nativeHashingGrid.Dispose();
-                vectorField.Dispose();
-            }
+        {
+            fireParticleCollisionPair.Dispose();
         }
     }
 }

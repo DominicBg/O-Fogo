@@ -5283,7 +5283,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 498217667}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.944043, y: -3.5545208, z: -9.298527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5578,22 +5578,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fogoSimulator: {fileID: 2054115752}
   vectorFieldSimulator: {fileID: 1317853645}
+  fireStrokeSimulator: {fileID: 1200326467}
   calentador: {fileID: 1162405490}
   fogoRenderer: {fileID: 305926068}
   vectorFieldGenerator: {fileID: 1294766511}
   vectorFieldRenderer: {fileID: 52611695}
+  settings:
+    particleCount: 2000
+    integrationType: 1
+    simulationBound:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 7, y: 5, z: 0}
+    hashingGridLength:
+      x: 50
+      y: 25
+    resolutionStepRatio: 0.2
+    colisionVelocityResolution: 0
+    maxSpeed: 3
+    wallBounceIntensity: 0.2
+    useVectorFieldAsGravity: 1
+    fireGravity: -3.8
+    temperatureDropPerSec: 15
+    temperatureUpwardForce: 18
+    maxTemperature: 15
+    heatTransferPercent: 0.5
+    heatingPerSec: 5
+    minParticleSize: 0.05
+    maxParticleSize: 0.4
+  initialSpacing: 0.5
   numberThreadJob: 16
   vectorFieldSize:
     x: 35
     y: 35
   simulationSpeed: 2
   substeps: 4
-  useFireSimulation: 1
+  fireSimulatorType: 0
   drawVectorFieldDebug: 0
   drawBoundsDebug: 0
   drawCalentadorDebug: 0
   debugRayDist: 0.2
-  nativeLeakDetectionMode: 3
+  nativeLeakDetectionMode: 1
 --- !u!4 &969678025
 Transform:
   m_ObjectHideFlags: 0
@@ -10601,11 +10625,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aae92a16a86f43e4491830ef009085f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ps: {fileID: 1544263632}
-  particleCount: 2000
   timeScale: 0.1
-  minParticleScale: 0.02
-  maxParticleScale: 1
   noiseSpeed: 2
   noiseAmplitude: 0.23
 --- !u!4 &1200326468
@@ -10742,7 +10762,7 @@ GameObject:
   - component: {fileID: 1317853646}
   - component: {fileID: 1317853645}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: VectorFieldParticleSimulator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10854,7 +10874,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1422306221}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.944043, y: 3.5545208, z: 9.298527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15837,7 +15857,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1621138084}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.944043, y: -3.5545208, z: -9.298527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15934,7 +15954,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1679826201}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.944043, y: -3.5545208, z: -9.298527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -16026,7 +16046,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776487147}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.944043, y: -3.5545208, z: -9.298527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16080,7 +16100,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1828181964}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.944043, y: -3.5545208, z: -9.298527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16221,31 +16241,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4780854a517b2404eb25ade756095bbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialSpacing: 0.2
-  particleCount: 2000
   seed: 43243215
   parallelCollision: 1
-  settings:
-    integrationType: 1
-    simulationBound:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 7, y: 5, z: 0}
-    hashingGridLength:
-      x: 50
-      y: 25
-    resolutionStepRatio: 0.2
-    colisionVelocityResolution: 0
-    maxSpeed: 3
-    wallBounceIntensity: 0.2
-    useVectorFieldAsGravity: 1
-    fireGravity: -3.87
-    temperatureDropPerSec: 15.37
-    temperatureUpwardForce: 18.5
-    maxTemperature: 15
-    heatTransferPercent: 0.5
-    heatingPerSec: 0
-    minParticleSize: 0.05
-    maxParticleSize: 0.4
 --- !u!4 &2054115753
 Transform:
   m_ObjectHideFlags: 0

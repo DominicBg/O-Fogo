@@ -1,4 +1,6 @@
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -6,21 +8,27 @@ namespace OFogo
 {
     public class OFogoController : MonoBehaviour
     {
-        [Header("Components")] 
+        [Header("Components")]
         [SerializeField] OFogoSimulator fogoSimulator;
-        [SerializeField] VectorFieldParticleSimulation vectorFieldSimulator;
+        [SerializeField] VectorFieldParticleSimulator vectorFieldSimulator;
+        [SerializeField] FireStrokeSimulator fireStrokeSimulator;
+
         [SerializeField] Calentador calentador;
         [SerializeField] FogoRenderer fogoRenderer;
         [SerializeField] VectorFieldGenerator vectorFieldGenerator;
         [SerializeField] VectorFieldRenderer vectorFieldRenderer;
 
         [Header("Simulation")]
+        [SerializeField] public SimulationSettings settings;
+        [SerializeField] float initialSpacing = 0.5f;
         [SerializeField] int numberThreadJob = 16;
         [SerializeField] int2 vectorFieldSize = 35;
         [SerializeField] float simulationSpeed = 1;
         [SerializeField] int substeps = 4;
-        [SerializeField] bool useFireSimulation;
+        [SerializeField] EFireSimulatorType fireSimulatorType;
+        public enum EFireSimulatorType { FOGO, VectorField, Stroke }
 
+        //todo move in other component
         [Header("Debug")]
         [SerializeField] bool drawVectorFieldDebug;
         [SerializeField] bool drawBoundsDebug;
@@ -28,14 +36,52 @@ namespace OFogo
         [SerializeField] float debugRayDist = 5;
         [SerializeField] NativeLeakDetectionMode nativeLeakDetectionMode;
 
+        public NativeGrid<float3> vectorField;
+        public NativeArray<FireParticle> fireParticles;
+        public NativeGrid<UnsafeList<int>> nativeHashingGrid;
+
         private void Start()
         {
-            fogoSimulator.Init();
-            fogoRenderer.Init(fogoSimulator.particleCount);
-            vectorFieldSimulator.Init(fogoSimulator.particleCount);
-            fogoSimulator.vectorField = vectorFieldGenerator.CreateVectorField(vectorFieldSize, in fogoSimulator.settings.simulationBound);
+            fireParticles = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
+            nativeHashingGrid = new NativeGrid<UnsafeList<int>>(settings.hashingGridLength, Allocator.Persistent);
 
-            vectorFieldRenderer.Init(fogoSimulator.vectorField);
+            for (int x = 0; x < settings.hashingGridLength.x; x++)
+            {
+                for (int y = 0; y < settings.hashingGridLength.y; y++)
+                {
+                    nativeHashingGrid[x, y] = new UnsafeList<int>(32, Allocator.Persistent);
+                }
+            }
+            SpawnParticles();
+
+            fogoSimulator.Init(in settings);
+            fogoRenderer.Init(settings.particleCount);
+            vectorFieldSimulator.Init(in settings);
+            fireStrokeSimulator.Init(in settings);
+
+            vectorField = vectorFieldGenerator.CreateVectorField(vectorFieldSize, in settings.simulationBound);
+            vectorFieldRenderer.Init(vectorField);
+        }
+
+        void SpawnParticles()
+        {
+            int particlePerCol = (int)math.sqrt(settings.particleCount);
+            for (int i = 0; i < settings.particleCount; i++)
+            {
+                int2 xy = new int2(i % particlePerCol, i / particlePerCol);
+                float3 pos = new float3((float2)xy * initialSpacing, 0f);
+                pos.x += (xy.y % 2 == 0) ? 0.5f * initialSpacing : 0f;
+
+                FireParticle fireParticle = new FireParticle()
+                {
+                    position = pos,
+                    prevPosition = pos,
+                    radius = settings.minParticleSize,
+                    temperature = 0,
+                    velocity = 0
+                };
+                fireParticles[i] = fireParticle;
+            }
         }
 
         private void Update()
@@ -43,8 +89,8 @@ namespace OFogo
             //stupid hack
             NativeLeakDetection.Mode = nativeLeakDetectionMode;
 
-            fogoRenderer.Render(in fogoSimulator.fireParticles, in fogoSimulator.settings);
-            vectorFieldRenderer.Render(in fogoSimulator.vectorField, in fogoSimulator.settings);
+            fogoRenderer.Render(in fireParticles, in settings);
+            vectorFieldRenderer.Render(in vectorField, in settings);
             DrawDebugBounds();
             DrawVectorField();
         }
@@ -63,24 +109,55 @@ namespace OFogo
                     pos = transform.position,
                 };
 
-                calentador?.HeatParticles(in simData, ref fogoSimulator.fireParticles, fogoSimulator.settings);
-                vectorFieldGenerator.UpdateVectorField(ref fogoSimulator.vectorField, in fogoSimulator.settings.simulationBound);
 
-                if(useFireSimulation)
+                IFireParticleSimulator currentSimulator = null;
+                switch (fireSimulatorType)
                 {
-                    fogoSimulator.TickSimulation(simData);
+                    case EFireSimulatorType.FOGO:
+                        currentSimulator = fogoSimulator;
+                        break;
+                    case EFireSimulatorType.VectorField:
+                        currentSimulator = vectorFieldSimulator;
+                        break;
+                    case EFireSimulatorType.Stroke:
+                        currentSimulator = fireStrokeSimulator;
+                        break;
                 }
-                else
+
+                if(!currentSimulator.IsHandlingParticleHeating())
                 {
-                    fogoSimulator.FillHashGrid();
-                    vectorFieldSimulator.TickSimulation(simData, fogoSimulator.fireParticles, fogoSimulator.vectorField, fogoSimulator.nativeHashingGrid, fogoSimulator.settings);
+                    calentador?.HeatParticles(in simData, ref fireParticles, settings);
+                }
+
+                if(currentSimulator.NeedsVectorField())
+                {
+                    vectorFieldGenerator.UpdateVectorField(ref vectorField, in settings.simulationBound);
+                }
+
+                currentSimulator.UpdateSimulation(in simData, ref fireParticles, vectorField, settings);
+
+                if (currentSimulator.CanResolveCollision())
+                {
+                    FillHashGrid();
+                    currentSimulator.ResolveCollision(simData, ref fireParticles, vectorField, nativeHashingGrid, settings);
                 }
             }
         }
+        public void FillHashGrid()
+        {
+            new FillHashGridJob()
+            {
+                fireParticles = fireParticles,
+                nativeHashingGrid = nativeHashingGrid,
+                settings = settings
+            }.Run();
+        }
 
-        public NativeGrid<float3> VectorField { 
-            get => fogoSimulator.vectorField; 
-            set { fogoSimulator.vectorField = value; }}
+        public NativeGrid<float3> VectorField
+        {
+            get => vectorField;
+            set { vectorField = value; }
+        }
 
         private void OnDestroy()
         {
@@ -89,12 +166,24 @@ namespace OFogo
             fogoRenderer.Dispose();
             vectorFieldRenderer.Dispose();
             vectorFieldSimulator.Dispose();
+            fireStrokeSimulator.Dispose();
+
+            fireParticles.Dispose();
+            for (int x = 0; x < settings.hashingGridLength.x; x++)
+            {
+                for (int y = 0; y < settings.hashingGridLength.y; y++)
+                {
+                    nativeHashingGrid[x, y].Dispose();
+                }
+            }
+            nativeHashingGrid.Dispose();
+            vectorField.Dispose();
         }
 
         private void DrawDebugBounds()
         {
-            float3 min = transform.position + fogoSimulator.settings.simulationBound.min;
-            float3 max = transform.position + fogoSimulator.settings.simulationBound.max;
+            float3 min = transform.position + settings.simulationBound.min;
+            float3 max = transform.position + settings.simulationBound.max;
             float3 bottomLeft = new float3(min.x, min.y, 0f);
             float3 bottomRight = new float3(max.x, min.y, 0f);
             float3 topLeft = new float3(min.x, max.y, 0f);
@@ -104,8 +193,8 @@ namespace OFogo
             Debug.DrawLine(topRight, bottomRight, Color.white);
             Debug.DrawLine(bottomRight, bottomLeft, Color.white);
 
-            float2 invLength = 1f / (float2)fogoSimulator.settings.hashingGridLength;
-            for (int i = 0; i < fogoSimulator.settings.hashingGridLength.x; i++)
+            float2 invLength = 1f / (float2)settings.hashingGridLength;
+            for (int i = 0; i < settings.hashingGridLength.x; i++)
             {
                 float yRatio = i * invLength.y;
                 float y = math.lerp(min.y, max.y, yRatio);
@@ -114,7 +203,7 @@ namespace OFogo
                 Debug.DrawLine(start, end, Color.cyan * 0.25f);
             }
 
-            for (int i = 0; i < fogoSimulator.settings.hashingGridLength.y; i++)
+            for (int i = 0; i < settings.hashingGridLength.y; i++)
             {
                 float xRatio = i * invLength.x;
                 float x = math.lerp(min.x, max.x, xRatio);
@@ -126,18 +215,18 @@ namespace OFogo
 
         private void DrawVectorField()
         {
-            float3 min = transform.position + fogoSimulator.settings.simulationBound.min;
-            float3 max = transform.position + fogoSimulator.settings.simulationBound.max;
+            float3 min = transform.position + settings.simulationBound.min;
+            float3 max = transform.position + settings.simulationBound.max;
 
-            float2 invSize = 1f / (float2)fogoSimulator.vectorField.Size;
-            for (int x = 0; x < fogoSimulator.vectorField.Size.x; x++)
+            float2 invSize = 1f / (float2)vectorField.Size;
+            for (int x = 0; x < vectorField.Size.x; x++)
             {
-                for (int y = 0; y < fogoSimulator.vectorField.Size.y; y++)
+                for (int y = 0; y < vectorField.Size.y; y++)
                 {
                     float2 pos = new float2(x + 0.5f, y + 0.5f) * invSize;
                     float3 t = new float3(pos, 0);
                     float3 gridCenter = math.lerp(min, max, t);
-                    float3 force = fogoSimulator.vectorField[x, y];
+                    float3 force = vectorField[x, y];
                     Debug.DrawRay(gridCenter, force * debugRayDist, Color.white);
                 }
             }

@@ -1,25 +1,25 @@
+using OFogo;
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class FireStrokeRenderers : MonoBehaviour
+public class FireStrokeSimulator : MonoBehaviour, IFireParticleSimulator
 {
-    [SerializeField] ParticleSystem ps;
-    [SerializeField] int particleCount = 100;
+    public bool CanResolveCollision() => false;
+    public bool IsHandlingParticleHeating() => true;
+    public bool NeedsVectorField() => false;
+
     [SerializeField] float timeScale = 1;
-    [SerializeField] float minParticleScale = .5f;
-    [SerializeField] float maxParticleScale = 1;
     [SerializeField] float noiseSpeed = 1f;
     [SerializeField] float noiseAmplitude = 0.1f;
+    [SerializeField, Range(0, 1)] float heatMultiplicator = 0.5f;
 
     FireStroke[] fireLines;
 
-    NativeArray<ParticleSystem.Particle> renderParticles;
     NativeArray<FireStrokeContainer> fireStrokeContainers;
-
-    //used split evenly all particle based on line length
     NativeArray<ParticleInfoPerLine> particlesInfoPerLines;
 
     public struct ParticleInfoPerLine
@@ -29,23 +29,14 @@ public class FireStrokeRenderers : MonoBehaviour
         public int count;
     }
 
-    //todo recieve particle count from controller
-    void Start()
+    public void Init(in SimulationSettings settings)
     {
         fireLines = GetComponentsInChildren<FireStroke>();
-
-        var main = ps.main;
-        main.maxParticles = particleCount;
-
-        var emission = ps.emission;
-        emission.enabled = false;
-
-        renderParticles = new NativeArray<ParticleSystem.Particle>(particleCount, Allocator.Persistent);
         fireStrokeContainers = new NativeArray<FireStrokeContainer>(fireLines.Length, Allocator.Persistent);
         particlesInfoPerLines = new NativeArray<ParticleInfoPerLine>(fireLines.Length, Allocator.Persistent);
     }
 
-    void Update()
+    public void UpdateSimulation(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in SimulationSettings settings)
     {
         float lengthSum = 0;
         for (int i = 0; i < fireLines.Length; i++)
@@ -64,13 +55,13 @@ public class FireStrokeRenderers : MonoBehaviour
         {
             var info = particlesInfoPerLines[i];
             float lengthRatio = info.length / lengthSum;
-            info.count = (int)(lengthRatio * particleCount);
+            info.count = (int)(lengthRatio * settings.particleCount);
 
             //with cast to int there might be overflow of particles
-            if(particleStartIndex + info.count > particleCount)
+            if (particleStartIndex + info.count > settings.particleCount)
             {
                 //take the rest
-                info.count = particleCount - particleStartIndex;
+                info.count = settings.particleCount - particleStartIndex;
             }
 
             info.startIndex = particleStartIndex;
@@ -82,20 +73,27 @@ public class FireStrokeRenderers : MonoBehaviour
         new ProcessFireLineJob()
         {
             timeScale = timeScale,
-            minParticleScale = minParticleScale,
-            maxParticleScale = maxParticleScale,
+            settings = settings,
+            fireParticles = fireParticles,
             noiseAmplitude = noiseAmplitude,
             noiseSpeed = noiseSpeed,
+            heatMultiplicator = heatMultiplicator,
 
             time = Time.time,
-
-            particleCount = particleCount,
-            renderParticles = renderParticles,
             fireStrokeContainer = fireStrokeContainers,
             particlesInfoPerLines = particlesInfoPerLines
-        }.RunParralel(renderParticles.Length);
+        }.RunParralel(fireParticles.Length);
+    }
 
-        ps.SetParticles(renderParticles);
+    public void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
+    {
+        //
+    }
+
+    public void Dispose()
+    {
+        fireStrokeContainers.Dispose();
+        particlesInfoPerLines.Dispose();
     }
 
     [BurstCompile]
@@ -106,14 +104,13 @@ public class FireStrokeRenderers : MonoBehaviour
         [ReadOnly]
         public NativeArray<ParticleInfoPerLine> particlesInfoPerLines;
 
-        public NativeArray<ParticleSystem.Particle> renderParticles;
+        public SimulationSettings settings;
+        public NativeArray<FireParticle> fireParticles;
         public float timeScale;
-        public float minParticleScale;
-        public float maxParticleScale;
         public float noiseSpeed;
         public float noiseAmplitude;
-        public int particleCount;
         public float time;
+        public float heatMultiplicator;
 
         public void Execute(int index)
         {
@@ -129,7 +126,7 @@ public class FireStrokeRenderers : MonoBehaviour
                 }
             }
 
-            ParticleSystem.Particle particle = renderParticles[index];
+            FireParticle particle = fireParticles[index];
 
             int indexForLine = (index - infoPerLine.startIndex);
             float t = ((float)indexForLine / infoPerLine.count) + time * timeScale;
@@ -138,25 +135,20 @@ public class FireStrokeRenderers : MonoBehaviour
 
             float2 noiseValue = noiseAmplitude * new float2(
                 noise.snoise(new float2(time * noiseSpeed, index * 1.7283f)),
-                noise.snoise(new float2(time * noiseSpeed, index * 7.73816f + particleCount))
+                noise.snoise(new float2(time * noiseSpeed, index * 7.73816f + settings.particleCount))
             );
 
             noiseValue = noiseValue * 2 - 1;//normalize [0, 1] -> [-1, 1]
 
-            particle.position += new Vector3(noiseValue.x, noiseValue.y, 0);
+            particle.position += new float3(noiseValue.x, noiseValue.y, 0);
 
             var rng = Unity.Mathematics.Random.CreateFromIndex((uint)index);
-            particle.startSize = math.lerp(minParticleScale, maxParticleScale, rng.NextFloat());
-            particle.startColor = Color.white * rng.NextFloat();
 
-            renderParticles[index] = particle;
+            float heatRatio = rng.NextFloat() * heatMultiplicator;
+            particle.temperature = heatRatio * settings.maxTemperature;
+            particle.radius = math.lerp(settings.minParticleSize, settings.maxParticleSize, heatRatio);
+
+            fireParticles[index] = particle;
         }
-    }
-
-    private void OnDestroy()
-    {
-        renderParticles.Dispose();
-        fireStrokeContainers.Dispose();
-        particlesInfoPerLines.Dispose();
     }
 }

@@ -8,6 +8,8 @@ namespace OFogo
     [System.Serializable]
     public struct SimulationSettings
     {
+        public int particleCount;
+
         [Header("Simulation")]
         public IntegrationType integrationType;
         public Bounds simulationBound;
