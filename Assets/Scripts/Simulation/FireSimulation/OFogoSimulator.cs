@@ -42,7 +42,7 @@ namespace OFogo
                 simulationData = simulationData,
                 fireParticles = fireParticles,
                 settings = settings,
-                vectorField = vectorField
+                vectorField = vectorField,
             }.RunParralel(fireParticles.Length);
         }
 
@@ -56,7 +56,7 @@ namespace OFogo
                     fireParticles = fireParticles,
                     fireParticleCollisionPair = fireParticleCollisionPair.AsParallelWriter(),
                     nativeHashingGrid = nativeHashingGrid,
-                    settings = settings
+                    settings = settings,
                 }.RunParralel(fireParticles.Length);
             }
             else
@@ -66,7 +66,7 @@ namespace OFogo
                     fireParticles = fireParticles,
                     fireParticleCollisionPair = fireParticleCollisionPair,
                     nativeHashingGrid = nativeHashingGrid,
-                    settings = settings
+                    settings = settings,
                 }.Run();
             }
 
@@ -76,7 +76,7 @@ namespace OFogo
                 fireParticleCollisionPair = fireParticleCollisionPair,
                 fireParticles = fireParticles,
                 rngRef = rngRef,
-                settings = settings
+                settings = settings,
             }.Run();
             rng = rngRef.Value;
             rngRef.Dispose();

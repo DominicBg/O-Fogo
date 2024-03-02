@@ -11,7 +11,7 @@ namespace OFogo
         public NativeArray<FireParticle> fireParticles;
         public NativeList<FireParticleCollision> fireParticleCollisionPair;
         public SimulationSettings settings;
-        public NativeReference<Unity.Mathematics.Random> rngRef;
+        public NativeReference<Random> rngRef;
 
         public void Execute()
         {

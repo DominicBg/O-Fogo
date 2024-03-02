@@ -78,7 +78,6 @@ namespace OFogo
                 float distSq = math.distancesq(fireParticles[i].position, fireParticles[j].position);
                 float radiusSqSum = Pow2(fireParticles[i].radius + fireParticles[j].radius);
 
-                //precompute penetration?
                 if (distSq < radiusSqSum)
                 {
                     collisionBuffer.Add(new FireParticleCollision(i, j, distSq));

@@ -105,6 +105,7 @@ namespace OFogo
                 }
 
                 var rng = Unity.Mathematics.Random.CreateFromIndex((uint)index);
+
                 //stupid heat hack
                 fireParticle.temperature = math.lerp(fireParticle.temperature, rng.NextFloat() * settings.maxTemperature, simulationData.dt * 10);
 
@@ -177,7 +178,7 @@ namespace OFogo
         public NativeArray<FireParticle> fireParticles;
         public NativeArray<float3> desiredForce;
         public SimulationSettings settings;
-
+        
         public void Execute(int i)
         {
             FireParticle fireParticle = fireParticles[i];

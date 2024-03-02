@@ -13,6 +13,13 @@ namespace OFogo
         public NativeGrid<UnsafeList<int>> nativeHashingGrid;
         public SimulationSettings settings;
 
+        public FillHashGridJob(NativeArray<FireParticle> fireParticles, NativeGrid<UnsafeList<int>> nativeHashingGrid, SimulationSettings settings)
+        {
+            this.fireParticles = fireParticles;
+            this.nativeHashingGrid = nativeHashingGrid;
+            this.settings = settings;
+        }
+
         public void Execute()
         {
             for (int x = 0; x < settings.hashingGridLength.x; x++)

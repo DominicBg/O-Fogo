@@ -56,7 +56,7 @@ namespace OFogo
 
             for (int x = 0; x < v1.Size.x; x++)
             {
-                for (int y = 0; y < v1.Size.x; y++)
+                for (int y = 0; y < v1.Size.y; y++)
                 {
                     vectorField[x, y] = math.lerp(v1[x, y], v2[x, y], t) * forceMultiplier;
                 }

@@ -25,7 +25,11 @@ namespace OFogo
         [SerializeField] int2 vectorFieldSize = 35;
         [SerializeField] float simulationSpeed = 1;
         [SerializeField] int substeps = 4;
-        [SerializeField] EFireSimulatorType fireSimulatorType;
+        public EFireSimulatorType fireSimulatorTypeA;
+        public EFireSimulatorType fireSimulatorTypeB;
+        [Range(0, 1)]
+        public float fireSimulatorLerpRatio = 0;
+
         public enum EFireSimulatorType { FOGO, VectorField, Stroke }
 
         //todo move in other component
@@ -38,11 +42,13 @@ namespace OFogo
 
         public NativeGrid<float3> vectorField;
         public NativeArray<FireParticle> fireParticles;
+        public NativeArray<FireParticle> fireParticlesTemp;
         public NativeGrid<UnsafeList<int>> nativeHashingGrid;
 
         private void Start()
         {
             fireParticles = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
+            fireParticlesTemp = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
             nativeHashingGrid = new NativeGrid<UnsafeList<int>>(settings.hashingGridLength, Allocator.Persistent);
 
             for (int x = 0; x < settings.hashingGridLength.x; x++)
@@ -109,48 +115,92 @@ namespace OFogo
                     pos = transform.position,
                 };
 
+                IFireParticleSimulator simulatorA = GetSimulator(fireSimulatorTypeA);
+                IFireParticleSimulator simulatorB = GetSimulator(fireSimulatorTypeB);
 
-                IFireParticleSimulator currentSimulator = null;
-                switch (fireSimulatorType)
+                if(fireSimulatorLerpRatio == 0)
                 {
-                    case EFireSimulatorType.FOGO:
-                        currentSimulator = fogoSimulator;
-                        break;
-                    case EFireSimulatorType.VectorField:
-                        currentSimulator = vectorFieldSimulator;
-                        break;
-                    case EFireSimulatorType.Stroke:
-                        currentSimulator = fireStrokeSimulator;
-                        break;
+                    UpdateSimulation(simulatorA, in simData, fireParticles);
                 }
-
-                if(!currentSimulator.IsHandlingParticleHeating())
-                {
-                    calentador?.HeatParticles(in simData, ref fireParticles, settings);
+                else if(fireSimulatorLerpRatio == 1)
+                {      
+                     UpdateSimulation(simulatorB, in simData, fireParticles);           
                 }
-
-                if(currentSimulator.NeedsVectorField())
+                else
                 {
-                    vectorFieldGenerator.UpdateVectorField(ref vectorField, in settings.simulationBound);
-                }
-
-                currentSimulator.UpdateSimulation(in simData, ref fireParticles, vectorField, settings);
-
-                if (currentSimulator.CanResolveCollision())
-                {
-                    FillHashGrid();
-                    currentSimulator.ResolveCollision(simData, ref fireParticles, vectorField, nativeHashingGrid, settings);
+                    UpdateLerpSimulation(simulatorA, simulatorB, simData, fireParticles, fireParticlesTemp, fireSimulatorLerpRatio);
                 }
             }
         }
+
+        private IFireParticleSimulator GetSimulator(EFireSimulatorType fireSimulatorType)
+        {
+            switch (fireSimulatorType)
+            {
+                case EFireSimulatorType.FOGO:
+                    return fogoSimulator;
+                case EFireSimulatorType.VectorField:
+                    return vectorFieldSimulator;
+                case EFireSimulatorType.Stroke:
+                    return fireStrokeSimulator;
+            }
+            return null;
+        }
+
+        void UpdateSimulation(IFireParticleSimulator simulator, in SimulationData simData, NativeArray<FireParticle> fireParticles)
+        {
+            if (!simulator.IsHandlingParticleHeating())
+            {
+                calentador?.HeatParticles(in simData, ref fireParticles, settings);
+            }
+
+            if (simulator.NeedsVectorField())
+            {
+                vectorFieldGenerator.UpdateVectorField(ref vectorField, in settings.simulationBound);
+            }
+
+            simulator.UpdateSimulation(in simData, ref fireParticles, vectorField, settings);
+
+            if (simulator.CanResolveCollision())
+            {
+                FillHashGrid();
+                simulator.ResolveCollision(simData, ref fireParticles, vectorField, nativeHashingGrid, settings);
+            }
+        }
+
+        NativeArray<FireParticle> UpdateLerpSimulation(IFireParticleSimulator simulatorA, IFireParticleSimulator simulatorB, in SimulationData simData, NativeArray<FireParticle> fireParticles, NativeArray<FireParticle> fireParticleBuffer, float t)
+        {
+            UpdateSimulation(simulatorA, simData, fireParticles);
+            UpdateSimulation(simulatorB, simData, fireParticlesTemp);
+
+            new LerpParticleJobs(fireParticles, fireParticlesTemp, t).RunParralel(fireParticles.Length);
+
+            return fireParticles;
+        }
+
+        public struct LerpParticleJobs : IJobParallelFor
+        {
+            NativeArray<FireParticle> fireParticles;
+            NativeArray<FireParticle> fireParticlesTemp;
+            public float t;
+
+            public LerpParticleJobs(NativeArray<FireParticle> fireParticles, NativeArray<FireParticle> fireParticlesTemp, float t)
+            {
+                this.fireParticles = fireParticles;
+                this.fireParticlesTemp = fireParticlesTemp;
+                this.t = t;
+            }
+
+            public void Execute(int index)
+            {
+                fireParticles[index] = FireParticle.Lerp(fireParticles[index], fireParticlesTemp[index], t);
+            }
+        }
+
+
         public void FillHashGrid()
         {
-            new FillHashGridJob()
-            {
-                fireParticles = fireParticles,
-                nativeHashingGrid = nativeHashingGrid,
-                settings = settings
-            }.Run();
+            new FillHashGridJob(fireParticles, nativeHashingGrid, settings).Run();
         }
 
         public NativeGrid<float3> VectorField
@@ -230,7 +280,6 @@ namespace OFogo
                     Debug.DrawRay(gridCenter, force * debugRayDist, Color.white);
                 }
             }
-
         }
     }
 }
