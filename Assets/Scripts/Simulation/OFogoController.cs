@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace OFogo
 {
+    public enum EFireSimulatorType { FOGO, VectorField, Stroke }
     public class OFogoController : MonoBehaviour
     {
         [Header("Components")]
@@ -30,7 +31,6 @@ namespace OFogo
         [Range(0, 1)]
         public float fireSimulatorLerpRatio = 0;
 
-        public enum EFireSimulatorType { FOGO, VectorField, Stroke }
 
         //todo move in other component
         [Header("Debug")]
@@ -42,13 +42,13 @@ namespace OFogo
 
         public NativeGrid<float3> vectorField;
         public NativeArray<FireParticle> fireParticles;
-        public NativeArray<FireParticle> fireParticlesTemp;
+        public NativeArray<FireParticle> fireParticlesB;
         public NativeGrid<UnsafeList<int>> nativeHashingGrid;
 
         private void Start()
         {
             fireParticles = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
-            fireParticlesTemp = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
+            fireParticlesB = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
             nativeHashingGrid = new NativeGrid<UnsafeList<int>>(settings.hashingGridLength, Allocator.Persistent);
 
             for (int x = 0; x < settings.hashingGridLength.x; x++)
@@ -128,7 +128,7 @@ namespace OFogo
                 }
                 else
                 {
-                    UpdateLerpSimulation(simulatorA, simulatorB, simData, fireParticles, fireParticlesTemp, fireSimulatorLerpRatio);
+                    UpdateLerpSimulation(simulatorA, simulatorB, simData, fireParticles, fireParticlesB, fireSimulatorLerpRatio);
                 }
                 calentador?.DrawDebug(transform.position, in settings);
             }
@@ -169,32 +169,33 @@ namespace OFogo
             }
         }
 
-        NativeArray<FireParticle> UpdateLerpSimulation(IFireParticleSimulator simulatorA, IFireParticleSimulator simulatorB, in SimulationData simData, NativeArray<FireParticle> fireParticles, NativeArray<FireParticle> fireParticleBuffer, float t)
+        NativeArray<FireParticle> UpdateLerpSimulation(IFireParticleSimulator simulatorA, IFireParticleSimulator simulatorB, in SimulationData simData, NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticleBuffer, float t)
         {
-            UpdateSimulation(simulatorA, simData, fireParticles);
-            UpdateSimulation(simulatorB, simData, fireParticlesTemp);
+            UpdateSimulation(simulatorA, simData, fireParticlesA);
+            UpdateSimulation(simulatorB, simData, fireParticlesB);
 
-            new LerpParticleJobs(fireParticles, fireParticlesTemp, t).RunParralel(fireParticles.Length);
+            new LerpParticleJobs(fireParticlesA, fireParticlesB, t).RunParralel(fireParticlesA.Length);
 
-            return fireParticles;
+            return fireParticlesA;
         }
 
         public struct LerpParticleJobs : IJobParallelFor
         {
-            NativeArray<FireParticle> fireParticles;
-            NativeArray<FireParticle> fireParticlesTemp;
+            NativeArray<FireParticle> fireParticlesA;
+            NativeArray<FireParticle> fireParticlesB;
             public float t;
 
-            public LerpParticleJobs(NativeArray<FireParticle> fireParticles, NativeArray<FireParticle> fireParticlesTemp, float t)
+            public LerpParticleJobs(NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticlesB, float t)
             {
-                this.fireParticles = fireParticles;
-                this.fireParticlesTemp = fireParticlesTemp;
+                this.fireParticlesA = fireParticlesA;
+                this.fireParticlesB = fireParticlesB;
                 this.t = t;
             }
 
             public void Execute(int index)
             {
-                fireParticles[index] = FireParticle.Lerp(fireParticles[index], fireParticlesTemp[index], t);
+                fireParticlesA[index] = FireParticle.Lerp(fireParticlesA[index], fireParticlesB[index], t);
+                fireParticlesB[index] = fireParticlesA[index];
             }
         }
 
