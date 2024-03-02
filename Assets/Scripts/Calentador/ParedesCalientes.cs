@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace OFogo
 {
-
     public class ParedesCalientes : Calentador
     {
         [System.Serializable]
@@ -62,11 +61,11 @@ namespace OFogo
                 particle.temperature += heat * simData.dt;
             }
         }
-        public override void DrawDebug(in SimulationData simData, in SimulationSettings settings)
+        public override void DrawDebug(float3 simPosition, in SimulationSettings settings)
         {
-            base.DrawDebug(simData, settings);
-            float3 min = simData.pos + (float3)settings.simulationBound.min;
-            float3 max = simData.pos + (float3)settings.simulationBound.max;
+            base.DrawDebug(simPosition, settings);
+            float3 min = simPosition + (float3)settings.simulationBound.min;
+            float3 max = simPosition + (float3)settings.simulationBound.max;
 
             float3 bottomLeft = new float3(min.x, min.y, 0f);
             float3 bottomRight = new float3(max.x, min.y, 0f);

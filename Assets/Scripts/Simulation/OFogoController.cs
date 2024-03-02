@@ -130,6 +130,7 @@ namespace OFogo
                 {
                     UpdateLerpSimulation(simulatorA, simulatorB, simData, fireParticles, fireParticlesTemp, fireSimulatorLerpRatio);
                 }
+                calentador?.DrawDebug(transform.position, in settings);
             }
         }
 

@@ -26,7 +26,7 @@ namespace OFogo
             }
 
             vectorFields[0] = fields[0].CreateVectorField(size, in bounds, allocator);
-            size = vectorFields[0].Size;
+            //size = vectorFields[0].Size;
 
             for (int i = 1; i < fields.Length; i++)
             {

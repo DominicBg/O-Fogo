@@ -40,7 +40,7 @@ namespace OFogo
 
         public static void CheckCollisionPairAtPosition(int particleIndex,
             in NativeArray<FireParticle> fireParticles, in NativeGrid<UnsafeList<int>> nativeHashingGrid,
-            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, int maxCollision = int.MaxValue)       
+            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, int maxCollision = -1)       
         {
             int2 hash = HashPosition(fireParticles[particleIndex].position, in settings.simulationBound, settings.hashingGridLength);
 
@@ -48,6 +48,10 @@ namespace OFogo
             {
                 for (int y = -1; y <= 1; y++)
                 {
+                    if (maxCollision != -1 && collisionBuffer.Length > maxCollision)
+                    {
+                        return;
+                    }
                     CheckCollisionPair(hash, particleIndex, x, y, fireParticles, nativeHashingGrid, settings, ref collisionBuffer, maxCollision);
                 }
             }
@@ -55,7 +59,7 @@ namespace OFogo
 
         public static void CheckCollisionPair(int2 hash, int i, int x, int y,
             in NativeArray<FireParticle> fireParticles, in NativeGrid<UnsafeList<int>> nativeHashingGrid,
-            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, int maxCollision = int.MaxValue)
+            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, int maxCollision = -1)
         {
             int2 pos = new int2(x + hash.x, y + hash.y);
 
@@ -82,7 +86,7 @@ namespace OFogo
                 {
                     collisionBuffer.Add(new FireParticleCollision(i, j, distSq));
 
-                    if(collisionBuffer.Length > maxCollision)
+                    if(maxCollision != -1 && collisionBuffer.Length > maxCollision)
                     {
                         return;
                     }

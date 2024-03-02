@@ -1,36 +1,38 @@
 using Unity.Mathematics;
 
-public class LineFireStroke : FireStroke
+namespace OFogo
 {
-    public LineFireStrokeContainer fireStroke;
-    public override FireStrokeContainer CreateFireStrokeContainer()
+    public class LineFireStroke : FireStroke
     {
-        var strokeCopy = fireStroke;
-        strokeCopy.posA += (float3)transform.position;
-        strokeCopy.posB += (float3)transform.position;
-
-        return new FireStrokeContainer()
+        public LineFireStrokeContainer fireStroke;
+        public override FireStrokeContainer CreateFireStrokeContainer()
         {
-            strokeType = FireStrokeContainer.StrokeType.Line,
-            lineFireStrokeContainer = strokeCopy
-        };
-    }
+            var strokeCopy = fireStroke;
+            strokeCopy.posA += (float3)transform.position;
+            strokeCopy.posB += (float3)transform.position;
 
-    [System.Serializable]
-    public struct LineFireStrokeContainer : IFireStroke
-    {
-        public float3 posA;
-        public float3 posB;
-
-        public float3 Evaluate(float t)
-        {
-            return math.lerp(posA, posB, t);
+            return new FireStrokeContainer()
+            {
+                strokeType = FireStrokeContainer.StrokeType.Line,
+                lineFireStrokeContainer = strokeCopy
+            };
         }
 
-        public float GetLength()
+        [System.Serializable]
+        public struct LineFireStrokeContainer : IFireStroke
         {
-            return math.distance(posA, posB);
-        }
+            public float3 posA;
+            public float3 posB;
 
+            public float3 Evaluate(float t)
+            {
+                return math.lerp(posA, posB, t);
+            }
+
+            public float GetLength()
+            {
+                return math.distance(posA, posB);
+            }
+        }
     }
 }

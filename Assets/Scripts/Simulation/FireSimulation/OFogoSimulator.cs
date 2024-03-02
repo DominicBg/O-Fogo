@@ -16,6 +16,7 @@ namespace OFogo
 
         public uint seed = 43243215;
         public bool parallelCollision;
+        public int maxParticleCollision = -1;
 
         NativeList<FireParticleCollision> fireParticleCollisionPair;
         Unity.Mathematics.Random rng;
@@ -57,6 +58,7 @@ namespace OFogo
                     fireParticleCollisionPair = fireParticleCollisionPair.AsParallelWriter(),
                     nativeHashingGrid = nativeHashingGrid,
                     settings = settings,
+                    maxParticleCollision = maxParticleCollision
                 }.RunParralel(fireParticles.Length);
             }
             else
@@ -67,6 +69,7 @@ namespace OFogo
                     fireParticleCollisionPair = fireParticleCollisionPair,
                     nativeHashingGrid = nativeHashingGrid,
                     settings = settings,
+                    maxParticleCollision = maxParticleCollision
                 }.Run();
             }
 

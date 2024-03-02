@@ -1,61 +1,63 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-public class PartialCircleFireStroke : FireStroke
+namespace OFogo
 {
-    public PartialCircleFireStrokeContainer fireStroke = new PartialCircleFireStrokeContainer()
+    public class PartialCircleFireStroke : FireStroke
     {
-        normal = math.forward(),
-        radius = 1,
-        minRange = 0f,
-        maxRange = 0.75f,
-        rotationOffset = 0,
-    };
-
-    public override FireStrokeContainer CreateFireStrokeContainer()
-    {
-        var strokeCopy = fireStroke;
-        strokeCopy.position += (float3)transform.position;
-
-        return new FireStrokeContainer()
+        public PartialCircleFireStrokeContainer fireStroke = new PartialCircleFireStrokeContainer()
         {
-            strokeType = FireStrokeContainer.StrokeType.PartialCircle,
-            partialCircleFireStrokeContainer = strokeCopy
+            normal = math.forward(),
+            radius = 1,
+            minRange = 0f,
+            maxRange = 0.75f,
+            rotationOffset = 0,
         };
-    }
 
-    [System.Serializable]
-    public struct PartialCircleFireStrokeContainer : IFireStroke
-    {
-        public float3 position;
-        public float3 normal;
-        public float radius;
-
-        [Range(0, 1)]
-        public float rotationOffset;
-        [Range(0, 1)]
-        public float minRange;
-        [Range(0, 1)]
-        public float maxRange;
-
-        public float3 Evaluate(float t)
+        public override FireStrokeContainer CreateFireStrokeContainer()
         {
-            t = math.remap(0, 1, minRange, maxRange, t);
-            t += rotationOffset;
+            var strokeCopy = fireStroke;
+            strokeCopy.position += (float3)transform.position;
 
-            float a = t * math.PI * 2;
-            math.sincos(a, out float sin, out float cos);
-
-            float3 up = math.dot(normal, math.up()) < 0.999 ? math.up() : math.forward();
-            float3 right = math.cross(up, normal);
-
-            return position + (up * cos - right * sin) * radius;
+            return new FireStrokeContainer()
+            {
+                strokeType = FireStrokeContainer.StrokeType.PartialCircle,
+                partialCircleFireStrokeContainer = strokeCopy
+            };
         }
 
-        public float GetLength()
+        [System.Serializable]
+        public struct PartialCircleFireStrokeContainer : IFireStroke
         {
-            return 2 * math.PI * radius * (maxRange - minRange);
+            public float3 position;
+            public float3 normal;
+            public float radius;
+
+            [Range(0, 1)]
+            public float rotationOffset;
+            [Range(0, 1)]
+            public float minRange;
+            [Range(0, 1)]
+            public float maxRange;
+
+            public float3 Evaluate(float t)
+            {
+                t = math.remap(0, 1, minRange, maxRange, t);
+                t += rotationOffset;
+
+                float a = t * math.PI * 2;
+                math.sincos(a, out float sin, out float cos);
+
+                float3 up = math.dot(normal, math.up()) < 0.999 ? math.up() : math.forward();
+                float3 right = math.cross(up, normal);
+
+                return position + (up * cos - right * sin) * radius;
+            }
+
+            public float GetLength()
+            {
+                return 2 * math.PI * radius * (maxRange - minRange);
+            }
         }
     }
-
 }

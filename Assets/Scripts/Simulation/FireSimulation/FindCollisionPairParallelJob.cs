@@ -17,12 +17,13 @@ namespace OFogo
 
         [WriteOnly]
         public NativeList<FireParticleCollision>.ParallelWriter fireParticleCollisionPair;
+        public int maxParticleCollision;
 
         public void Execute(int index)
         {
             NativeList<FireParticleCollision> collisionBuffer = new NativeList<FireParticleCollision>(200, Allocator.Temp);
 
-            OFogoHelper.CheckCollisionPairAtPosition(index, fireParticles, nativeHashingGrid, settings, ref collisionBuffer);
+            OFogoHelper.CheckCollisionPairAtPosition(index, fireParticles, nativeHashingGrid, settings, ref collisionBuffer, maxParticleCollision);
 
             fireParticleCollisionPair.AddRangeNoResize(collisionBuffer);
             collisionBuffer.Dispose();

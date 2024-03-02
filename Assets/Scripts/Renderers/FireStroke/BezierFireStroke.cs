@@ -1,38 +1,41 @@
 using Unity.Mathematics;
 
-public class BezierFireStroke : FireStroke
+namespace OFogo
 {
-    public BezierFireStrokeContainer fireStroke;
-
-    public override FireStrokeContainer CreateFireStrokeContainer()
+    public class BezierFireStroke : FireStroke
     {
-        var strokeCopy = fireStroke;
-        strokeCopy.posA += (float3)transform.position;
-        strokeCopy.posB += (float3)transform.position;
-        strokeCopy.posC += (float3)transform.position;
+        public BezierFireStrokeContainer fireStroke;
 
-        return new FireStrokeContainer()
+        public override FireStrokeContainer CreateFireStrokeContainer()
         {
-            strokeType = FireStrokeContainer.StrokeType.Bezier,
-            bezierFireStrokeContainer = strokeCopy
-        };
-    }
+            var strokeCopy = fireStroke;
+            strokeCopy.posA += (float3)transform.position;
+            strokeCopy.posB += (float3)transform.position;
+            strokeCopy.posC += (float3)transform.position;
 
-    [System.Serializable]
-    public struct BezierFireStrokeContainer : IFireStroke
-    {
-        public float3 posA;
-        public float3 posB;
-        public float3 posC;
-        public float3 Evaluate(float t)
-        {
-            return math.lerp(math.lerp(posA, posB, t), math.lerp(posB, posC, t), t);
+            return new FireStrokeContainer()
+            {
+                strokeType = FireStrokeContainer.StrokeType.Bezier,
+                bezierFireStrokeContainer = strokeCopy
+            };
         }
 
-        public float GetLength()
+        [System.Serializable]
+        public struct BezierFireStrokeContainer : IFireStroke
         {
-            //fuck je sais pas lol
-            return math.distance(posA, posB) + math.distance(posB, posC);
+            public float3 posA;
+            public float3 posB;
+            public float3 posC;
+            public float3 Evaluate(float t)
+            {
+                return math.lerp(math.lerp(posA, posB, t), math.lerp(posB, posC, t), t);
+            }
+
+            public float GetLength()
+            {
+                //fuck je sais pas lol
+                return math.distance(posA, posB) + math.distance(posB, posC);
+            }
         }
     }
 }
