@@ -13,12 +13,12 @@ namespace OFogo
         public bool IsHandlingParticleHeating() => true;
         public bool NeedsVectorField() => false;
 
-        [SerializeField] float timeScale = 1;
-        [SerializeField] float burnSpeed = 1;
-        [SerializeField] float burnHeight = 0.1f;
-        [SerializeField] float noiseSpeed = 1f;
-        [SerializeField] float noiseAmplitude = 0.1f;
-        [SerializeField, Range(0, 1)] float heatMultiplicator = 0.5f;
+        public float timeScale = 1;
+        public float burnSpeed = 1;
+        public float burnHeight = 0.1f;
+        public float noiseSpeed = 1f;
+        public float noiseAmplitude = 0.1f;
+        [Range(0, 1)] public float heatMultiplicator = 0.5f;
 
         FireStroke[] fireLines;
 
@@ -87,7 +87,7 @@ namespace OFogo
                 time = Time.time,
                 fireStrokeContainer = fireStrokeContainers,
                 particlesInfoPerLines = particlesInfoPerLines
-            }.RunParralel(fireParticles.Length);
+            }.RunParralelAndProfile(fireParticles.Length);
         }
 
         public void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)

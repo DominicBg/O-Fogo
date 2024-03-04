@@ -6,11 +6,24 @@ namespace OFogo
 {
     public abstract class VectorFieldGenerator : MonoBehaviour
     {
-        public virtual NativeGrid<float3> CreateVectorField(int2 size, in Bounds bounds, Allocator allocator = Allocator.Persistent)
+        protected bool isInit { get; private set; }
+
+        public void TryInit(in SimulationSettings settings) 
         {
-            return new NativeGrid<float3>(size, allocator);
+            if(!isInit)
+            {
+                OnInit(in settings);
+                isInit = true;
+            }
         }
-        public abstract void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds);
+
+        public virtual void OnInit(in SimulationSettings settings) { }
+        public abstract void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings);
         public virtual void Dispose() { }
+
+        public static NativeGrid<float3> CreateVectorField(in SimulationSettings settings, Allocator allocator = Allocator.Persistent)
+        {
+            return new NativeGrid<float3>(settings.vectorFieldSize, allocator);
+        }
     }
 }

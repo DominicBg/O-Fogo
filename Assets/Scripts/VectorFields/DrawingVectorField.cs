@@ -24,20 +24,19 @@ namespace OFogo
             stroke.Dispose();
         }
 
-        public override NativeGrid<float3> CreateVectorField(int2 size, in Bounds bounds, Allocator allocator = Allocator.Persistent)
+        public override void OnInit(in SimulationSettings settings)
         {
+            base.OnInit(settings);
             stroke = new NativeList<float3>(100, Allocator.Persistent);
-
-            return base.CreateVectorField(size, bounds, allocator);
         }
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds)
+        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             if (stroke.Length > 0 && isStrokeFinised)
             {
                 for (int i = 1; i < stroke.Length; i++)
                 {
-                    int2 hashPos = OFogoHelper.HashPosition(stroke[i], bounds, vectorField.Size);
+                    int2 hashPos = OFogoHelper.HashPosition(stroke[i], settings.simulationBound, vectorField.Size);
                     float3 delta = stroke[i] - stroke[i - 1];
                     vectorField[hashPos] += delta * strength;
                 }

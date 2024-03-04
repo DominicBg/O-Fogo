@@ -6,12 +6,14 @@ namespace OFogo
     {
         [SerializeField] float3 force;
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds)
+        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
-            //todo optim this 
-            foreach(int2 pos in vectorField.GetIterator())
+            for (int x = 0; x < vectorField.Size.x; x++)
             {
-                vectorField[pos] = force;
+                for (int y = 0; y < vectorField.Size.y; y++)
+                {
+                    vectorField[x, y] = force;
+                }
             }
         }
     }

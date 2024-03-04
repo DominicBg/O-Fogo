@@ -31,5 +31,8 @@ namespace OFogo
         [Header("Particles")]
         public float minParticleSize;
         public float maxParticleSize;
+
+        [Header("Other")]
+        public int2 vectorFieldSize;
     }
 }

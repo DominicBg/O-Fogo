@@ -25,7 +25,8 @@ namespace OFogo
 
             var animationAutomation = animationAutomations[currentAnimationIndex];
 
-            animationAutomation.UpdateAnimation(math.min(internalTimer, animationAutomation.duration), math.saturate(internalTimer / animationAutomation.duration));
+            float timeRatio = animationAutomation.animationCurve.Evaluate(math.saturate(internalTimer / animationAutomation.duration));
+            animationAutomation.UpdateAnimation(timeRatio);
 
             if (internalTimer > animationAutomation.duration)
             {

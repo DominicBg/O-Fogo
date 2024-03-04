@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace OFogo
@@ -20,25 +21,16 @@ namespace OFogo
         [SerializeField] VectorFieldRenderer vectorFieldRenderer;
 
         [Header("Simulation")]
-        [SerializeField] public SimulationSettings settings;
+        public SimulationSettings settings;
         [SerializeField] float initialSpacing = 0.5f;
         [SerializeField] int numberThreadJob = 16;
-        [SerializeField] int2 vectorFieldSize = 35;
         [SerializeField] float simulationSpeed = 1;
         [SerializeField] int substeps = 4;
         public EFireSimulatorType fireSimulatorTypeA;
         public EFireSimulatorType fireSimulatorTypeB;
         [Range(0, 1)]
         public float fireSimulatorLerpRatio = 0;
-
-
-        //todo move in other component
-        [Header("Debug")]
-        [SerializeField] bool drawVectorFieldDebug;
-        [SerializeField] bool drawBoundsDebug;
-        [SerializeField] bool drawCalentadorDebug;
-        [SerializeField] float debugRayDist = 5;
-        [SerializeField] NativeLeakDetectionMode nativeLeakDetectionMode;
+        public bool isFireSimulatorLerpAdditive;
 
         public NativeGrid<float3> vectorField;
         public NativeArray<FireParticle> fireParticles;
@@ -65,7 +57,9 @@ namespace OFogo
             vectorFieldSimulator.Init(in settings);
             fireStrokeSimulator.Init(in settings);
 
-            vectorField = vectorFieldGenerator.CreateVectorField(vectorFieldSize, in settings.simulationBound);
+            vectorField = VectorFieldGenerator.CreateVectorField(in settings);
+
+            vectorFieldGenerator.TryInit(in settings);
             vectorFieldRenderer.Init(vectorField);
         }
 
@@ -92,13 +86,8 @@ namespace OFogo
 
         private void Update()
         {
-            //stupid hack
-            NativeLeakDetection.Mode = nativeLeakDetectionMode;
-
             fogoRenderer.Render(in fireParticles, in settings);
             vectorFieldRenderer.Render(in vectorField, in settings);
-            DrawDebugBounds();
-            DrawVectorField();
         }
 
         private void FixedUpdate()
@@ -118,13 +107,13 @@ namespace OFogo
                 IFireParticleSimulator simulatorA = GetSimulator(fireSimulatorTypeA);
                 IFireParticleSimulator simulatorB = GetSimulator(fireSimulatorTypeB);
 
-                if(fireSimulatorLerpRatio == 0)
+                if (fireSimulatorLerpRatio == 0)
                 {
                     UpdateSimulation(simulatorA, in simData, fireParticles);
                 }
-                else if(fireSimulatorLerpRatio == 1)
-                {      
-                     UpdateSimulation(simulatorB, in simData, fireParticles);           
+                else if (fireSimulatorLerpRatio == 1)
+                {
+                    UpdateSimulation(simulatorB, in simData, fireParticles);
                 }
                 else
                 {
@@ -157,7 +146,7 @@ namespace OFogo
 
             if (simulator.NeedsVectorField())
             {
-                vectorFieldGenerator.UpdateVectorField(ref vectorField, in settings.simulationBound);
+                vectorFieldGenerator.UpdateVectorField(ref vectorField, in settings);
             }
 
             simulator.UpdateSimulation(in simData, ref fireParticles, vectorField, settings);
@@ -174,8 +163,7 @@ namespace OFogo
             UpdateSimulation(simulatorA, simData, fireParticlesA);
             UpdateSimulation(simulatorB, simData, fireParticlesB);
 
-            new LerpParticleJobs(fireParticlesA, fireParticlesB, t).RunParralel(fireParticlesA.Length);
-
+            new LerpParticleJobs(fireParticlesA, fireParticlesB, t, isFireSimulatorLerpAdditive).RunParralelAndProfile(fireParticlesA.Length);
             return fireParticlesA;
         }
 
@@ -184,25 +172,32 @@ namespace OFogo
             NativeArray<FireParticle> fireParticlesA;
             NativeArray<FireParticle> fireParticlesB;
             public float t;
+            public bool isFireSimulatorLerpAdditive;
 
-            public LerpParticleJobs(NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticlesB, float t)
+            public LerpParticleJobs(NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticlesB, float t, bool isFireSimulatorLerpAdditive)
             {
                 this.fireParticlesA = fireParticlesA;
                 this.fireParticlesB = fireParticlesB;
+                this.isFireSimulatorLerpAdditive = isFireSimulatorLerpAdditive;
                 this.t = t;
             }
 
             public void Execute(int index)
             {
-                fireParticlesA[index] = FireParticle.Lerp(fireParticlesA[index], fireParticlesB[index], t);
-                fireParticlesB[index] = fireParticlesA[index];
+                FireParticle fireParticle = FireParticle.Lerp(fireParticlesA[index], fireParticlesB[index], t);
+                fireParticlesA[index] = fireParticle;
+
+                //if not, it won't reset the position of the particles B, so it will do a drag effect
+                if (!isFireSimulatorLerpAdditive)
+                {
+                    fireParticlesB[index] = fireParticle;
+                }
             }
         }
 
-
         public void FillHashGrid()
         {
-            new FillHashGridJob(fireParticles, nativeHashingGrid, settings).Run();
+            new FillHashGridJob(fireParticles, nativeHashingGrid, settings).RunAndProfile();
         }
 
         public NativeGrid<float3> VectorField
@@ -230,58 +225,6 @@ namespace OFogo
             }
             nativeHashingGrid.Dispose();
             vectorField.Dispose();
-        }
-
-        private void DrawDebugBounds()
-        {
-            float3 min = transform.position + settings.simulationBound.min;
-            float3 max = transform.position + settings.simulationBound.max;
-            float3 bottomLeft = new float3(min.x, min.y, 0f);
-            float3 bottomRight = new float3(max.x, min.y, 0f);
-            float3 topLeft = new float3(min.x, max.y, 0f);
-            float3 topRight = new float3(max.x, max.y, 0f);
-            Debug.DrawLine(bottomLeft, topLeft, Color.white);
-            Debug.DrawLine(topLeft, topRight, Color.white);
-            Debug.DrawLine(topRight, bottomRight, Color.white);
-            Debug.DrawLine(bottomRight, bottomLeft, Color.white);
-
-            float2 invLength = 1f / (float2)settings.hashingGridLength;
-            for (int i = 0; i < settings.hashingGridLength.x; i++)
-            {
-                float yRatio = i * invLength.y;
-                float y = math.lerp(min.y, max.y, yRatio);
-                float3 start = new float3(min.x, y, min.z);
-                float3 end = new float3(max.x, y, max.z);
-                Debug.DrawLine(start, end, Color.cyan * 0.25f);
-            }
-
-            for (int i = 0; i < settings.hashingGridLength.y; i++)
-            {
-                float xRatio = i * invLength.x;
-                float x = math.lerp(min.x, max.x, xRatio);
-                float3 start = new float3(x, min.y, min.z);
-                float3 end = new float3(x, max.y, max.z);
-                Debug.DrawLine(start, end, Color.cyan * 0.25f);
-            }
-        }
-
-        private void DrawVectorField()
-        {
-            float3 min = transform.position + settings.simulationBound.min;
-            float3 max = transform.position + settings.simulationBound.max;
-
-            float2 invSize = 1f / (float2)vectorField.Size;
-            for (int x = 0; x < vectorField.Size.x; x++)
-            {
-                for (int y = 0; y < vectorField.Size.y; y++)
-                {
-                    float2 pos = new float2(x + 0.5f, y + 0.5f) * invSize;
-                    float3 t = new float3(pos, 0);
-                    float3 gridCenter = math.lerp(min, max, t);
-                    float3 force = vectorField[x, y];
-                    Debug.DrawRay(gridCenter, force * debugRayDist, Color.white);
-                }
-            }
         }
     }
 }

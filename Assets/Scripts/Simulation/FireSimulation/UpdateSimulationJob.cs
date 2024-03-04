@@ -28,7 +28,7 @@ namespace OFogo
 
             if (settings.useVectorFieldAsGravity)
             {
-                acceleration += heatTurbulence * (settings.fireGravity + fireParticle.temperature * settings.temperatureUpwardForce);
+                acceleration += math.normalizesafe(heatTurbulence) * (settings.fireGravity + fireParticle.temperature * settings.temperatureUpwardForce);
             }
             else
             {

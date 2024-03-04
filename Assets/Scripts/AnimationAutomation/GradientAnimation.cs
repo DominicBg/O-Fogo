@@ -17,7 +17,7 @@ namespace OFogo
         {
         }
 
-        public override void UpdateAnimation(float time, float timeRatio)
+        public override void UpdateAnimation(float timeRatio)
         {
             magicController.LerpGradient(gradientIndexA, gradientIndexB, timeRatio);
         }

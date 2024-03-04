@@ -1,7 +1,6 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -44,7 +43,7 @@ namespace OFogo
                 fireParticles = fireParticles,
                 settings = settings,
                 vectorField = vectorField,
-            }.RunParralel(fireParticles.Length);
+            }.RunParralelAndProfile(fireParticles.Length);
         }
 
         public void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
@@ -59,7 +58,7 @@ namespace OFogo
                     nativeHashingGrid = nativeHashingGrid,
                     settings = settings,
                     maxParticleCollision = maxParticleCollision
-                }.RunParralel(fireParticles.Length);
+                }.RunParralelAndProfile(fireParticles.Length);
             }
             else
             {
@@ -70,7 +69,7 @@ namespace OFogo
                     nativeHashingGrid = nativeHashingGrid,
                     settings = settings,
                     maxParticleCollision = maxParticleCollision
-                }.Run();
+                }.RunAndProfile();
             }
 
             var rngRef = new NativeReference<Unity.Mathematics.Random>(rng, Allocator.TempJob);
@@ -80,7 +79,8 @@ namespace OFogo
                 fireParticles = fireParticles,
                 rngRef = rngRef,
                 settings = settings,
-            }.Run();
+            }.RunAndProfile();
+
             rng = rngRef.Value;
             rngRef.Dispose();
 
@@ -89,7 +89,7 @@ namespace OFogo
                 fireParticleCollisionPair = fireParticleCollisionPair,
                 fireParticles = fireParticles,
                 settings = settings,
-            }.Run();
+            }.RunAndProfile();
         }
 
         public void Dispose()

@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace OFogo
@@ -32,7 +33,8 @@ namespace OFogo
                 vectorField = vectorField,
                 settings = settings,
                 maxCollision = maxCollision,
-            }.RunParralel(fireParticles.Length);
+            }.RunParralelAndProfile(fireParticles.Length);
+
         }
 
         public void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
@@ -47,14 +49,15 @@ namespace OFogo
                 separationForce = separationForce,
                 vectorField = vectorField,
                 desiredForce = desiredForce
-            }.RunParralel(fireParticles.Length);
+            }.RunParralelAndProfile(fireParticles.Length);
 
             new ParticleSimulationApplyDesiredForceJob()
             {
                 fireParticles = fireParticles,
                 settings = settings,
-                desiredForce = desiredForce
-            }.RunParralel(fireParticles.Length);
+                desiredForce = desiredForce,
+                
+            }.RunParralelAndProfile(fireParticles.Length);
         }
 
         public void Dispose()
@@ -145,7 +148,7 @@ namespace OFogo
 
                     float3 dir;
 
-                    if(collisionBuffer[j].distSq < 0.001f)
+                    if (collisionBuffer[j].distSq < 0.001f)
                     {
                         var rng = Unity.Mathematics.Random.CreateFromIndex((uint)i);
                         dir = rng.NextFloat3Direction();
@@ -178,7 +181,7 @@ namespace OFogo
         public NativeArray<FireParticle> fireParticles;
         public NativeArray<float3> desiredForce;
         public SimulationSettings settings;
-        
+
         public void Execute(int i)
         {
             FireParticle fireParticle = fireParticles[i];

@@ -27,7 +27,7 @@ namespace OFogo
                 fireParticles = fireParticles,
                 settings = settings,
                 heatSettings = heatSettings,
-            }.RunParralel(fireParticles.Length);
+            }.RunParralelAndProfile(fireParticles.Length);
         }
 
         [BurstCompile]

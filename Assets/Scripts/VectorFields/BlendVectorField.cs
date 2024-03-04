@@ -14,18 +14,16 @@ namespace OFogo
         NativeGrid<float3> vectorField1;
         NativeGrid<float3> vectorField2;
 
-        public override NativeGrid<float3> CreateVectorField(int2 size, in Bounds bounds, Allocator allocator = Allocator.Persistent)
+        public override void OnInit(in SimulationSettings settings)
         {
-            vectorField1 = vectorFieldGenerator1.CreateVectorField(size, in bounds, allocator);
-            vectorField2 = vectorFieldGenerator2.CreateVectorField(size, in bounds, allocator);
-
-            return vectorField1;
+            vectorField1 = CreateVectorField(settings, Allocator.Persistent);
+            vectorField2 = CreateVectorField(settings, Allocator.Persistent);
         }
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds)
+        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
-            vectorFieldGenerator1.UpdateVectorField(ref vectorField1, in bounds);
-            vectorFieldGenerator2.UpdateVectorField(ref vectorField2, in bounds);
+            vectorFieldGenerator1.UpdateVectorField(ref vectorField1, in settings);
+            vectorFieldGenerator2.UpdateVectorField(ref vectorField2, in settings);
 
             for (int x = 0; x < vectorField1.Size.x; x++)
             {

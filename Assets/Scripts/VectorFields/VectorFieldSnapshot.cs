@@ -12,7 +12,7 @@ namespace OFogo
         public void Serialize(in NativeGrid<float3> vectorField)
         {
             size = vectorField.Size;
-            vectors = new float3[vectorField.Size.x * vectorField.Size.y]; 
+            vectors = new float3[vectorField.Size.x * vectorField.Size.y];
             for (int x = 0; x < vectorField.Size.x; x++)
             {
                 for (int y = 0; y < vectorField.Size.y; y++)
@@ -32,6 +32,16 @@ namespace OFogo
                 }
             }
             return vectorField;
+        }
+        public void DeserializeInVectorField(ref NativeGrid<float3> vectorField)
+        {
+            for (int x = 0; x < vectorField.Size.x; x++)
+            {
+                for (int y = 0; y < vectorField.Size.y; y++)
+                {
+                    vectorField[x, y] = vectors[vectorField.PosToIndex(new int2(x, y))];
+                }
+            }
         }
     }
 }

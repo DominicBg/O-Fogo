@@ -1,5 +1,6 @@
 using Unity.Collections;
 using Unity.Mathematics;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace OFogo
@@ -15,32 +16,23 @@ namespace OFogo
 
         NativeGrid<float3>[] vectorFields;
 
-        public override NativeGrid<float3> CreateVectorField(int2 size, in Bounds bounds, Allocator allocator = Allocator.Persistent)
+        public override void OnInit(in SimulationSettings settings)
         {
             vectorFields = new NativeGrid<float3>[fields.Length];
 
             if (fields.Length == 0)
             {
                 Debug.LogError(nameof(fields) + " can't be null.");
-                return default;
             }
 
-            vectorFields[0] = fields[0].CreateVectorField(size, in bounds, allocator);
-            //size = vectorFields[0].Size;
-
-            for (int i = 1; i < fields.Length; i++)
+            for (int i = 0; i < fields.Length; i++)
             {
-                vectorFields[i] = fields[i].CreateVectorField(size, in bounds, allocator);
-                if (math.any(vectorFields[i].Size != size))
-                {
-                    Debug.LogError("Vector fields aren't the same size. Will cause errors");
-                }
+                vectorFields[i] = CreateVectorField(in settings, Allocator.Persistent);
             }
-
-            return base.CreateVectorField(size, bounds, allocator);
         }
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in Bounds bounds)
+
+        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             float time = (timeOffset + Time.time) * morphSpeed;
             int currentIndex = (int)math.floor(time) % vectorFields.Length;
@@ -51,8 +43,8 @@ namespace OFogo
             NativeGrid<float3> v1 = vectorFields[currentIndex];
             NativeGrid<float3> v2 = vectorFields[nextIndex];
 
-            fields[currentIndex].UpdateVectorField(ref v1, in bounds);
-            fields[nextIndex].UpdateVectorField(ref v2, in bounds);
+            fields[currentIndex].UpdateVectorField(ref v1, in settings);
+            fields[nextIndex].UpdateVectorField(ref v2, in settings);
 
             for (int x = 0; x < v1.Size.x; x++)
             {

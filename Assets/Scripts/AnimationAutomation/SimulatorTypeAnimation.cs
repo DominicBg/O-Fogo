@@ -18,7 +18,7 @@ namespace OFogo
             controller.fireSimulatorTypeB = simulatorTypeB;
         }
 
-        public override void UpdateAnimation(float time, float timeRatio)
+        public override void UpdateAnimation(float timeRatio)
         {
             controller.fireSimulatorLerpRatio = timeRatio;
         }
