@@ -12,12 +12,16 @@ namespace OFogo
         public struct HeatSettings
         {
             public float heatSize;
-        }
-        public HeatSettings heatSettings = new HeatSettings()
-        {
-            heatSize = 0.5f,
-        };
+            public float heatingPerSec;
 
+            public static HeatSettings Default = new HeatSettings()
+            {
+                heatSize = 0.5f,
+                heatingPerSec = 10,
+            };
+        }
+
+        [SerializeField] HeatSettings heatSettings = HeatSettings.Default;
 
         public override void HeatParticles(in SimulationData simData, ref NativeArray<FireParticle> fireParticles, in SimulationSettings settings)
         {
@@ -42,11 +46,11 @@ namespace OFogo
             public void Execute(int index)
             {
                 FireParticle fireParticleParticle = fireParticles[index];
-                WarmupParticle(ref fireParticleParticle);
+                HeatParticle(ref fireParticleParticle);
                 fireParticles[index] = fireParticleParticle;
             }
 
-            public void WarmupParticle(ref FireParticle particle)
+            public void HeatParticle(ref FireParticle particle)
             {
                 float3 min = settings.simulationBound.min;
                 float3 max = settings.simulationBound.max;
@@ -57,7 +61,7 @@ namespace OFogo
                 float minDist = math.cmin(minDists);
 
                 float heightSmoothStep = 1f - math.smoothstep(0, heatSettings.heatSize, minDist);
-                float heat = heightSmoothStep * settings.heatingPerSec;
+                float heat = heightSmoothStep * heatSettings.heatingPerSec;
                 particle.temperature += heat * simData.dt;
             }
         }

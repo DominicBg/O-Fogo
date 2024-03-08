@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace OFogo
 {
-    public class FireStrokeSimulator : MonoBehaviour, IFireParticleSimulator
+    public class FireStrokeSimulator : FireParticleSimulator
     {
-        public bool CanResolveCollision() => false;
-        public bool IsHandlingParticleHeating() => true;
-        public bool NeedsVectorField() => false;
+        public override bool CanResolveCollision() => false;
+        public override bool IsHandlingParticleHeating() => true;
+        public override bool NeedsVectorField() => false;
 
         public float timeScale = 1;
         public float burnSpeed = 1;
@@ -32,14 +32,14 @@ namespace OFogo
             public int count;
         }
 
-        public void Init(in SimulationSettings settings)
+        protected override void Init(in SimulationSettings settings)
         {
             fireLines = GetComponentsInChildren<FireStroke>();
             fireStrokeContainers = new NativeArray<FireStrokeContainer>(fireLines.Length, Allocator.Persistent);
             particlesInfoPerLines = new NativeArray<ParticleInfoPerLine>(fireLines.Length, Allocator.Persistent);
         }
 
-        public void UpdateSimulation(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in SimulationSettings settings)
+        public override void UpdateSimulation(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             float lengthSum = 0;
             for (int i = 0; i < fireLines.Length; i++)
@@ -90,12 +90,12 @@ namespace OFogo
             }.RunParralelAndProfile(fireParticles.Length);
         }
 
-        public void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
+        public override void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
         {
             //
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             fireStrokeContainers.Dispose();
             particlesInfoPerLines.Dispose();

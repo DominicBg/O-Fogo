@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
+using static OFogo.OFogoSimulator;
 
 namespace OFogo
 {
@@ -12,6 +13,7 @@ namespace OFogo
         public NativeList<FireParticleCollision> fireParticleCollisionPair;
         public SimulationSettings settings;
         public NativeReference<Random> rngRef;
+        public InternalSettings internalSettings;
 
         public void Execute()
         {
@@ -42,14 +44,14 @@ namespace OFogo
 
                 float3 delta = 0.5f * dir * penetration;
 
-                particleA.position += delta * settings.resolutionStepRatio;
-                particleB.position -= delta * settings.resolutionStepRatio;
+                particleA.position += delta * internalSettings.resolutionStepRatio;
+                particleB.position -= delta * internalSettings.resolutionStepRatio;
 
-                particleA.velocity += delta * settings.colisionVelocityResolution;
-                particleB.velocity -= delta * settings.colisionVelocityResolution;
+                particleA.velocity += delta * internalSettings.collisionVelocityResolution;
+                particleB.velocity -= delta * internalSettings.collisionVelocityResolution;
 
-                OFogoHelper.ApplyConstraintBounce(ref particleA, settings);
-                OFogoHelper.ApplyConstraintBounce(ref particleB, settings);
+                OFogoHelper.ApplyConstraintBounce(ref particleA, settings, internalSettings.wallBounceIntensity);
+                OFogoHelper.ApplyConstraintBounce(ref particleB, settings, internalSettings.wallBounceIntensity);
 
                 fireParticles[pair.indexA] = particleA;
                 fireParticles[pair.indexB] = particleB;

@@ -2,18 +2,16 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
-using Unity.Profiling;
 using UnityEngine;
 
 namespace OFogo
 {
-    public enum EFireSimulatorType { FOGO, VectorField, Stroke }
     public class OFogoController : MonoBehaviour
     {
+        public static OFogoController Instance;
+
         [Header("Components")]
-        [SerializeField] OFogoSimulator fogoSimulator;
-        [SerializeField] VectorFieldParticleSimulator vectorFieldSimulator;
-        [SerializeField] FireStrokeSimulator fireStrokeSimulator;
+        [SerializeField] FireParticleSimulator simulator;
 
         [SerializeField] Calentador calentador;
         [SerializeField] FogoRenderer fogoRenderer;
@@ -26,21 +24,26 @@ namespace OFogo
         [SerializeField] int numberThreadJob = 16;
         [SerializeField] float simulationSpeed = 1;
         [SerializeField] int substeps = 4;
-        public EFireSimulatorType fireSimulatorTypeA;
-        public EFireSimulatorType fireSimulatorTypeB;
-        [Range(0, 1)]
-        public float fireSimulatorLerpRatio = 0;
-        public bool isFireSimulatorLerpAdditive;
+
+        //public EFireSimulatorType fireSimulatorTypeA;
+        //public EFireSimulatorType fireSimulatorTypeB;
+        //[Range(0, 1)]
+        //public float fireSimulatorLerpRatio = 0;
+        //public bool isFireSimulatorLerpAdditive;
 
         public NativeGrid<float3> vectorField;
         public NativeArray<FireParticle> fireParticles;
-        public NativeArray<FireParticle> fireParticlesB;
+        //public NativeArray<FireParticle> fireParticlesB;
         public NativeGrid<UnsafeList<int>> nativeHashingGrid;
+
+        private void Awake()
+        {
+            Instance = this;
+        }
 
         private void Start()
         {
             fireParticles = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
-            fireParticlesB = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
             nativeHashingGrid = new NativeGrid<UnsafeList<int>>(settings.hashingGridLength, Allocator.Persistent);
 
             for (int x = 0; x < settings.hashingGridLength.x; x++)
@@ -52,10 +55,7 @@ namespace OFogo
             }
             SpawnParticles();
 
-            fogoSimulator.Init(in settings);
             fogoRenderer.Init(settings.particleCount);
-            vectorFieldSimulator.Init(in settings);
-            fireStrokeSimulator.Init(in settings);
 
             vectorField = VectorFieldGenerator.CreateVectorField(in settings);
 
@@ -86,8 +86,17 @@ namespace OFogo
 
         private void Update()
         {
-            fogoRenderer.Render(in fireParticles, in settings);
-            vectorFieldRenderer.Render(in vectorField, in settings);
+            if (fogoRenderer.alpha > 0)
+            {
+                fogoRenderer.Render(in fireParticles, in settings);
+            }
+
+            if (vectorFieldRenderer.alpha > 0)
+            {
+                vectorFieldRenderer.Render(in vectorField, in settings);
+            }
+            calentador?.DrawDebug(transform.position, in settings);
+
         }
 
         private void FixedUpdate()
@@ -104,41 +113,29 @@ namespace OFogo
                     pos = transform.position,
                 };
 
-                IFireParticleSimulator simulatorA = GetSimulator(fireSimulatorTypeA);
-                IFireParticleSimulator simulatorB = GetSimulator(fireSimulatorTypeB);
+                UpdateSimulation(simulator, in simData, fireParticles);
 
-                if (fireSimulatorLerpRatio == 0)
-                {
-                    UpdateSimulation(simulatorA, in simData, fireParticles);
-                }
-                else if (fireSimulatorLerpRatio == 1)
-                {
-                    UpdateSimulation(simulatorB, in simData, fireParticles);
-                }
-                else
-                {
-                    UpdateLerpSimulation(simulatorA, simulatorB, simData, fireParticles, fireParticlesB, fireSimulatorLerpRatio);
-                }
-                calentador?.DrawDebug(transform.position, in settings);
+                //IFireParticleSimulator simulatorB = GetSimulator(fireSimulatorTypeB);
+
+                //if (fireSimulatorLerpRatio == 0)
+                //{
+                //    UpdateSimulation(simulatorA, in simData, fireParticles);
+                //}
+                //else if (fireSimulatorLerpRatio == 1)
+                //{
+                //    UpdateSimulation(simulatorB, in simData, fireParticles);
+                //}
+                //else
+                //{
+                //    UpdateLerpSimulation(simulatorA, simulatorB, simData, fireParticles, fireParticlesB, fireSimulatorLerpRatio);
+                //}
             }
         }
 
-        private IFireParticleSimulator GetSimulator(EFireSimulatorType fireSimulatorType)
+        public void UpdateSimulation(FireParticleSimulator simulator, in SimulationData simData, NativeArray<FireParticle> fireParticles)
         {
-            switch (fireSimulatorType)
-            {
-                case EFireSimulatorType.FOGO:
-                    return fogoSimulator;
-                case EFireSimulatorType.VectorField:
-                    return vectorFieldSimulator;
-                case EFireSimulatorType.Stroke:
-                    return fireStrokeSimulator;
-            }
-            return null;
-        }
+            simulator.TryInit(in settings);
 
-        void UpdateSimulation(IFireParticleSimulator simulator, in SimulationData simData, NativeArray<FireParticle> fireParticles)
-        {
             if (!simulator.IsHandlingParticleHeating())
             {
                 calentador?.HeatParticles(in simData, ref fireParticles, settings);
@@ -158,42 +155,42 @@ namespace OFogo
             }
         }
 
-        NativeArray<FireParticle> UpdateLerpSimulation(IFireParticleSimulator simulatorA, IFireParticleSimulator simulatorB, in SimulationData simData, NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticleBuffer, float t)
-        {
-            UpdateSimulation(simulatorA, simData, fireParticlesA);
-            UpdateSimulation(simulatorB, simData, fireParticlesB);
+        //NativeArray<FireParticle> UpdateLerpSimulation(IFireParticleSimulator simulatorA, IFireParticleSimulator simulatorB, in SimulationData simData, NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticleBuffer, float t)
+        //{
+        //    UpdateSimulation(simulatorA, simData, fireParticlesA);
+        //    UpdateSimulation(simulatorB, simData, fireParticleBuffer);
 
-            new LerpParticleJobs(fireParticlesA, fireParticlesB, t, isFireSimulatorLerpAdditive).RunParralelAndProfile(fireParticlesA.Length);
-            return fireParticlesA;
-        }
+        //    new LerpParticleJobs(fireParticlesA, fireParticlesB, t, isFireSimulatorLerpAdditive).RunParralelAndProfile(fireParticlesA.Length);
+        //    return fireParticlesA;
+        //}
 
-        public struct LerpParticleJobs : IJobParallelFor
-        {
-            NativeArray<FireParticle> fireParticlesA;
-            NativeArray<FireParticle> fireParticlesB;
-            public float t;
-            public bool isFireSimulatorLerpAdditive;
+        //public struct LerpParticleJobs : IJobParallelFor
+        //{
+        //    NativeArray<FireParticle> fireParticlesA;
+        //    NativeArray<FireParticle> fireParticlesB;
+        //    public float t;
+        //    public bool isFireSimulatorLerpAdditive;
 
-            public LerpParticleJobs(NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticlesB, float t, bool isFireSimulatorLerpAdditive)
-            {
-                this.fireParticlesA = fireParticlesA;
-                this.fireParticlesB = fireParticlesB;
-                this.isFireSimulatorLerpAdditive = isFireSimulatorLerpAdditive;
-                this.t = t;
-            }
+        //    public LerpParticleJobs(NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticlesB, float t, bool isFireSimulatorLerpAdditive)
+        //    {
+        //        this.fireParticlesA = fireParticlesA;
+        //        this.fireParticlesB = fireParticlesB;
+        //        this.isFireSimulatorLerpAdditive = isFireSimulatorLerpAdditive;
+        //        this.t = t;
+        //    }
 
-            public void Execute(int index)
-            {
-                FireParticle fireParticle = FireParticle.Lerp(fireParticlesA[index], fireParticlesB[index], t);
-                fireParticlesA[index] = fireParticle;
+        //    public void Execute(int index)
+        //    {
+        //        FireParticle fireParticle = FireParticle.Lerp(fireParticlesA[index], fireParticlesB[index], t);
+        //        fireParticlesA[index] = fireParticle;
 
-                //if not, it won't reset the position of the particles B, so it will do a drag effect
-                if (!isFireSimulatorLerpAdditive)
-                {
-                    fireParticlesB[index] = fireParticle;
-                }
-            }
-        }
+        //        //if not, it won't reset the position of the particles B, so it will do a drag effect
+        //        if (!isFireSimulatorLerpAdditive)
+        //        {
+        //            fireParticlesB[index] = fireParticle;
+        //        }
+        //    }
+        //}
 
         public void FillHashGrid()
         {
@@ -208,12 +205,10 @@ namespace OFogo
 
         private void OnDestroy()
         {
-            fogoSimulator.Dispose();
+            simulator.Dispose();
             vectorFieldGenerator.Dispose();
             fogoRenderer.Dispose();
             vectorFieldRenderer.Dispose();
-            vectorFieldSimulator.Dispose();
-            fireStrokeSimulator.Dispose();
 
             fireParticles.Dispose();
             for (int x = 0; x < settings.hashingGridLength.x; x++)

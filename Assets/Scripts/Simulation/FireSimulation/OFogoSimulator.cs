@@ -2,27 +2,59 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace OFogo
 {
     [BurstCompile]
-    public class OFogoSimulator : MonoBehaviour, IFireParticleSimulator
+    public class OFogoSimulator : FireParticleSimulator
     {
-        public bool CanResolveCollision() => true;
-        public bool IsHandlingParticleHeating() => false;
-        public bool NeedsVectorField() => true;
+        [System.Serializable]
+        public struct InternalSettings
+        {
+            public IntegrationType integrationType;
+            public uint seed;
+            public int maxParticleCollision;
+            public bool parallelCollision;
 
-        public uint seed = 43243215;
-        public bool parallelCollision;
-        public int maxParticleCollision = -1;
+            public float resolutionStepRatio;
+            public float collisionVelocityResolution;
+            public float maxSpeed;
+            public float wallBounceIntensity;
+            public bool useVectorFieldAsGravity;
+            public float fireGravity;
+            public float temperatureDropPerSec;
+            public float temperatureUpwardForce;
+            public float heatTransferPercent;
+
+            public static InternalSettings Default = new InternalSettings()
+            {
+                integrationType = IntegrationType.Verlet,
+                seed = 43243215,
+                maxParticleCollision = -1,
+                parallelCollision = true,
+                resolutionStepRatio = 0.5f,
+                collisionVelocityResolution = 0.2f,
+                maxSpeed = 1,
+                fireGravity = -3,
+                heatTransferPercent = 0.5f,
+                temperatureDropPerSec = 1,
+                temperatureUpwardForce = 3,
+                useVectorFieldAsGravity = false,
+                wallBounceIntensity = 0.2f
+            };
+        }
+
+        public override bool CanResolveCollision() => true;
+        public override bool IsHandlingParticleHeating() => false;
+        public override bool NeedsVectorField() => true;
+        public InternalSettings internalSettings = InternalSettings.Default;
 
         NativeList<FireParticleCollision> fireParticleCollisionPair;
-        Unity.Mathematics.Random rng;
+        Random rng;
 
-        public void Init(in SimulationSettings settings)
+        protected override void Init(in SimulationSettings settings)
         {
-            rng = Unity.Mathematics.Random.CreateFromIndex(seed);
+            rng = Random.CreateFromIndex(internalSettings.seed);
             fireParticleCollisionPair = new NativeList<FireParticleCollision>(GetMaxCollisionCount(settings.particleCount), Allocator.Persistent);
         }
 
@@ -35,21 +67,22 @@ namespace OFogo
             return (particleCount * (particleCount - 1)) / 2;
         }
 
-        public void UpdateSimulation(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in SimulationSettings settings)
+        public override void UpdateSimulation(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             new UpdateSimulationJob()
             {
                 simulationData = simulationData,
                 fireParticles = fireParticles,
                 settings = settings,
+                internalSettings = internalSettings,
                 vectorField = vectorField,
             }.RunParralelAndProfile(fireParticles.Length);
         }
 
-        public void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
+        public override void ResolveCollision(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in NativeGrid<UnsafeList<int>> nativeHashingGrid, in SimulationSettings settings)
         {
             fireParticleCollisionPair.Clear();
-            if (parallelCollision)
+            if (internalSettings.parallelCollision)
             {
                 new FindCollisionPairParallelJob()
                 {
@@ -57,7 +90,7 @@ namespace OFogo
                     fireParticleCollisionPair = fireParticleCollisionPair.AsParallelWriter(),
                     nativeHashingGrid = nativeHashingGrid,
                     settings = settings,
-                    maxParticleCollision = maxParticleCollision
+                    internalSettings = internalSettings
                 }.RunParralelAndProfile(fireParticles.Length);
             }
             else
@@ -68,7 +101,7 @@ namespace OFogo
                     fireParticleCollisionPair = fireParticleCollisionPair,
                     nativeHashingGrid = nativeHashingGrid,
                     settings = settings,
-                    maxParticleCollision = maxParticleCollision
+                    internalSettings = internalSettings
                 }.RunAndProfile();
             }
 
@@ -79,6 +112,7 @@ namespace OFogo
                 fireParticles = fireParticles,
                 rngRef = rngRef,
                 settings = settings,
+                internalSettings = internalSettings
             }.RunAndProfile();
 
             rng = rngRef.Value;
@@ -92,7 +126,7 @@ namespace OFogo
             }.RunAndProfile();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             fireParticleCollisionPair.Dispose();
         }

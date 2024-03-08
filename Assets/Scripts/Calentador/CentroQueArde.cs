@@ -12,11 +12,11 @@ namespace OFogo
         public void Execute(int index)
         {
             FireParticle fireParticleParticle = fireParticles[index];
-            WarmupParticle(ref fireParticleParticle);
+            HeatParticle(ref fireParticleParticle);
             fireParticles[index] = fireParticleParticle;
         }
 
-        public void WarmupParticle(ref FireParticle particle)
+        public void HeatParticle(ref FireParticle particle)
         {
 
         }

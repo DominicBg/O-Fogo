@@ -194,8 +194,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1901674432}
-  m_RootOrder: 1
+  m_Father: {fileID: 1094367719}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &32407745
 GameObject:
@@ -289,11 +289,90 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd83dd119afd09a48bb4ee71282e2be0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  alpha: 0
   ps: {fileID: 74523209}
   particleScaleMultiplier: 1
   maxForce: 2
   offsetRotationDeg: -90
   baseColor: {r: 1, g: 0.14710616, b: 0, a: 0.5372549}
+--- !u!1 &71494395
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 71494396}
+  - component: {fileID: 71494397}
+  m_Layer: 0
+  m_Name: Wait 1s
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &71494396
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 71494395}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1905998023}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &71494397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 71494395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 678f80e03ce34074bba5ab85a3653e39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 1
+  animationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &74523206
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,7 +390,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &74523207
 Transform:
   m_ObjectHideFlags: 0
@@ -5183,7 +5262,7 @@ Transform:
   m_Children:
   - {fileID: 52611694}
   m_Father: {fileID: 1901674432}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &165974519
 GameObject:
@@ -5300,6 +5379,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f391ca5d872ff6e4fbb5d104c2db349e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  alpha: 1
   ps: {fileID: 1008460231}
   heatGradient:
     serializedVersion: 2
@@ -5416,9 +5496,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
   controller: {fileID: 969678024}
-  simulatorTypeA: 2
-  simulatorTypeB: 0
 --- !u!1 &460166898
 GameObject:
   m_ObjectHideFlags: 0
@@ -5464,6 +5551,86 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   snapShot: {fileID: 11400000, guid: a4b56b7ba6d975a439738df973ce369f, type: 2}
+--- !u!1 &547283086
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 547283087}
+  - component: {fileID: 547283088}
+  m_Layer: 0
+  m_Name: Alpha Renderer animation (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &547283087
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 547283086}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1905998023}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &547283088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 547283086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a75c4822c73aee4889817969730b8a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 1
+  animationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  alphaRendererA: {fileID: 52611695}
+  alphaRendererB: {fileID: 305926068}
 --- !u!1 &574612066
 GameObject:
   m_ObjectHideFlags: 0
@@ -5655,6 +5822,15 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
   magicController: {fileID: 16314608}
   gradientIndexA: 3
   gradientIndexB: 1
@@ -5784,6 +5960,15 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
   magicController: {fileID: 16314608}
   gradientIndexA: 1
   gradientIndexB: 2
@@ -5934,33 +6119,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b57ab5c8d7de6a542b5e149005539342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fogoSimulator: {fileID: 2054115752}
-  vectorFieldSimulator: {fileID: 1317853645}
-  fireStrokeSimulator: {fileID: 1200326467}
+  simulator: {fileID: 2054115752}
   calentador: {fileID: 1162405490}
   fogoRenderer: {fileID: 305926068}
   vectorFieldGenerator: {fileID: 86655484}
   vectorFieldRenderer: {fileID: 52611695}
   settings:
     particleCount: 2000
-    integrationType: 1
     simulationBound:
       m_Center: {x: 0, y: 0, z: 0}
       m_Extent: {x: 14, y: 7, z: 0}
     hashingGridLength:
       x: 50
       y: 25
-    resolutionStepRatio: 0.5
-    colisionVelocityResolution: 0.2
-    maxSpeed: 3
-    wallBounceIntensity: 0.2
-    useVectorFieldAsGravity: 1
-    fireGravity: -3.8
-    temperatureDropPerSec: 1
-    temperatureUpwardForce: 2
     maxTemperature: 15
-    heatTransferPercent: 0.5
-    heatingPerSec: 15
     minParticleSize: 0.05
     maxParticleSize: 0.4
     vectorFieldSize:
@@ -5970,10 +6142,6 @@ MonoBehaviour:
   numberThreadJob: 16
   simulationSpeed: 2
   substeps: 2
-  fireSimulatorTypeA: 2
-  fireSimulatorTypeB: 1
-  fireSimulatorLerpRatio: 0
-  isFireSimulatorLerpAdditive: 1
 --- !u!4 &969678025
 Transform:
   m_ObjectHideFlags: 0
@@ -10834,9 +11002,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 16314609}
   m_Father: {fileID: 1901674432}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1094367720
 MonoBehaviour:
@@ -10901,6 +11070,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   heatSettings:
     heatSize: 0.5
+    heatingPerSec: 10
 --- !u!1 &1200326466
 GameObject:
   m_ObjectHideFlags: 0
@@ -10944,7 +11114,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1200326466}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.944043, y: -3.5545208, z: -9.298527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11087,8 +11257,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f3c1b65f3d8ee64793dfa715bf942e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  separationForce: 0.1
-  maxCollision: 100
+  internalSettings:
+    integrationType: 1
+    separationForce: 0.5
+    maxCollision: -1
+    wallBounceIntensity: 0.2
+    maxSpeed: 1
 --- !u!4 &1317853646
 Transform:
   m_ObjectHideFlags: 0
@@ -11227,8 +11401,17 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
   fireStrokeSimulator: {fileID: 1200326467}
-  minHeatHeight: 0.3
+  minHeatHeight: 1
   maxHeatHeight: 5
 --- !u!1 &1442316740
 GameObject:
@@ -11366,6 +11549,7 @@ MonoBehaviour:
     heatAtBottomNoiseRatio: 0.5
     heatAtBottomNoiseSize: 1
     heatAtBottomNoiseSpeed: 1
+    heatingPerSec: 10
 --- !u!1 &1544263631
 GameObject:
   m_ObjectHideFlags: 0
@@ -16299,9 +16483,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
   controller: {fileID: 969678024}
-  simulatorTypeA: 1
-  simulatorTypeB: 2
 --- !u!1 &1638934021
 GameObject:
   m_ObjectHideFlags: 0
@@ -16344,6 +16535,111 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c22030bb51b57fa4a9e12779a27f3dbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1696110232
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1696110233}
+  - component: {fileID: 1696110234}
+  - component: {fileID: 1696110235}
+  m_Layer: 0
+  m_Name: Alpha Renderer animation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1696110233
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696110232}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1905998023}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1696110234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696110232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a75c4822c73aee4889817969730b8a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 1
+  animationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1696110235}
+        m_TargetAssemblyTypeName: OFogo.ChangeSimulationTypeAnimHelper, Assembly-CSharp
+        m_MethodName: ChangeSimulationType
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  alphaRendererA: {fileID: 305926068}
+  alphaRendererB: {fileID: 52611695}
+--- !u!114 &1696110235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696110232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b82e839a03c97a9428b3759db11dabb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1766963422
@@ -16515,6 +16811,15 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
   fireStrokeSimulator: {fileID: 1200326467}
   minHeatHeight: 5
   maxHeatHeight: 0.3
@@ -16529,7 +16834,7 @@ GameObject:
   - component: {fileID: 1803425497}
   - component: {fileID: 1803425496}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: OFogoDebugger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16547,12 +16852,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 022c9e8e411b02b449fae59b0fca9700, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 969678024}
   drawVectorFieldDebug: 0
   drawBoundsDebug: 0
   drawCalentadorDebug: 0
-  debugRayDist: 5
-  nativeLeakDetectionMode: 1
+  debugRayDist: 0.5
+  nativeLeakDetectionMode: 3
 --- !u!4 &1803425497
 Transform:
   m_ObjectHideFlags: 0
@@ -16637,9 +16941,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
   controller: {fileID: 969678024}
-  simulatorTypeA: 0
-  simulatorTypeB: 1
 --- !u!1 &1901674431
 GameObject:
   m_ObjectHideFlags: 0
@@ -16669,7 +16980,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 305926069}
-  - {fileID: 16314609}
   - {fileID: 1094367719}
   - {fileID: 139235115}
   m_Father: {fileID: 969678025}
@@ -16691,7 +17001,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1905998022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16727,6 +17037,9 @@ Transform:
   - {fileID: 1566650011}
   - {fileID: 868057242}
   - {fileID: 1794096052}
+  - {fileID: 1696110233}
+  - {fileID: 71494396}
+  - {fileID: 547283087}
   m_Father: {fileID: 969678025}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -16847,6 +17160,15 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  OnStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEndEvent:
+    m_PersistentCalls:
+      m_Calls: []
   magicController: {fileID: 16314608}
   gradientIndexA: 2
   gradientIndexB: 3
@@ -16879,9 +17201,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4780854a517b2404eb25ade756095bbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 43243215
-  parallelCollision: 1
-  maxParticleCollision: -1
+  internalSettings:
+    integrationType: 1
+    seed: 43243215
+    maxParticleCollision: -1
+    parallelCollision: 1
+    resolutionStepRatio: 0.5
+    collisionVelocityResolution: 0
+    maxSpeed: 1
+    wallBounceIntensity: 0.2
+    useVectorFieldAsGravity: 0
+    fireGravity: 3
+    temperatureDropPerSec: 1
+    temperatureUpwardForce: 15
+    heatTransferPercent: 0.5
 --- !u!4 &2054115753
 Transform:
   m_ObjectHideFlags: 0
@@ -16890,7 +17223,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2054115751}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.944043, y: -3.5545208, z: -9.298527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17008,7 +17341,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2100030090}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.944043, y: 3.5545208, z: 9.298527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

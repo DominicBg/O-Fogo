@@ -38,7 +38,8 @@ namespace OFogo
                 particleScaleMultiplier = particleScaleMultiplier,
                 maxForce = maxForce,
                 offsetRotationDeg = offsetRotationDeg,
-                baseColor = baseColor
+                baseColor = baseColor,
+                alpha = alpha,
             }.RunParralelAndProfile(renderParticles.Length);
 
             ps.SetParticles(renderParticles);
@@ -54,6 +55,7 @@ namespace OFogo
             public float maxForce;
             public float offsetRotationDeg;
             public Color baseColor;
+            public float alpha;
 
             public void Execute(int i)
             {
@@ -76,7 +78,9 @@ namespace OFogo
                 particle.startSize = particleScaleMultiplier;
                 particle.rotation = math.degrees(math.atan2(dir.y, dir.x)) + offsetRotationDeg;
 
-                particle.startColor = baseColor * math.saturate(forceLength / maxForce);
+                Color particleColor = baseColor * math.saturate(forceLength / maxForce);
+                particleColor.a = alpha;
+                particle.startColor = particleColor;
 
                 renderParticles[i] = particle;
             }

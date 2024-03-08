@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
+using static OFogo.OFogoSimulator;
 
 namespace OFogo
 {
@@ -11,6 +12,7 @@ namespace OFogo
         public NativeArray<FireParticle> fireParticles;
         public NativeList<FireParticleCollision> fireParticleCollisionPair;
         public SimulationSettings settings;
+        public InternalSettings internalSettings;
 
         public void Execute()
         {
@@ -22,7 +24,7 @@ namespace OFogo
 
                 float tempA = particleA.temperature;
                 float tempB = particleB.temperature;
-                float t = settings.heatTransferPercent;
+                float t = internalSettings.heatTransferPercent;
                 particleA.temperature = math.lerp(tempA, tempB, t);
                 particleB.temperature = math.lerp(tempB, tempA, t);
 

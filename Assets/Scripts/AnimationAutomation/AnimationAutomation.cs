@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace OFogo
 {
@@ -10,5 +11,13 @@ namespace OFogo
         public abstract void OnStart();
         public abstract void UpdateAnimation(float timeRatio);
         public abstract void OnEnd();
+
+        public UnityEvent OnStartEvent;
+        public UnityEventFloat OnUpdateEvent;
+        public UnityEvent OnEndEvent;
+    }
+    [System.Serializable]
+    public class UnityEventFloat : UnityEvent<float>
+    {
     }
 }

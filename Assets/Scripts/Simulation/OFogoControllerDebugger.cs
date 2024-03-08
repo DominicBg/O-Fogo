@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -8,7 +6,6 @@ namespace OFogo
 {
     public class OFogoControllerDebugger : MonoBehaviour
     {
-        [SerializeField] OFogoController controller;
         [SerializeField] bool drawVectorFieldDebug;
         [SerializeField] bool drawBoundsDebug;
         [SerializeField] bool drawCalentadorDebug;
@@ -20,14 +17,14 @@ namespace OFogo
         {      
             //stupid hack
             NativeLeakDetection.Mode = nativeLeakDetectionMode;
-            DrawDebugBounds(controller.settings);
-            DrawVectorField(controller.vectorField, controller.settings);
+            DrawDebugBounds(OFogoController.Instance.settings);
+            DrawVectorField(OFogoController.Instance.vectorField, OFogoController.Instance.settings);
 
         }
         private void DrawDebugBounds(in SimulationSettings settings)
         {
-            float3 min = controller.transform.position + settings.simulationBound.min;
-            float3 max = controller.transform.position + settings.simulationBound.max;
+            float3 min = OFogoController.Instance.transform.position + settings.simulationBound.min;
+            float3 max = OFogoController.Instance.transform.position + settings.simulationBound.max;
             float3 bottomLeft = new float3(min.x, min.y, 0f);
             float3 bottomRight = new float3(max.x, min.y, 0f);
             float3 topLeft = new float3(min.x, max.y, 0f);
@@ -59,8 +56,8 @@ namespace OFogo
 
         private void DrawVectorField(NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
-            float3 min = controller.transform.position + settings.simulationBound.min;
-            float3 max = controller.transform.position + settings.simulationBound.max;
+            float3 min = OFogoController.Instance.transform.position + settings.simulationBound.min;
+            float3 max = OFogoController.Instance.transform.position + settings.simulationBound.max;
 
             float2 invSize = 1f / (float2)vectorField.Size;
             for (int x = 0; x < vectorField.Size.x; x++)

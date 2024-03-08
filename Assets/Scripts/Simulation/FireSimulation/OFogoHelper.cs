@@ -23,7 +23,7 @@ namespace OFogo
             return new int2(math.floor(v / (float2)cellSize));
         }
 
-        public static void ApplyConstraintBounce(ref FireParticle fireParticles, in SimulationSettings settings)
+        public static void ApplyConstraintBounce(ref FireParticle fireParticles, in SimulationSettings settings, float wallBounceIntensity)
         {
             if (!settings.simulationBound.Contains(fireParticles.position))
             {
@@ -33,7 +33,7 @@ namespace OFogo
                     false
                 );
 
-                fireParticles.velocity = math.select(fireParticles.velocity, -fireParticles.velocity * settings.wallBounceIntensity, outOfBounds);
+                fireParticles.velocity = math.select(fireParticles.velocity, -fireParticles.velocity * wallBounceIntensity, outOfBounds);
                 fireParticles.position = settings.simulationBound.ClosestPoint(fireParticles.position);
             }
         }
@@ -43,23 +43,23 @@ namespace OFogo
             in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, int maxCollision = -1)       
         {
             int2 hash = HashPosition(fireParticles[particleIndex].position, in settings.simulationBound, settings.hashingGridLength);
-
+            int collisionCount = 0;
             for (int x = -1; x <= 1; x++)
             {
                 for (int y = -1; y <= 1; y++)
                 {
-                    if (maxCollision != -1 && collisionBuffer.Length > maxCollision)
+                    if (maxCollision != -1 && collisionCount > maxCollision)
                     {
                         return;
                     }
-                    CheckCollisionPair(hash, particleIndex, x, y, fireParticles, nativeHashingGrid, settings, ref collisionBuffer, maxCollision);
+                    CheckCollisionPair(hash, particleIndex, x, y, fireParticles, nativeHashingGrid, settings, ref collisionBuffer, ref collisionCount, maxCollision);
                 }
             }
         }
 
         public static void CheckCollisionPair(int2 hash, int i, int x, int y,
             in NativeArray<FireParticle> fireParticles, in NativeGrid<UnsafeList<int>> nativeHashingGrid,
-            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, int maxCollision = -1)
+            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, ref int collisionCount, int maxCollision = -1)
         {
             int2 pos = new int2(x + hash.x, y + hash.y);
 
@@ -85,8 +85,9 @@ namespace OFogo
                 if (distSq < radiusSqSum)
                 {
                     collisionBuffer.Add(new FireParticleCollision(i, j, distSq));
+                    collisionCount++;
 
-                    if(maxCollision != -1 && collisionBuffer.Length > maxCollision)
+                    if (maxCollision != -1 && collisionCount > maxCollision)
                     {
                         return;
                     }

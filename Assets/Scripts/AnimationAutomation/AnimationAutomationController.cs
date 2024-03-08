@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -16,7 +15,7 @@ namespace OFogo
         {
             animationAutomations = GetComponentsInChildren<AnimationAutomation>();
             animationAutomations[currentAnimationIndex].OnStart();
-            Debug.Log("Starting anim " + currentAnimationIndex);
+            animationAutomations[currentAnimationIndex].OnStartEvent.Invoke();
         }
 
         void Update()
@@ -32,7 +31,7 @@ namespace OFogo
             {
                 internalTimer -= animationAutomation.duration;
                 animationAutomation.OnEnd();
-                Debug.Log("ennding anim " + currentAnimationIndex);
+                animationAutomation.OnEndEvent.Invoke();
 
                 currentAnimationIndex++;
                 if(cycleAnimations)
@@ -42,13 +41,12 @@ namespace OFogo
                 
                 if(currentAnimationIndex >= animationAutomations.Length)
                 {
-                    Debug.Log("finalized animations");
                     enabled = false;
                     return;
                 }
 
                 animationAutomations[currentAnimationIndex].OnStart();
-                Debug.Log("Starting anim " + currentAnimationIndex);
+                animationAutomations[currentAnimationIndex].OnStartEvent.Invoke();
             }
         }
     }

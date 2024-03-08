@@ -30,7 +30,9 @@ namespace OFogo
                 ParticleSystem.Particle particle = renderParticles[i];
                 particle.position = fireParticle.position;
                 particle.startSize = fireParticle.radius * particleScaleMultiplier;
-                particle.startColor = heatGradient.Evaluate(fireParticle.temperature / settings.maxTemperature);
+                Color particleColor = heatGradient.Evaluate(fireParticle.temperature / settings.maxTemperature);
+                particleColor.a = alpha;
+                particle.startColor = particleColor;
                 renderParticles[i] = particle;
             }
             ps.SetParticles(renderParticles);

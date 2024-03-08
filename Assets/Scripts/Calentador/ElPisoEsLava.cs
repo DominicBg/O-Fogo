@@ -16,15 +16,19 @@ namespace OFogo
             public float heatAtBottomNoiseRatio;
             public float heatAtBottomNoiseSize;
             public float heatAtBottomNoiseSpeed;
+            public float heatingPerSec;
+
+            public static HeatSettings Default = new HeatSettings()
+            {
+                heatAtBottomHeight = 0.5f,
+                heatAtBottomNoiseRatio = 0.5f,
+                heatAtBottomNoiseSize = 1,
+                heatAtBottomNoiseSpeed = 1,
+                heatingPerSec = 10,
+            };
         }
 
-        public HeatSettings heatSettings = new HeatSettings()
-        {
-            heatAtBottomHeight = 0.5f,
-            heatAtBottomNoiseRatio = 0.5f,
-            heatAtBottomNoiseSize = 1,
-            heatAtBottomNoiseSpeed = 1,
-        };
+        public HeatSettings heatSettings = HeatSettings.Default;
 
         public override void HeatParticles(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in SimulationSettings settings)
         {
@@ -48,11 +52,11 @@ namespace OFogo
             public void Execute(int index)
             {
                 FireParticle fireParticleParticle = fireParticles[index];
-                WarmupParticle(ref fireParticleParticle);
+                HeatParticle(ref fireParticleParticle);
                 fireParticles[index] = fireParticleParticle;
             }
 
-            public void WarmupParticle(ref FireParticle particle)
+            public void HeatParticle(ref FireParticle particle)
             {
                 float minSimulationY = simData.pos.y + settings.simulationBound.min.y;
                 float heightSmoothStep = 1f - math.smoothstep(minSimulationY, minSimulationY + heatSettings.heatAtBottomHeight, particle.position.y);
@@ -63,7 +67,7 @@ namespace OFogo
                     heightSmoothStep *= math.lerp(1, heatNoise, heatSettings.heatAtBottomNoiseRatio);
                 }
 
-                float heat = heightSmoothStep * settings.heatingPerSec;
+                float heat = heightSmoothStep * heatSettings.heatingPerSec;
                 particle.temperature += heat * simData.dt;
             }
         }

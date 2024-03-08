@@ -61,37 +61,5 @@ namespace OFogo
                 }
             }       
         }
-
-        //public Int2Enumerator GetEnumerator() => new Int2Enumerator(this);
-        //public IEnumerator<int2> GetEnumerator() => GetEnumerator();
-        //IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-
-        //public struct Int2Enumerator : IEnumerator<int2>
-        //{
-        //    public Int2Enumerator(NativeGrid<T> test)
-        //    {
-
-        //    }
-
-        //    public int2 Current => throw new System.NotImplementedException();
-
-        //    object IEnumerator.Current => throw new System.NotImplementedException();
-
-        //    public void Dispose()
-        //    {
-        //        throw new System.NotImplementedException();
-        //    }
-
-        //    public bool MoveNext()
-        //    {
-        //        throw new System.NotImplementedException();
-        //    }
-
-        //    public void Reset()
-        //    {
-        //        throw new System.NotImplementedException();
-        //    }
-        //}
     }
 }
