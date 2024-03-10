@@ -7,17 +7,17 @@ namespace OFogo
 {
     public struct NativeGrid<T> where T : unmanaged
     {
-        NativeArray<T> nativeHashingGrid;
+        NativeArray<T> nativeGrid;
         int2 size;
 
         public int2 Size => size;
         public int TotalLength => size.x * size.y;
-        public bool IsCreated => nativeHashingGrid.IsCreated;
+        public bool IsCreated => nativeGrid.IsCreated;
 
         public NativeGrid(int2 size, Allocator allocator)
         {
             this.size = size;
-            nativeHashingGrid = new NativeArray<T>(size.x * size.y, allocator);
+            nativeGrid = new NativeArray<T>(size.x * size.y, allocator);
         }
 
         public int PosToIndex(int2 pos) => pos.y * size.x + pos.x;
@@ -25,25 +25,26 @@ namespace OFogo
 
         public T this[int2 pos]
         {
-            get { return nativeHashingGrid[PosToIndex(pos)]; }
-            set { nativeHashingGrid[PosToIndex(pos)] = value; }
+            get { return nativeGrid[PosToIndex(pos)]; }
+            set { nativeGrid[PosToIndex(pos)] = value; }
         }
         public T this[int x, int y]
         {
-            get { return nativeHashingGrid[PosToIndex(new int2(x, y))]; }
-            set { nativeHashingGrid[PosToIndex(new int2(x, y))] = value; }
+            get { return nativeGrid[PosToIndex(new int2(x, y))]; }
+            set { nativeGrid[PosToIndex(new int2(x, y))] = value; }
         }
 
         public T this[int i]
         {
-            get { return nativeHashingGrid[i]; }
-            set { nativeHashingGrid[i] = value; }
+            get { return nativeGrid[i]; }
+            set { nativeGrid[i] = value; }
         }
 
 
         public void Dispose()
         {
-            nativeHashingGrid.Dispose();
+            if(nativeGrid.IsCreated)
+                nativeGrid.Dispose();
         }
         public bool InBound(int2 pos)
         {

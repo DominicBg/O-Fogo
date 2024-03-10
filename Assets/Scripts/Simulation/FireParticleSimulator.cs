@@ -8,13 +8,15 @@ namespace OFogo
     public abstract class FireParticleSimulator : MonoBehaviour
     {
         bool isInit;
-        public void TryInit(in SimulationSettings settings)
+        public bool TryInit(in SimulationSettings settings)
         {
             if(!isInit)
             {
                 Init(settings);
                 isInit = true;
+                return true;
             }
+            return false;
         }
 
         protected abstract void Init(in SimulationSettings settings);

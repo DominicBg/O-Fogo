@@ -8,13 +8,15 @@ namespace OFogo
     {
         protected bool isInit { get; private set; }
 
-        public void TryInit(in SimulationSettings settings) 
+        public bool TryInit(in SimulationSettings settings) 
         {
             if(!isInit)
             {
                 OnInit(in settings);
                 isInit = true;
+                return true;
             }
+            return false;
         }
 
         public virtual void OnInit(in SimulationSettings settings) { }

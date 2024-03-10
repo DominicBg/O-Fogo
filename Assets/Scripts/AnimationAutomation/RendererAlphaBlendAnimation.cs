@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OFogo
 {
-    public class RendereAlphaBlendAnimation : AnimationAutomation
+    public class RendererAlphaBlendAnimation : AnimationAutomation
     {
         [SerializeField] AlphaRenderer alphaRendererA;
         [SerializeField] AlphaRenderer alphaRendererB;

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace OFogo
 {
-    public class SimulationBlend : FireParticleSimulator
+    public class SimulatorBlend : FireParticleSimulator
     {
         public FireParticleSimulator fireParticleSimulatorA;
         public FireParticleSimulator fireParticleSimulatorB;
@@ -29,10 +29,20 @@ namespace OFogo
 
         public override void UpdateSimulation(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
-            OFogoController.Instance.UpdateSimulation(fireParticleSimulatorA, simulationData, fireParticles);
-            OFogoController.Instance.UpdateSimulation(fireParticleSimulatorB, simulationData, fireParticlesB);
-
-            new LerpParticleJobs(fireParticles, fireParticlesB, ratio, isFireSimulatorLerpAdditive).RunParralelAndProfile(fireParticles.Length);
+            if(ratio == 0)
+            {
+                OFogoController.Instance.UpdateSimulation(fireParticleSimulatorA, simulationData, fireParticles);
+            }
+            else if(ratio == 1)
+            {
+                OFogoController.Instance.UpdateSimulation(fireParticleSimulatorB, simulationData, fireParticles);
+            }
+            else
+            {
+                OFogoController.Instance.UpdateSimulation(fireParticleSimulatorA, simulationData, fireParticles);
+                OFogoController.Instance.UpdateSimulation(fireParticleSimulatorB, simulationData, fireParticlesB);
+                new LerpParticleJobs(fireParticles, fireParticlesB, ratio, isFireSimulatorLerpAdditive).RunParralelAndProfile(fireParticles.Length);
+            }
         }
 
         public struct LerpParticleJobs : IJobParallelFor

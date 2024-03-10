@@ -33,5 +33,12 @@ namespace OFogo
                 }
             }
         }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            vectorField1.Dispose();
+            vectorField2.Dispose();
+        }
     }
 }

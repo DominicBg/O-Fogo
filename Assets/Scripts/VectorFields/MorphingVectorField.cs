@@ -1,6 +1,5 @@
 using Unity.Collections;
 using Unity.Mathematics;
-using Unity.Profiling;
 using UnityEngine;
 
 namespace OFogo
@@ -11,8 +10,6 @@ namespace OFogo
         [SerializeField] float morphSpeed = 0.5f;
         [SerializeField] float timeOffset;
         [SerializeField] float forceMultiplier = 1;
-
-        [SerializeField] MagicController hackParceQueJmenCriss;
 
         NativeGrid<float3>[] vectorFields;
 
@@ -53,8 +50,6 @@ namespace OFogo
                     vectorField[x, y] = math.lerp(v1[x, y], v2[x, y], t) * forceMultiplier;
                 }
             }
-
-            hackParceQueJmenCriss?.LerpGradient(currentIndex, nextIndex, t);
         }
 
         public override void Dispose()

@@ -22,13 +22,16 @@ namespace OFogo
             public int maxCollision;
             public float wallBounceIntensity;
             public float maxSpeed;
+            public float vectorFieldSpeedMultiplier;
+
             public static InternalSettings Default => new InternalSettings()
             {
                 integrationType = IntegrationType.Verlet,
                 maxCollision = -1,
                 maxSpeed = 1,
                 separationForce = 0.5f,
-                wallBounceIntensity = 0.2f
+                wallBounceIntensity = 0.2f,
+                vectorFieldSpeedMultiplier = 1
             };
         }
         [SerializeField] InternalSettings internalSettings = InternalSettings.Default;
@@ -61,9 +64,10 @@ namespace OFogo
                 simulationData = simulationData,
                 settings = settings,
                 nativeHashingGrid = nativeHashingGrid,
-                
+
                 vectorField = vectorField,
-                desiredForce = desiredForce
+                desiredForce = desiredForce,
+                internalSettings = internalSettings
             }.RunParralelAndProfile(fireParticles.Length);
 
             new ParticleSimulationApplyDesiredForceJob()
@@ -71,7 +75,7 @@ namespace OFogo
                 fireParticles = fireParticles,
                 settings = settings,
                 desiredForce = desiredForce,
-                
+                internalSettings = internalSettings
             }.RunParralelAndProfile(fireParticles.Length);
         }
 
@@ -95,7 +99,7 @@ namespace OFogo
             public void Execute(int index)
             {
                 FireParticle fireParticle = fireParticles[index];
-                float3 vectorFieldForce = vectorField[OFogoHelper.HashPosition(fireParticle.position, settings.simulationBound, vectorField.Size)];
+                float3 vectorFieldForce = vectorField[OFogoHelper.HashPosition(fireParticle.position, settings.simulationBound, vectorField.Size)] * internalSettings.vectorFieldSpeedMultiplier;
 
                 switch (internalSettings.integrationType)
                 {
@@ -141,7 +145,7 @@ namespace OFogo
 
             public SimulationSettings settings;
             public InternalSettings internalSettings;
-    
+
             [ReadOnly]
             public NativeGrid<UnsafeList<int>> nativeHashingGrid;
 
@@ -150,7 +154,8 @@ namespace OFogo
 
             public void Execute(int i)
             {
-                var collisionBuffer = new NativeList<FireParticleCollision>(internalSettings.maxCollision, Allocator.Temp);
+                int maxCollision = internalSettings.maxCollision == -1 ? settings.particleCount : internalSettings.maxCollision;
+                var collisionBuffer = new NativeList<FireParticleCollision>(maxCollision, Allocator.Temp);
                 OFogoHelper.CheckCollisionPairAtPosition(i, fireParticles, nativeHashingGrid, settings, ref collisionBuffer, internalSettings.maxCollision);
 
                 float3 sperationDirectionSum = 0;
@@ -177,7 +182,7 @@ namespace OFogo
 
                 if (collisionBuffer.Length > 0)
                 {
-                    desiredForce[i] = (sperationDirectionSum / collisionBuffer.Length) * internalSettings.separationForce * simulationData.dt;
+                    desiredForce[i] = (sperationDirectionSum / collisionBuffer.Length) * -internalSettings.separationForce * simulationData.dt;
                 }
                 else
                 {
@@ -186,22 +191,22 @@ namespace OFogo
                 collisionBuffer.Dispose();
             }
         }
-    }
-
-    [BurstCompile]
-    public struct ParticleSimulationApplyDesiredForceJob : IJobParallelFor
-    {
-        public NativeArray<FireParticle> fireParticles;
-        public NativeArray<float3> desiredForce;
-        public SimulationSettings settings;
-        public float wallBounceIntensity;
-
-        public void Execute(int i)
+        [BurstCompile]
+        public struct ParticleSimulationApplyDesiredForceJob : IJobParallelFor
         {
-            FireParticle fireParticle = fireParticles[i];
-            fireParticle.position += desiredForce[i];
-            OFogoHelper.ApplyConstraintBounce(ref fireParticle, settings, wallBounceIntensity);
-            fireParticles[i] = fireParticle;
+            public NativeArray<FireParticle> fireParticles;
+            public NativeArray<float3> desiredForce;
+            public SimulationSettings settings;
+            public InternalSettings internalSettings;
+
+            public void Execute(int i)
+            {
+                FireParticle fireParticle = fireParticles[i];
+                fireParticle.position += desiredForce[i];
+                OFogoHelper.ApplyConstraintBounce(ref fireParticle, settings, internalSettings.wallBounceIntensity);
+                fireParticles[i] = fireParticle;
+            }
         }
     }
+
 }

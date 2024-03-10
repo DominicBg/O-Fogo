@@ -1,15 +1,22 @@
 using UnityEngine;
 namespace OFogo
 {
-    public class SimulatorBlendAnimation : MonoBehaviour
+    public class SimulatorBlendAnimation : AnimationAutomation
     {
-        //[SerializeField] EFireSimulatorType desiredSimilationType;
+        [SerializeField] SimulatorBlend simulationBlend;
 
-        public void ChangeSimulationType()
+        public override void OnEnd()
         {
-            //OFogoController.Instance.fireSimulatorTypeA = desiredSimilationType;
-            //OFogoController.Instance.fireSimulatorTypeB = desiredSimilationType;
-            //OFogoController.Instance.fireSimulatorLerpRatio = 0;
+        }
+
+        public override void OnStart()
+        {
+            OFogoController.Instance.SetSimulator(simulationBlend);
+        }
+
+        public override void UpdateAnimation(float timeRatio)
+        {
+            simulationBlend.ratio = timeRatio;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
@@ -12,7 +13,6 @@ namespace OFogo
 
         [Header("Components")]
         [SerializeField] FireParticleSimulator simulator;
-
         [SerializeField] Calentador calentador;
         [SerializeField] FogoRenderer fogoRenderer;
         [SerializeField] VectorFieldGenerator vectorFieldGenerator;
@@ -25,16 +25,12 @@ namespace OFogo
         [SerializeField] float simulationSpeed = 1;
         [SerializeField] int substeps = 4;
 
-        //public EFireSimulatorType fireSimulatorTypeA;
-        //public EFireSimulatorType fireSimulatorTypeB;
-        //[Range(0, 1)]
-        //public float fireSimulatorLerpRatio = 0;
-        //public bool isFireSimulatorLerpAdditive;
-
         public NativeGrid<float3> vectorField;
         public NativeArray<FireParticle> fireParticles;
-        //public NativeArray<FireParticle> fireParticlesB;
         public NativeGrid<UnsafeList<int>> nativeHashingGrid;
+
+        private HashSet<FireParticleSimulator> simulatorToDispose = new HashSet<FireParticleSimulator>();
+        private HashSet<VectorFieldGenerator> vectorFieldGeneratorToDispose = new HashSet<VectorFieldGenerator>();
 
         private void Awake()
         {
@@ -59,7 +55,10 @@ namespace OFogo
 
             vectorField = VectorFieldGenerator.CreateVectorField(in settings);
 
-            vectorFieldGenerator.TryInit(in settings);
+
+            SetSimulator(simulator);
+            SetVectorFieldGenerator(vectorFieldGenerator);
+
             vectorFieldRenderer.Init(vectorField);
         }
 
@@ -114,27 +113,39 @@ namespace OFogo
                 };
 
                 UpdateSimulation(simulator, in simData, fireParticles);
-
-                //IFireParticleSimulator simulatorB = GetSimulator(fireSimulatorTypeB);
-
-                //if (fireSimulatorLerpRatio == 0)
-                //{
-                //    UpdateSimulation(simulatorA, in simData, fireParticles);
-                //}
-                //else if (fireSimulatorLerpRatio == 1)
-                //{
-                //    UpdateSimulation(simulatorB, in simData, fireParticles);
-                //}
-                //else
-                //{
-                //    UpdateLerpSimulation(simulatorA, simulatorB, simData, fireParticles, fireParticlesB, fireSimulatorLerpRatio);
-                //}
             }
         }
 
+        public void SetSimulator(FireParticleSimulator simulator)
+        {
+            if (simulator.TryInit(in settings))
+            {
+                simulatorToDispose.Add(simulator);
+            }
+
+            this.simulator = simulator;
+        }
+
+        public void SetVectorFieldGenerator(VectorFieldGenerator generator)
+        {
+            if (generator.TryInit(in settings))
+            {
+                vectorFieldGeneratorToDispose.Add(generator);
+            }
+
+            vectorFieldGenerator = generator;
+        }
+
+
         public void UpdateSimulation(FireParticleSimulator simulator, in SimulationData simData, NativeArray<FireParticle> fireParticles)
         {
-            simulator.TryInit(in settings);
+#if UNITY_EDITOR
+            //for drag n drop support
+            if(simulator.TryInit(in settings))
+            {
+                simulatorToDispose.Add(simulator);
+            }
+#endif
 
             if (!simulator.IsHandlingParticleHeating())
             {
@@ -143,6 +154,13 @@ namespace OFogo
 
             if (simulator.NeedsVectorField())
             {
+#if UNITY_EDITOR
+            //for drag n drop support
+            if(vectorFieldGenerator.TryInit(in settings))
+            {
+                vectorFieldGeneratorToDispose.Add(vectorFieldGenerator);
+            }
+#endif
                 vectorFieldGenerator.UpdateVectorField(ref vectorField, in settings);
             }
 
@@ -154,43 +172,6 @@ namespace OFogo
                 simulator.ResolveCollision(simData, ref fireParticles, vectorField, nativeHashingGrid, settings);
             }
         }
-
-        //NativeArray<FireParticle> UpdateLerpSimulation(IFireParticleSimulator simulatorA, IFireParticleSimulator simulatorB, in SimulationData simData, NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticleBuffer, float t)
-        //{
-        //    UpdateSimulation(simulatorA, simData, fireParticlesA);
-        //    UpdateSimulation(simulatorB, simData, fireParticleBuffer);
-
-        //    new LerpParticleJobs(fireParticlesA, fireParticlesB, t, isFireSimulatorLerpAdditive).RunParralelAndProfile(fireParticlesA.Length);
-        //    return fireParticlesA;
-        //}
-
-        //public struct LerpParticleJobs : IJobParallelFor
-        //{
-        //    NativeArray<FireParticle> fireParticlesA;
-        //    NativeArray<FireParticle> fireParticlesB;
-        //    public float t;
-        //    public bool isFireSimulatorLerpAdditive;
-
-        //    public LerpParticleJobs(NativeArray<FireParticle> fireParticlesA, NativeArray<FireParticle> fireParticlesB, float t, bool isFireSimulatorLerpAdditive)
-        //    {
-        //        this.fireParticlesA = fireParticlesA;
-        //        this.fireParticlesB = fireParticlesB;
-        //        this.isFireSimulatorLerpAdditive = isFireSimulatorLerpAdditive;
-        //        this.t = t;
-        //    }
-
-        //    public void Execute(int index)
-        //    {
-        //        FireParticle fireParticle = FireParticle.Lerp(fireParticlesA[index], fireParticlesB[index], t);
-        //        fireParticlesA[index] = fireParticle;
-
-        //        //if not, it won't reset the position of the particles B, so it will do a drag effect
-        //        if (!isFireSimulatorLerpAdditive)
-        //        {
-        //            fireParticlesB[index] = fireParticle;
-        //        }
-        //    }
-        //}
 
         public void FillHashGrid()
         {
@@ -205,7 +186,14 @@ namespace OFogo
 
         private void OnDestroy()
         {
-            simulator.Dispose();
+            foreach (var simulator in simulatorToDispose)
+            {
+                simulator.Dispose();
+            }
+            foreach (var generator in vectorFieldGeneratorToDispose)
+            {
+                generator.Dispose();
+            }
             vectorFieldGenerator.Dispose();
             fogoRenderer.Dispose();
             vectorFieldRenderer.Dispose();

@@ -4,7 +4,6 @@ namespace OFogo
 {
     public class VectorFieldBlendAnimation : AnimationAutomation
     {
-        [SerializeField] OFogoController controller;
         [SerializeField] BlendVectorField blendVector;
 
         public override void OnEnd()
@@ -13,7 +12,7 @@ namespace OFogo
 
         public override void OnStart()
         {
-            blendVector.TryInit(controller.settings);
+            OFogoController.Instance.SetVectorFieldGenerator(blendVector);
         }
 
         public override void UpdateAnimation(float timeRatio)

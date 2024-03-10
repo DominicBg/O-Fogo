@@ -5,7 +5,8 @@ namespace OFogo
 {
     public class AnimationAutomationController : MonoBehaviour
     {
-        [SerializeField] AnimationAutomation[] animationAutomations;
+        AnimationAutomation[] animationAutomations;
+        [Header("Put all animation automation as children of this transform")]
         [SerializeField] bool cycleAnimations;
 
         private float internalTimer;
@@ -13,9 +14,16 @@ namespace OFogo
 
         private void Start()
         {
-            animationAutomations = GetComponentsInChildren<AnimationAutomation>();
+            animationAutomations = GetComponentsInChildren<AnimationAutomation>(includeInactive: false);
             animationAutomations[currentAnimationIndex].OnStart();
             animationAutomations[currentAnimationIndex].OnStartEvent.Invoke();
+
+            float durationSum = 0;
+            for (int i = 0; i < animationAutomations.Length; i++)
+            {
+                durationSum += animationAutomations[i].duration;
+            }
+            Debug.Log($"{nameof(AnimationAutomationController)}.{name} have an animation duration of {durationSum}");
         }
 
         void Update()
