@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -53,12 +54,14 @@ public class MagicRenderPass : ScriptableRenderPass
         }
 
         CommandBuffer cmd = CommandBufferPool.Get("Magic Post Process");
+        float maxScreenSize = math.max(Screen.width, Screen.height);
 
         material.SetFloat("_MinRemap", magicSettings.minRemap.value);
         material.SetFloat("_MaxRemap", magicSettings.maxRemap.value);
 
         material.SetFloat("_LumPow", magicSettings.luminocityPower.value);
-        material.SetFloat("_Quantize", magicSettings.quantize.value);
+        float quantizeValue = 1 - magicSettings.quantize.value * maxScreenSize;
+        material.SetFloat("_Quantize", quantizeValue);
         material.SetInt("_Diamondize", magicSettings.diamondize.value ? 1 : 0);
         material.SetInt("_UseDither", magicSettings.useDither.value ? 1 : 0);
 

@@ -123,7 +123,7 @@ MonoBehaviour:
     m_Value: 0.59
   quantize:
     m_OverrideState: 1
-    m_Value: 200
+    m_Value: 0.596
   useDither:
     m_OverrideState: 1
     m_Value: 1
@@ -176,9 +176,15 @@ MonoBehaviour:
   m_Name: BlurSettings
   m_EditorClassIdentifier: 
   active: 1
-  strength:
+  gridCellCount:
     m_OverrideState: 1
-    m_Value: 10.2
+    m_Value: 15
+  wideness:
+    m_OverrideState: 1
+    m_Value: 0.005
+  spread:
+    m_OverrideState: 1
+    m_Value: 2.46
 --- !u!114 &5377890408480631067
 MonoBehaviour:
   m_ObjectHideFlags: 3

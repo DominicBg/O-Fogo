@@ -23,7 +23,8 @@ Shader "PostProcessing/Blur"
 		sampler2D _MainTex;
 
 		CBUFFER_START(UnityPerMaterial)
-			float4 _MainTex_TexelSize;
+			//float4 _MainTex_TexelSize;
+			float _Wideness;
 			uint _GridSize;
 			float _Spread;
 		CBUFFER_END
@@ -76,7 +77,7 @@ Shader "PostProcessing/Blur"
 				{
 					float gauss = gaussian(x);
 					gridSum += gauss;
-					float2 uv = i.uv + float2(_MainTex_TexelSize.x * x, 0.0f);
+					float2 uv = i.uv + float2(_Wideness * x, 0.0f);
 					col += gauss * tex2D(_MainTex, uv).xyz;
 				}
 
@@ -107,7 +108,7 @@ Shader "PostProcessing/Blur"
 				{
 					float gauss = gaussian(y);
 					gridSum += gauss;
-					float2 uv = i.uv + float2(0.0f, _MainTex_TexelSize.y * y);
+					float2 uv = i.uv + float2(0.0f, _Wideness * y);
 					col += gauss * tex2D(_MainTex, uv).xyz;
 				}
 

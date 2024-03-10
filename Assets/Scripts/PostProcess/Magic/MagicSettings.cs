@@ -11,7 +11,7 @@ public class MagicSettings : VolumeComponent, IPostProcessComponent
 
     public FloatParameter luminocityPower = new FloatParameter(0.25f);
 
-    public FloatParameter quantize = new FloatParameter(200.0f);
+    public ClampedFloatParameter quantize = new ClampedFloatParameter(0.01f, 0.0f, 1.0f);
     public BoolParameter useDither = new BoolParameter(false);
     public BoolParameter diamondize = new BoolParameter(false);
 

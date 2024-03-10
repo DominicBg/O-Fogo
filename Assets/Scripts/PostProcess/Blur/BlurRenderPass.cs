@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -50,8 +51,8 @@ public class BlurRenderPass : ScriptableRenderPass
 
         CommandBuffer cmd = CommandBufferPool.Get("Blur Post Process");
 
-        // Set Blur effect properties.
-        int gridSize = Mathf.CeilToInt(blurSettings.strength.value * 3.0f);
+        //float maxScreenSize = math.max(Screen.width, Screen.height);
+        int gridSize = blurSettings.gridCellCount.value;
 
         if(gridSize % 2 == 0)
         {
@@ -59,7 +60,8 @@ public class BlurRenderPass : ScriptableRenderPass
         }
 
         material.SetInteger("_GridSize", gridSize);
-        material.SetFloat("_Spread", blurSettings.strength.value);
+        material.SetFloat("_Spread", blurSettings.spread.value);
+        material.SetFloat("_Wideness", blurSettings.wideness.value);
 
         // Execute effect using effect material with two passes.
         cmd.Blit(source, blurTex.id, material, 0);

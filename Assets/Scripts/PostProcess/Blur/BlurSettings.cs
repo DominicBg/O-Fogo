@@ -5,12 +5,13 @@ using UnityEngine.Rendering.Universal;
 [System.Serializable, VolumeComponentMenu("Blur")]
 public class BlurSettings : VolumeComponent, IPostProcessComponent
 {
-    [Tooltip("Standard deviation (spread) of the blur. Grid size is approx. 3x larger.")]
-    public ClampedFloatParameter strength = new ClampedFloatParameter(0.0f, 0.0f, 15.0f);
+    public IntParameter gridCellCount = new IntParameter(5);
+    public FloatParameter wideness = new FloatParameter(0.1f);
+    public FloatParameter spread = new FloatParameter(1);
 
     public bool IsActive()
     {
-        return (strength.value > 0.0f) && active;
+        return (gridCellCount.value > 0) && active;
     }
 
     public bool IsTileCompatible()
