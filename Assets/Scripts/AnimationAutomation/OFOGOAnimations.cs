@@ -1,13 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static MagicController;
 
-namespace OFogo
+namespace OFogo.Animations
 {
-    public class FireLineHeatAnimation : AnimationXVII
+    public class FireLineHeat : AnimationXVII
     {
         FireStrokeSimulator fireStrokeSimulator;
         float minHeatHeight;
@@ -16,7 +14,7 @@ namespace OFogo
         float maxHeatMultiplicator;
 
 
-        public FireLineHeatAnimation(FireStrokeSimulator fireStrokeSimulator, float minHeatHeight, float maxHeatHeight, float minHeatMultiplicator, float maxHeatMultiplicator)
+        public FireLineHeat(FireStrokeSimulator fireStrokeSimulator, float minHeatHeight, float maxHeatHeight, float minHeatMultiplicator, float maxHeatMultiplicator)
         {
             this.fireStrokeSimulator = fireStrokeSimulator;
             this.minHeatHeight = minHeatHeight;
@@ -39,13 +37,13 @@ namespace OFogo
             fireStrokeSimulator.heatMultiplicator = math.lerp(minHeatMultiplicator, maxHeatMultiplicator, timeRatio);
         }
     }
-    public class RendererAlphaAnimationPart : AnimationXVII
+    public class RendererAlpha : AnimationXVII
     {
         AlphaRenderer alphaRenderer;
         float alphaFrom;
         float alphaTo;
 
-        public RendererAlphaAnimationPart(AlphaRenderer alphaRenderer, float alphaFrom, float alphaTo)
+        public RendererAlpha(AlphaRenderer alphaRenderer, float alphaFrom, float alphaTo)
         {
             this.alphaRenderer = alphaRenderer;
             this.alphaFrom = alphaFrom;
@@ -66,13 +64,13 @@ namespace OFogo
         }
     }
 
-    public class SimulatorBlendToAnimationPart : AnimationXVII
+    public class SimulatorBlendTo : AnimationXVII
     {
         [SerializeField] FireParticleSimulator simulatorBlendTo;
 
         SimulatorBlend simulatorBlend;
 
-        public SimulatorBlendToAnimationPart(FireParticleSimulator simulatorBlendTo)
+        public SimulatorBlendTo(FireParticleSimulator simulatorBlendTo)
         {
             this.simulatorBlendTo = simulatorBlendTo;
         }
@@ -102,13 +100,13 @@ namespace OFogo
         }
     }
 
-    public class VectorFieldBlendToAnimationPart : AnimationXVII
+    public class VectorFieldBlendTo : AnimationXVII
     {
         VectorFieldGenerator vectorFieldBlendTo;
 
         BlendVectorField vectorFieldBlend;
 
-        public VectorFieldBlendToAnimationPart(VectorFieldGenerator vectorFieldBlendTo)
+        public VectorFieldBlendTo(VectorFieldGenerator vectorFieldBlendTo)
         {
             this.vectorFieldBlendTo = vectorFieldBlendTo;
         }
@@ -137,7 +135,7 @@ namespace OFogo
         }
     }
 
-    public class GradientAnimationPart : AnimationXVII
+    public class GradientBlendTo : AnimationXVII
     {
         MagicSettings settings;
 
@@ -145,7 +143,7 @@ namespace OFogo
         List<Color> toGradient = new List<Color>();
         List<Color> tempGradient = new List<Color>();
 
-        public GradientAnimationPart(VolumeProfile volumeProfile, GPUColorGradient colorGradient)
+        public GradientBlendTo(VolumeProfile volumeProfile, GPUColorGradient colorGradient)
         {
             toGradient = colorGradient.colors;
             volumeProfile.TryGet(out settings);

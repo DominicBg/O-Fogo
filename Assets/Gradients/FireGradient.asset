@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3252c68c68750c54b976ed097ca5b6f5, type: 3}
+  m_Name: FireGradient
+  m_EditorClassIdentifier: 
+  gpuGradient:
+    colors:
+    - {r: 1, g: 1, b: 1, a: 0}
+    - {r: 1, g: 0.9098039, b: 0.5137255, a: 0}
+    - {r: 1, g: 0.38039216, b: 0, a: 0}
+    - {r: 1, g: 0.20392157, b: 0, a: 0}
+    - {r: 0.20784314, g: 0.02745098, b: 0.023529412, a: 0}
+    - {r: 0.14150941, g: 0.11667851, b: 0.11667851, a: 0}
