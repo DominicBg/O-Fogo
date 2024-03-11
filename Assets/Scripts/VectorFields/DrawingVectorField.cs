@@ -30,7 +30,7 @@ namespace OFogo
             stroke = new NativeList<float3>(100, Allocator.Persistent);
         }
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
+        protected override void OnUpdateVectorField(in SimulationData simData, ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             if (stroke.Length > 0 && isStrokeFinised)
             {

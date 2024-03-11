@@ -7,9 +7,9 @@ namespace OFogo
     public class BlendVectorField : VectorFieldGenerator
     {
         [Range(0, 1)]
-        public float t;
-        [SerializeField] VectorFieldGenerator vectorFieldGenerator1;
-        [SerializeField] VectorFieldGenerator vectorFieldGenerator2;
+        public float ratio;
+        public VectorFieldGenerator vectorFieldGeneratorA;
+        public VectorFieldGenerator vectorFieldGeneratorB;
 
         NativeGrid<float3> vectorField1;
         NativeGrid<float3> vectorField2;
@@ -20,16 +20,16 @@ namespace OFogo
             vectorField2 = CreateVectorField(settings, Allocator.Persistent);
         }
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
+        protected override void OnUpdateVectorField(in SimulationData simData, ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
-            vectorFieldGenerator1.UpdateVectorField(ref vectorField1, in settings);
-            vectorFieldGenerator2.UpdateVectorField(ref vectorField2, in settings);
+            vectorFieldGeneratorA.UpdateVectorField(simData, ref vectorField1, in settings);
+            vectorFieldGeneratorB.UpdateVectorField(simData, ref vectorField2, in settings);
 
             for (int x = 0; x < vectorField1.Size.x; x++)
             {
                 for (int y = 0; y < vectorField1.Size.y; y++)
                 {
-                    vectorField[x, y] = math.lerp(vectorField1[x, y], vectorField2[x, y], t);
+                    vectorField[x, y] = math.lerp(vectorField1[x, y], vectorField2[x, y], ratio);
                 }
             }
         }

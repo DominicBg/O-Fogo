@@ -10,7 +10,7 @@ namespace OFogo
         [SerializeField] float2 offset;
         [SerializeField] float2 offsetOverTime;
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
+        protected override void OnUpdateVectorField(in SimulationData simData, ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             for (int x = 0; x < vectorField.Size.x; x++)
             {

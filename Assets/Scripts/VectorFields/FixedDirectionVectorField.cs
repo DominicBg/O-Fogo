@@ -6,7 +6,7 @@ namespace OFogo
     {
         [SerializeField] float3 force;
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
+        protected override void OnUpdateVectorField(in SimulationData simData, ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             for (int x = 0; x < vectorField.Size.x; x++)
             {

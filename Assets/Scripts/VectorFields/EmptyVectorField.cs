@@ -5,7 +5,7 @@ namespace OFogo
 {
     public class EmptyVectorField : VectorFieldGenerator
     {
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
+        protected override void OnUpdateVectorField(in SimulationData simData, ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             //
         }

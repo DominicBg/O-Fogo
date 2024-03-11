@@ -125,6 +125,7 @@ namespace OFogo
 
             this.simulator = simulator;
         }
+        public FireParticleSimulator GetCurrentSimulator() => simulator;
 
         public void SetVectorFieldGenerator(VectorFieldGenerator generator)
         {
@@ -135,13 +136,15 @@ namespace OFogo
 
             vectorFieldGenerator = generator;
         }
+        public VectorFieldGenerator GetCurrentVectorFieldGenerator() => vectorFieldGenerator;
+
 
 
         public void UpdateSimulation(FireParticleSimulator simulator, in SimulationData simData, NativeArray<FireParticle> fireParticles)
         {
 #if UNITY_EDITOR
             //for drag n drop support
-            if(simulator.TryInit(in settings))
+            if (simulator.TryInit(in settings))
             {
                 simulatorToDispose.Add(simulator);
             }
@@ -155,13 +158,13 @@ namespace OFogo
             if (simulator.NeedsVectorField())
             {
 #if UNITY_EDITOR
-            //for drag n drop support
-            if(vectorFieldGenerator.TryInit(in settings))
-            {
-                vectorFieldGeneratorToDispose.Add(vectorFieldGenerator);
-            }
+                //for drag n drop support
+                if (vectorFieldGenerator.TryInit(in settings))
+                {
+                    vectorFieldGeneratorToDispose.Add(vectorFieldGenerator);
+                }
 #endif
-                vectorFieldGenerator.UpdateVectorField(ref vectorField, in settings);
+                vectorFieldGenerator.UpdateVectorField(in simData, ref vectorField, in settings);
             }
 
             simulator.UpdateSimulation(in simData, ref fireParticles, vectorField, settings);

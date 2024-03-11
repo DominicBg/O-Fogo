@@ -123,7 +123,7 @@ MonoBehaviour:
     m_Value: 0.59
   quantize:
     m_OverrideState: 1
-    m_Value: 0.596
+    m_Value: 0.642
   useDither:
     m_OverrideState: 1
     m_Value: 1
@@ -216,7 +216,7 @@ MonoBehaviour:
   active: 1
   blend:
     m_OverrideState: 1
-    m_Value: 0.379
+    m_Value: 0.814
 --- !u!114 &8367976965437951557
 MonoBehaviour:
   m_ObjectHideFlags: 3

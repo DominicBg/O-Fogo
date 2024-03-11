@@ -8,7 +8,7 @@ namespace OFogo
     {
         [SerializeField] VectorFieldSnapshot snapShot;
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
+        protected override void OnUpdateVectorField(in SimulationData simData, ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             if (math.all(settings.vectorFieldSize != vectorField.Size))
             {

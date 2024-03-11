@@ -14,6 +14,7 @@ namespace OFogo
         {
             var strokeCopy = fireStroke;
             strokeCopy.position += (float3)transform.position;
+            strokeCopy.radius *= transform.lossyScale.x;
 
             return new FireStrokeContainer()
             {

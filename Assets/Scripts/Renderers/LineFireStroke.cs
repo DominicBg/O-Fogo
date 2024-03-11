@@ -8,6 +8,9 @@ namespace OFogo
         public override FireStrokeContainer CreateFireStrokeContainer()
         {
             var strokeCopy = fireStroke;
+
+            strokeCopy.posA *= transform.lossyScale.x;
+            strokeCopy.posB *= transform.lossyScale.x;
             strokeCopy.posA += (float3)transform.position;
             strokeCopy.posB += (float3)transform.position;
 

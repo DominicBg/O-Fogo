@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace OFogo
 {
-    public class VectorFieldBlendAnimation : AnimationAutomation
+    public class RendererAlphaAnimation : AnimationAutomation
     {
-        [SerializeField] BlendVectorField blendVector;
+        [SerializeField] AlphaRenderer alphaRenderer;
 
         public override void OnEnd()
         {
@@ -12,12 +12,11 @@ namespace OFogo
 
         public override void OnStart()
         {
-            OFogoController.Instance.SetVectorFieldGenerator(blendVector);
         }
 
         public override void UpdateAnimation(float timeRatio)
         {
-            blendVector.ratio = timeRatio;
+            alphaRenderer.alpha = timeRatio;
         }
     }
 }

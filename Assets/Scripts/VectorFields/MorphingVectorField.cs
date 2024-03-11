@@ -29,7 +29,7 @@ namespace OFogo
         }
 
 
-        public override void UpdateVectorField(ref NativeGrid<float3> vectorField, in SimulationSettings settings)
+        protected override void OnUpdateVectorField(in SimulationData simData, ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             float time = (timeOffset + Time.time) * morphSpeed;
             int currentIndex = (int)math.floor(time) % vectorFields.Length;
@@ -40,8 +40,8 @@ namespace OFogo
             NativeGrid<float3> v1 = vectorFields[currentIndex];
             NativeGrid<float3> v2 = vectorFields[nextIndex];
 
-            fields[currentIndex].UpdateVectorField(ref v1, in settings);
-            fields[nextIndex].UpdateVectorField(ref v2, in settings);
+            fields[currentIndex].UpdateVectorField(simData, ref v1, in settings);
+            fields[nextIndex].UpdateVectorField(simData, ref v2, in settings);
 
             for (int x = 0; x < v1.Size.x; x++)
             {
