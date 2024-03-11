@@ -7,6 +7,10 @@ using UnityEngine;
 
 public class AnimationTimelineXVII
 {
+    public List<AnimationXVII> AnimationParts => animations;
+    public EaseXVII.Ease defaultEase = EaseXVII.Ease.InOutQuad;
+    public float defaultDuration = 1;
+
     List<AnimationXVII> animations = new List<AnimationXVII>();
 
     public AnimationTimelineXVII Wait(float seconds)
@@ -16,6 +20,8 @@ public class AnimationTimelineXVII
     }
     public AnimationTimelineXVII Add(AnimationXVII animation)
     {
+        animation.duration = defaultDuration;
+        animation.easeCurve = defaultEase;
         animation.OnCreated();
         animations.Add(animation);
         return this;
@@ -25,16 +31,27 @@ public class AnimationTimelineXVII
     {
         for (int i = 0; i < animations.Length; i++)
         {
+            animations[i].duration = defaultDuration;
+            animations[i].easeCurve = defaultEase;
             animations[i].OnCreated();
         }
         this.animations.Add(new GroupAnimationPart(animations.ToList()));
         return this;
     }
 
-    public AnimationTimelineXVII SetCurve(AnimationCurve animationCurve)
+    public AnimationTimelineXVII SetAnimationCurve(AnimationCurve animationCurve)
     {
-        animations[animations.Count - 1].animationCurve = animationCurve;
+        AnimationXVII animation = animations[animations.Count - 1];
+        animation.animationCurve = animationCurve;
+        animation.useAnimationCurve = true;
         return this;
+    }
+
+    public AnimationTimelineXVII SetEaseCurve(EaseXVII.Ease easeCurve)
+    {
+        AnimationXVII animation = animations[animations.Count - 1];
+        animation.easeCurve = easeCurve;
+        animation.useAnimationCurve = false; return this;
     }
 
     public AnimationTimelineXVII SetDuration(float duration)
@@ -61,7 +78,6 @@ public class AnimationTimelineXVII
         return this;
     }
 
-    public List<AnimationXVII> AnimationParts => animations;
 }
 
 public interface AnimationTimelineFactory
@@ -73,11 +89,13 @@ public abstract class AnimationXVII
 {
     public float duration = 1;
     public AnimationCurve animationCurve = AnimationCurve.Linear(0, 0, 1, 1);
+    public EaseXVII.Ease easeCurve;
+    public bool useAnimationCurve = false;
 
     public abstract void OnStart();
     public abstract void UpdateAnimation(float timeRatio);
     public abstract void OnEnd();
-    public virtual void OnCreated() { } 
+    public virtual void OnCreated() { }
 }
 
 public class WaitAnimationPart : AnimationXVII
@@ -166,7 +184,7 @@ public class OnUpdateAction : AnimationXVII
     Action<float> action;
     public OnUpdateAction(Action<float> action)
     {
-        this.action = action; 
+        this.action = action;
         duration = 0;
     }
 
@@ -219,7 +237,7 @@ public class AnimationTimelineController
 
     public AnimationTimelineController(AnimationTimelineFactory factory)
     {
-        timeline = new AnimationTimelineXVII(); 
+        timeline = new AnimationTimelineXVII();
         factory.CreateAnimationTimeLine(timeline);
 
         IsRunning = false;
@@ -242,7 +260,7 @@ public class AnimationTimelineController
 
     public void Update(float deltaTime)
     {
-        if(!IsRunning)
+        if (!IsRunning)
         {
             Debug.LogError("Can't run without using Start()");
             return;
@@ -265,7 +283,7 @@ public class AnimationTimelineController
             {
                 currentAnimationIndex = currentAnimationIndex % animations.Count;
             }
-
+            Debug.Log(currentAnimationIndex + " " + animations[currentAnimationIndex].GetType());
             if (currentAnimationIndex >= animations.Count)
             {
                 IsRunning = false;

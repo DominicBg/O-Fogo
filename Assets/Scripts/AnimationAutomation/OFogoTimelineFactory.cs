@@ -47,12 +47,12 @@ namespace OFogo.Animations
 
             timeline.Add(
                 new FireLineHeat(logoSimulator, 0.3f, 15f, 0.0f, 0.75f)
-            ).SetDuration(2);
+            ).SetDuration(1);
 
             timeline.AddGroup(
                 new SimulatorBlendTo(ofogoSimulator)
             //add gradient n other
-            ).SetDuration(2).Wait(4);
+            ).SetDuration(.25f).Wait(4);
 
             timeline.AddGroup(
                 new VectorFieldBlendTo(fixedTurbulenceVectorFieldGenerator),
@@ -67,7 +67,7 @@ namespace OFogo.Animations
             timeline.AddGroup(
                   new RendererAlpha(fogoParticleRenderer, 1, 0)
             //add gradient n other
-            ).SetDuration(5);
+            ).SetDuration(1);
         }
     }
 }

@@ -145,7 +145,7 @@ namespace OFogo.Animations
 
         public GradientBlendTo(VolumeProfile volumeProfile, GPUColorGradient colorGradient)
         {
-            toGradient = colorGradient.colors;
+            toGradient.AddRange(colorGradient.colors);
             volumeProfile.TryGet(out settings);
         }
 
@@ -155,8 +155,7 @@ namespace OFogo.Animations
 
         public override void OnStart()
         {
-            settings.SetGradientIntoList(ref toGradient);
-
+            settings.SetGradientIntoList(ref fromGradient);
         }
 
         public override void UpdateAnimation(float timeRatio)
