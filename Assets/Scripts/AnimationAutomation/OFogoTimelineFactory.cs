@@ -37,9 +37,13 @@ namespace OFogo.Animations
 
         public void CreateAnimationTimeLine(AnimationTimelineXVII timeline)
         {
-            timeline.OnStart(() => OFogoController.Instance.SetSimulator(logoSimulator));
-            timeline.OnStart(() => OFogoController.Instance.SetVectorFieldGenerator(radialTurbulenceVectorFieldGenerator));
-            timeline.OnStart(() => fogoParticleRenderer.alpha = 0);
+            timeline.AddOnStart(() => OFogoController.Instance.SetSimulator(logoSimulator));
+            timeline.AddOnStart(() => OFogoController.Instance.SetVectorFieldGenerator(radialTurbulenceVectorFieldGenerator));
+            timeline.AddOnStart(() => fogoParticleRenderer.alpha = 0);
+
+            timeline.Add(
+               new GradientBlendTo(volumeProfile, fireGradient.gpuGradient)
+           ).SetDuration(0);
 
             timeline.Add(
                 new RendererAlpha(fogoParticleRenderer, 0, 1)

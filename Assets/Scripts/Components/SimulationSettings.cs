@@ -12,7 +12,6 @@ namespace OFogo
 
         [Header("Simulation")]
         public Bounds simulationBound;
-        public int2 hashingGridLength;
 
         [Header("Particles")]
         public float maxTemperature;

@@ -22,9 +22,9 @@ namespace OFogo
 
         public void Execute()
         {
-            for (int x = 0; x < settings.hashingGridLength.x; x++)
+            for (int x = 0; x < nativeHashingGrid.Size.x; x++)
             {
-                for (int y = 0; y < settings.hashingGridLength.y; y++)
+                for (int y = 0; y < nativeHashingGrid.Size.y; y++)
                 {
                     var list = nativeHashingGrid[x, y];
                     list.Clear();
@@ -34,7 +34,7 @@ namespace OFogo
 
             for (int i = 0; i < fireParticles.Length; i++)
             {
-                int2 hash = OFogoHelper.HashPosition(fireParticles[i].position, in settings.simulationBound, settings.hashingGridLength);
+                int2 hash = OFogoHelper.HashPosition(fireParticles[i].position, in settings.simulationBound, nativeHashingGrid.Size);
 
                 var list = nativeHashingGrid[hash];
                 list.Add(i);

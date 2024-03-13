@@ -40,11 +40,11 @@ namespace OFogo
         private void Start()
         {
             fireParticles = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
-            nativeHashingGrid = new NativeGrid<UnsafeList<int>>(settings.hashingGridLength, Allocator.Persistent);
-
-            for (int x = 0; x < settings.hashingGridLength.x; x++)
+            nativeHashingGrid = new NativeGrid<UnsafeList<int>>(CalculateNativeHashingGridSize(in settings), Allocator.Persistent);
+            Debug.Log(nativeHashingGrid.Size);
+            for (int x = 0; x < nativeHashingGrid.Size.x; x++)
             {
-                for (int y = 0; y < settings.hashingGridLength.y; y++)
+                for (int y = 0; y < nativeHashingGrid.Size.y; y++)
                 {
                     nativeHashingGrid[x, y] = new UnsafeList<int>(32, Allocator.Persistent);
                 }
@@ -60,6 +60,12 @@ namespace OFogo
             SetVectorFieldGenerator(vectorFieldGenerator);
 
             vectorFieldRenderer.Init(vectorField);
+        }
+
+        static int2 CalculateNativeHashingGridSize(in SimulationSettings settings)
+        {
+            float2 size = ((float3)settings.simulationBound.size).xy;
+            return (int2)math.ceil(size / settings.maxParticleSize);
         }
 
         void SpawnParticles()
@@ -202,9 +208,9 @@ namespace OFogo
             vectorFieldRenderer.Dispose();
 
             fireParticles.Dispose();
-            for (int x = 0; x < settings.hashingGridLength.x; x++)
+            for (int x = 0; x < nativeHashingGrid.Size.x; x++)
             {
-                for (int y = 0; y < settings.hashingGridLength.y; y++)
+                for (int y = 0; y < nativeHashingGrid.Size.y; y++)
                 {
                     nativeHashingGrid[x, y].Dispose();
                 }

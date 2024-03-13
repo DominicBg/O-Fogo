@@ -60,19 +60,19 @@ public class AnimationTimelineXVII
         return this;
     }
 
-    public AnimationTimelineXVII OnStart(Action action)
+    public AnimationTimelineXVII AddOnStart(Action action)
     {
         animations.Add(new OnStartAction(action));
         return this;
     }
 
-    public AnimationTimelineXVII OnEnd(Action action)
+    public AnimationTimelineXVII AddOnEnd(Action action)
     {
         animations.Add(new OnEndAction(action));
         return this;
     }
 
-    public AnimationTimelineXVII OnUpdate(Action<float> action)
+    public AnimationTimelineXVII AddOnUpdate(Action<float> action)
     {
         animations.Add(new OnUpdateAction(action));
         return this;

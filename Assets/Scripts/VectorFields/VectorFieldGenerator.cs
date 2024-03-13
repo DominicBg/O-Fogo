@@ -24,7 +24,7 @@ namespace OFogo
 
         public void UpdateVectorField(in SimulationData simData, ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
-            if (simData.time != lastUpdateTime)
+            //if (simData.time != lastUpdateTime)
             {
                 OnUpdateVectorField(in simData, ref vectorField, in settings);
             }

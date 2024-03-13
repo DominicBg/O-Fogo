@@ -42,7 +42,7 @@ namespace OFogo
             in NativeArray<FireParticle> fireParticles, in NativeGrid<UnsafeList<int>> nativeHashingGrid,
             in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, int maxCollision = -1)       
         {
-            int2 hash = HashPosition(fireParticles[particleIndex].position, in settings.simulationBound, settings.hashingGridLength);
+            int2 hash = HashPosition(fireParticles[particleIndex].position, in settings.simulationBound, nativeHashingGrid.Size);
             int collisionCount = 0;
             for (int x = -1; x <= 1; x++)
             {
@@ -52,18 +52,18 @@ namespace OFogo
                     {
                         return;
                     }
-                    CheckCollisionPair(hash, particleIndex, x, y, fireParticles, nativeHashingGrid, settings, ref collisionBuffer, ref collisionCount, maxCollision);
+                    CheckCollisionPair(hash, particleIndex, x, y, fireParticles, nativeHashingGrid, ref collisionBuffer, ref collisionCount, maxCollision);
                 }
             }
         }
 
         public static void CheckCollisionPair(int2 hash, int i, int x, int y,
             in NativeArray<FireParticle> fireParticles, in NativeGrid<UnsafeList<int>> nativeHashingGrid,
-            in SimulationSettings settings, ref NativeList<FireParticleCollision> collisionBuffer, ref int collisionCount, int maxCollision = -1)
+            ref NativeList<FireParticleCollision> collisionBuffer, ref int collisionCount, int maxCollision = -1)
         {
             int2 pos = new int2(x + hash.x, y + hash.y);
 
-            if (pos.x < 0 || pos.x >= settings.hashingGridLength.x || pos.y < 0 || pos.y >= settings.hashingGridLength.y)
+            if (pos.x < 0 || pos.x >= nativeHashingGrid.Size.x || pos.y < 0 || pos.y >= nativeHashingGrid.Size.y)
             {
                 return;
             }

@@ -34,8 +34,9 @@ namespace OFogo
             Debug.DrawLine(topRight, bottomRight, Color.white);
             Debug.DrawLine(bottomRight, bottomLeft, Color.white);
 
-            float2 invLength = 1f / (float2)settings.hashingGridLength;
-            for (int i = 0; i < settings.hashingGridLength.x; i++)
+            int2 hashGridSize = OFogoController.Instance.nativeHashingGrid.Size;
+            float2 invLength = 1f / (float2)hashGridSize;
+            for (int i = 0; i < hashGridSize.x; i++)
             {
                 float yRatio = i * invLength.y;
                 float y = math.lerp(min.y, max.y, yRatio);
@@ -44,7 +45,7 @@ namespace OFogo
                 Debug.DrawLine(start, end, Color.cyan * 0.25f);
             }
 
-            for (int i = 0; i < settings.hashingGridLength.y; i++)
+            for (int i = 0; i < hashGridSize.y; i++)
             {
                 float xRatio = i * invLength.x;
                 float x = math.lerp(min.x, max.x, xRatio);
