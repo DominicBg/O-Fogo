@@ -5694,7 +5694,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &843263658
 Transform:
   m_ObjectHideFlags: 0
@@ -5925,9 +5925,6 @@ MonoBehaviour:
     simulationBound:
       m_Center: {x: 0, y: 0, z: 0}
       m_Extent: {x: 11, y: 14, z: 0}
-    hashingGridLength:
-      x: 40
-      y: 50
     maxTemperature: 15
     minParticleSize: 0.05
     maxParticleSize: 0.4
@@ -5938,6 +5935,7 @@ MonoBehaviour:
   numberThreadJob: 16
   simulationSpeed: 2
   substeps: 2
+  maxSimulationPerFrame: 1
 --- !u!4 &969678025
 Transform:
   m_ObjectHideFlags: 0
@@ -10816,7 +10814,7 @@ MonoBehaviour:
   fireParticleSimulatorA: {fileID: 2054115752}
   fireParticleSimulatorB: {fileID: 1317853645}
   isFireSimulatorLerpAdditive: 1
-  ratio: 0.2
+  ratio: 0.05
 --- !u!1 &1094367718
 GameObject:
   m_ObjectHideFlags: 0
@@ -11013,7 +11011,7 @@ MonoBehaviour:
   burnHeight: 15
   noiseSpeed: 2
   noiseAmplitude: 0.23
-  heatMultiplicator: 0
+  heatMultiplicator: 0.321
 --- !u!4 &1200326468
 Transform:
   m_ObjectHideFlags: 0
@@ -11028,6 +11026,7 @@ Transform:
   m_Children:
   - {fileID: 843263658}
   - {fileID: 214042128}
+  - {fileID: 1607897355}
   m_Father: {fileID: 2100030091}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -11307,7 +11306,7 @@ MonoBehaviour:
   internalSettings:
     integrationType: 1
     separationForce: 0.5
-    maxCollision: -1
+    maxCollision: 25
     wallBounceIntensity: 0.2
     maxSpeed: 1
     vectorFieldSpeedMultiplier: 1
@@ -11483,7 +11482,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1505357070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11499,12 +11498,19 @@ MonoBehaviour:
   logoSimulator: {fileID: 1200326467}
   ofogoSimulator: {fileID: 2054115752}
   solarPowerSimulator: {fileID: 1018258229}
+  radialVectorField: {fileID: 574612068}
   fixedTurbulenceVectorFieldGenerator: {fileID: 1789090252}
   radialTurbulenceVectorFieldGenerator: {fileID: 86655484}
   fogoParticleRenderer: {fileID: 305926068}
+  paredesCalientes: {fileID: 0}
+  pisoEsLava: {fileID: 0}
   volumeProfile: {fileID: 11400000, guid: 9702793403a57664481ffc277d6fed6e, type: 2}
   fireGradient: {fileID: 11400000, guid: fd0d055d60a6e2842a8073ef38a3229d, type: 2}
   blueGradient: {fileID: 11400000, guid: 59fa55694455de24dba7f5d0730729b8, type: 2}
+  activateLogo: 1
+  activateTornadoOfFuego: 1
+  activateNormalFire: 1
+  activateSolarPower: 1
 --- !u!4 &1505357071
 Transform:
   m_ObjectHideFlags: 0
@@ -11622,6 +11628,71 @@ MonoBehaviour:
   offsetOverTime:
     x: -0.48
     y: -1.7
+--- !u!1 &1607897354
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1607897355}
+  - component: {fileID: 1607897357}
+  - component: {fileID: 1607897356}
+  m_Layer: 0
+  m_Name: LineTrailFIRE
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1607897355
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607897354}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1200326468}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1607897356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607897354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a50c97966449884996f50ea1738c478, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startPos:
+    x: 0
+    y: 0
+    z: 0
+  radius: 2
+  rotationSpeed: 360
+--- !u!114 &1607897357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607897354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d781d252eb6667447a2cfb42d24c0337, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  samplePointsInterval: 0.01
+  maxPointCount: 100
 --- !u!1 &1638934021
 GameObject:
   m_ObjectHideFlags: 0
@@ -12193,7 +12264,7 @@ MonoBehaviour:
   internalSettings:
     integrationType: 1
     seed: 43243215
-    maxParticleCollision: -1
+    maxParticleCollision: 15
     parallelCollision: 1
     resolutionStepRatio: 0.5
     collisionVelocityResolution: 0

@@ -152,14 +152,21 @@ namespace OFogo
                 var rng = Unity.Mathematics.Random.CreateFromIndex((uint)index);
 
                 float heatRatio = rng.NextFloat();
-
                 heatRatio += time * burnSpeed;
                 heatRatio = math.frac(heatRatio);
+
                 heatRatio *= heatMultiplicator;
+                
+                bool useRatioAsHeat = fireStrokeContainer[fireLineId].useRatioAsHeat;
+                if(useRatioAsHeat)
+                {
+                    heatRatio *= t;
+                }
 
                 particle.prevPosition = particle.position;
                 particle.position += math.up() * heatRatio * burnHeight;
                 particle.temperature = heatRatio * settings.maxTemperature;
+
                 particle.radius = math.lerp(settings.minParticleSize, settings.maxParticleSize, heatRatio);
 
                 fireParticles[index] = particle;

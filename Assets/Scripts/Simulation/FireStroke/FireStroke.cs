@@ -4,6 +4,7 @@ using static OFogo.BezierFireStroke;
 using static OFogo.CircleFireStroke;
 using static OFogo.LineFireStroke;
 using static OFogo.PartialCircleFireStroke;
+using static OFogo.TrailStroke;
 
 namespace OFogo
 {
@@ -15,13 +16,15 @@ namespace OFogo
     //This is a bit nasty, but this is supported for burst
     public struct FireStrokeContainer
     {
-        public enum StrokeType { Circle, PartialCircle, Line, Bezier };
+        public enum StrokeType { Circle, PartialCircle, Line, Bezier, Trail };
         public StrokeType strokeType;
 
         public CircleFireStrokeContainer circleFireStrokeContainer;
         public PartialCircleFireStrokeContainer partialCircleFireStrokeContainer;
         public LineFireStrokeContainer lineFireStrokeContainer;
         public BezierFireStrokeContainer bezierFireStrokeContainer;
+        public TrailFireStrokeContainer trailFireStrokeContainer;
+        public bool useRatioAsHeat;
 
         public float3 Evaluate(float t)
         {
@@ -31,6 +34,7 @@ namespace OFogo
                 case StrokeType.PartialCircle: return partialCircleFireStrokeContainer.Evaluate(t);
                 case StrokeType.Line: return lineFireStrokeContainer.Evaluate(t);
                 case StrokeType.Bezier: return bezierFireStrokeContainer.Evaluate(t);
+                case StrokeType.Trail: return trailFireStrokeContainer.Evaluate(t);
             }
             return 0;
         }
@@ -42,6 +46,7 @@ namespace OFogo
                 case StrokeType.PartialCircle: return partialCircleFireStrokeContainer.GetLength();
                 case StrokeType.Line: return lineFireStrokeContainer.GetLength();
                 case StrokeType.Bezier: return bezierFireStrokeContainer.GetLength();
+                case StrokeType.Trail: return trailFireStrokeContainer.GetLength();
             }
             return 0;
         }

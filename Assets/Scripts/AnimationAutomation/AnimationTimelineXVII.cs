@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
@@ -78,6 +77,11 @@ public class AnimationTimelineXVII
         return this;
     }
 
+    public AnimationTimelineXVII AddTimeLine(AnimationTimelineXVII otherTimeline)
+    {
+        animations.AddRange(otherTimeline.AnimationParts);
+        return this;
+    }
 }
 
 public interface AnimationTimelineFactory
@@ -248,7 +252,6 @@ public class AnimationTimelineController
         {
             TotalDuration += animations[i].duration;
         }
-
     }
 
     public void Start(bool cycleAnimations = false)
@@ -283,7 +286,6 @@ public class AnimationTimelineController
             {
                 currentAnimationIndex = currentAnimationIndex % animations.Count;
             }
-            Debug.Log(currentAnimationIndex + " " + animations[currentAnimationIndex].GetType());
             if (currentAnimationIndex >= animations.Count)
             {
                 IsRunning = false;

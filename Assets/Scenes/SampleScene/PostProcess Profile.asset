@@ -123,7 +123,7 @@ MonoBehaviour:
     m_Value: 0.59
   quantize:
     m_OverrideState: 1
-    m_Value: 0.642
+    m_Value: 0.723
   useDither:
     m_OverrideState: 1
     m_Value: 1

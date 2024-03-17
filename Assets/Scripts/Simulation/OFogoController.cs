@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -24,11 +23,13 @@ namespace OFogo
         [SerializeField] int numberThreadJob = 16;
         [SerializeField] float simulationSpeed = 1;
         [SerializeField] int substeps = 4;
+        [SerializeField] int maxSimulationPerFrame = 1;
 
         public NativeGrid<float3> vectorField;
         public NativeArray<FireParticle> fireParticles;
         public NativeGrid<UnsafeList<int>> nativeHashingGrid;
 
+        private int currentSimulationPerFrame = 0;
         private HashSet<FireParticleSimulator> simulatorToDispose = new HashSet<FireParticleSimulator>();
         private HashSet<VectorFieldGenerator> vectorFieldGeneratorToDispose = new HashSet<VectorFieldGenerator>();
 
@@ -41,7 +42,7 @@ namespace OFogo
         {
             fireParticles = new NativeArray<FireParticle>(settings.particleCount, Allocator.Persistent);
             nativeHashingGrid = new NativeGrid<UnsafeList<int>>(CalculateNativeHashingGridSize(in settings), Allocator.Persistent);
-            Debug.Log(nativeHashingGrid.Size);
+
             for (int x = 0; x < nativeHashingGrid.Size.x; x++)
             {
                 for (int y = 0; y < nativeHashingGrid.Size.y; y++)
@@ -54,7 +55,6 @@ namespace OFogo
             fogoRenderer.Init(settings.particleCount);
 
             vectorField = VectorFieldGenerator.CreateVectorField(in settings);
-
 
             SetSimulator(simulator);
             SetVectorFieldGenerator(vectorFieldGenerator);
@@ -102,11 +102,17 @@ namespace OFogo
             }
             calentador?.DrawDebug(transform.position, in settings);
 
+            currentSimulationPerFrame = 0;
         }
 
         private void FixedUpdate()
         {
             JobUtility.numberOfThread = numberThreadJob;
+
+            if(currentSimulationPerFrame > maxSimulationPerFrame)
+            {
+                return;
+            }
 
             for (int i = 0; i < substeps; i++)
             {
@@ -120,6 +126,7 @@ namespace OFogo
 
                 UpdateSimulation(simulator, in simData, fireParticles);
             }
+            currentSimulationPerFrame++;
         }
 
         public void SetSimulator(FireParticleSimulator simulator)
@@ -144,6 +151,10 @@ namespace OFogo
         }
         public VectorFieldGenerator GetCurrentVectorFieldGenerator() => vectorFieldGenerator;
 
+        public void SetCalentador(Calentador calentador)
+        {
+            this.calentador = calentador;
+        }
 
 
         public void UpdateSimulation(FireParticleSimulator simulator, in SimulationData simData, NativeArray<FireParticle> fireParticles)

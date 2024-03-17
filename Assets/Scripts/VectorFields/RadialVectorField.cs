@@ -1,12 +1,11 @@
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace OFogo
 {
     public class RadialVectorField : VectorFieldGenerator
     {
-        [SerializeField] float force;
-        [SerializeField] float angle;
+        public float force;
+        public float angle;
 
         protected override void OnUpdateVectorField(in SimulationData simData, ref NativeGrid<float3> vectorField, in SimulationSettings settings)
         {

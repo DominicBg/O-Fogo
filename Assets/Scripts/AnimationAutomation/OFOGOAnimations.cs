@@ -135,6 +135,41 @@ namespace OFogo.Animations
         }
     }
 
+    //public class RadialVectorFieldForce : AnimationXVII
+    //{
+    //    VectorFieldGenerator vectorFieldBlendTo;
+
+    //    BlendVectorField vectorFieldBlend;
+
+    //    public VectorFieldBlendTo(VectorFieldGenerator vectorFieldBlendTo)
+    //    {
+    //        this.vectorFieldBlendTo = vectorFieldBlendTo;
+    //    }
+
+    //    public override void OnCreated()
+    //    {
+    //        var blendToAnim = new GameObject("VectorFieldBlendToAnimation");
+    //        vectorFieldBlend = blendToAnim.AddComponent<BlendVectorField>();
+    //    }
+
+    //    public override void OnEnd()
+    //    {
+    //    }
+
+    //    public override void OnStart()
+    //    {
+    //        vectorFieldBlend.vectorFieldGeneratorA = OFogoController.Instance.GetCurrentVectorFieldGenerator();
+    //        vectorFieldBlend.vectorFieldGeneratorB = vectorFieldBlendTo;
+
+    //        OFogoController.Instance.SetVectorFieldGenerator(vectorFieldBlend);
+    //    }
+
+    //    public override void UpdateAnimation(float timeRatio)
+    //    {
+    //        vectorFieldBlend.ratio = timeRatio;
+    //    }
+    //}
+
     public class GradientBlendTo : AnimationXVII
     {
         MagicSettings settings;
