@@ -11,7 +11,7 @@ public struct NativeCircularBuffer<T> : IDisposable where T : unmanaged
     int tailIndex;
     int maxLength;
     bool isFilled;
-    public int Length => isFilled ? maxLength : tailIndex;
+    public int Length => isFilled ? maxLength : tailIndex + 1;
 
     public unsafe NativeCircularBuffer(int length, Allocator allocator)
     {
@@ -54,7 +54,8 @@ public struct NativeCircularBuffer<T> : IDisposable where T : unmanaged
 
     private int ConvertIndex(int i)
     {
-        return (int)Mathf.Repeat(headIndex + i - 1, maxLength);
+        int index = isFilled ? (int)Mathf.Repeat(headIndex + i - 1, maxLength) : i;
+        return index;
     }
 
     //todo add out of buffer error?

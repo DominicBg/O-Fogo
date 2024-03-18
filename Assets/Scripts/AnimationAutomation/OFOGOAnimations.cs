@@ -60,7 +60,7 @@ namespace OFogo.Animations
 
         public override void UpdateAnimation(float timeRatio)
         {
-            alphaRenderer.alpha = math.remap(timeRatio, 0, 1, alphaFrom, alphaTo);
+            alphaRenderer.alpha = math.remap(0, 1, alphaFrom, alphaTo, timeRatio);
         }
     }
 

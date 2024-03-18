@@ -20,6 +20,7 @@ namespace OFogo
         {
             points = new NativeCircularBuffer<float3>(maxPointCount, Allocator.Persistent);
             cumulativeRatio = new UnsafeList<float>(maxPointCount, Allocator.Persistent);
+            cumulativeRatio.Length = maxPointCount;
         }
         private void OnDestroy()
         {
@@ -72,17 +73,16 @@ namespace OFogo
 
         public float CalculateLength(NativeCircularBuffer<float3> points, ref UnsafeList<float> cumulativeRatio)
         {
-            cumulativeRatio.Clear();
-            cumulativeRatio.Add(0);
+            cumulativeRatio[0] = 0;
 
             float sum = 0;
             for (int i = 1; i < points.Length; i++)
             {
                 sum += math.distance(points[i - 1], points[i]);
-                cumulativeRatio.Add(sum);
+                cumulativeRatio[i] = sum;
             }
 
-            for (int i = 0; i < cumulativeRatio.Length; i++)
+            for (int i = 0; i < points.Length; i++)
             {
                 cumulativeRatio[i] /= sum;
             }

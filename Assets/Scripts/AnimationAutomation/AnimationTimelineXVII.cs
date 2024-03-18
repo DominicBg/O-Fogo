@@ -50,7 +50,8 @@ public class AnimationTimelineXVII
     {
         AnimationXVII animation = animations[animations.Count - 1];
         animation.easeCurve = easeCurve;
-        animation.useAnimationCurve = false; return this;
+        animation.useAnimationCurve = false; 
+        return this;
     }
 
     public AnimationTimelineXVII SetDuration(float duration)
@@ -274,6 +275,11 @@ public class AnimationTimelineController
         var animationAutomation = animations[currentAnimationIndex];
 
         float timeRatio = animationAutomation.animationCurve.Evaluate(math.saturate(internalTimer / animationAutomation.duration));
+        timeRatio = 
+            animationAutomation.useAnimationCurve ?
+            animationAutomation.animationCurve.Evaluate(timeRatio) :
+            EaseXVII.Evaluate(timeRatio, animationAutomation.easeCurve);
+
         animationAutomation.UpdateAnimation(timeRatio);
 
         if (internalTimer > animationAutomation.duration)
