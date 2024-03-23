@@ -41,7 +41,7 @@ namespace OFogo
                 }
                 points.Add(transform.position);
             }
-            DebugDraw();
+            //DebugDraw();
         }
 
         void DebugDraw()

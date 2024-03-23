@@ -27,7 +27,7 @@ namespace OFogo
 
         public override void UpdateSimulation(in SimulationData simulationData, ref NativeArray<FireParticle> fireParticles, in NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
-            if(ratio == 0)
+            if(ratio == 0 || fireParticleSimulatorA == fireParticleSimulatorB)
             {
                 OFogoController.Instance.UpdateSimulation(fireParticleSimulatorA, simulationData, fireParticles);
             }

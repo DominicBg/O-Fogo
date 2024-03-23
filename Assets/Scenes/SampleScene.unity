@@ -5323,6 +5323,58 @@ MonoBehaviour:
       x: -1.89
       y: 0
       z: 0
+--- !u!1 &191880981
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 191880982}
+  - component: {fileID: 191880983}
+  m_Layer: 0
+  m_Name: TurbulenceVectorField2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &191880982
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191880981}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 655174614}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &191880983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191880981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f98f598e61098ad4fa3a70fc5119a04c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scale: 0.05
+  strength: 5
+  offset:
+    x: 0
+    y: 0
+  offsetOverTime:
+    x: -0.48
+    y: -1.7
 --- !u!1 &214042127
 GameObject:
   m_ObjectHideFlags: 0
@@ -5620,6 +5672,7 @@ Transform:
   - {fileID: 574612067}
   - {fileID: 460166899}
   - {fileID: 1100687859}
+  - {fileID: 191880982}
   m_Father: {fileID: 969678025}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5966,10 +6019,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b57ab5c8d7de6a542b5e149005539342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simulator: {fileID: 18760427}
-  calentador: {fileID: 1162405490}
+  simulator: {fileID: 2043617214}
+  calentador: {fileID: 1532565392}
   fogoRenderer: {fileID: 305926068}
-  vectorFieldGenerator: {fileID: 1789090252}
+  vectorFieldGenerator: {fileID: 191880983}
   vectorFieldRenderer: {fileID: 52611695}
   settings:
     particleCount: 2000
@@ -5982,9 +6035,8 @@ MonoBehaviour:
     vectorFieldSize:
       x: 40
       y: 50
-  initialSpacing: 0.5
-  numberThreadJob: 16
   simulationSpeed: 2
+  numberThreadJob: 16
   substeps: 2
   maxSimulationPerFrame: 1
 --- !u!4 &969678025
@@ -6073,7 +6125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   samplePointsInterval: 0.01
-  maxPointCount: 100
+  maxPointCount: 150
 --- !u!1 &1008460229
 GameObject:
   m_ObjectHideFlags: 0
@@ -11617,9 +11669,11 @@ MonoBehaviour:
   serpenteDiFuocoSimulator: {fileID: 18760427}
   serpenteDiFuocoMover: {fileID: 996385358}
   ofogoSimulator: {fileID: 2054115752}
+  feuNormal: {fileID: 2043617214}
   solarPowerSimulator: {fileID: 1018258229}
   radialVectorField: {fileID: 574612068}
   fixedTurbulenceVectorFieldGenerator: {fileID: 1789090252}
+  turbulenceVectorFieldGenerator: {fileID: 191880983}
   radialTurbulenceVectorFieldGenerator: {fileID: 86655484}
   fogoParticleRenderer: {fileID: 305926068}
   paredesCalientes: {fileID: 1162405490}
@@ -11715,11 +11769,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heatSettings:
-    heatAtBottomHeight: 0.5
+    heatAtBottomHeight: 5
     heatAtBottomNoiseRatio: 0.5
     heatAtBottomNoiseSize: 1
     heatAtBottomNoiseSpeed: 1
-    heatingPerSec: 10
+    heatingPerSec: 30
 --- !u!1 &1561617335
 GameObject:
   m_ObjectHideFlags: 0
@@ -12050,7 +12104,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1803425495}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 022c9e8e411b02b449fae59b0fca9700, type: 3}
   m_Name: 
@@ -12256,7 +12310,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   force:
     x: 0
-    y: -2
+    y: 2
     z: 0
 --- !u!1 &2016471821
 GameObject:
@@ -12311,6 +12365,64 @@ MonoBehaviour:
       x: -1
       y: -2
       z: 0
+--- !u!1 &2043617212
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2043617213}
+  - component: {fileID: 2043617214}
+  m_Layer: 0
+  m_Name: FeuNormal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2043617213
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043617212}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2100030091}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2043617214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043617212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4780854a517b2404eb25ade756095bbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  internalSettings:
+    integrationType: 0
+    seed: 43243215
+    maxParticleCollision: -1
+    parallelCollision: 1
+    resolutionStepRatio: 0
+    collisionVelocityResolution: 0.5
+    maxSpeed: 15
+    wallBounceIntensity: 0.2
+    useVectorFieldAsGravity: 0
+    fireGravity: -10
+    temperatureDropPerSec: 10
+    temperatureUpwardForce: 3
+    heatTransferPercent: 0.5
 --- !u!1 &2054115751
 GameObject:
   m_ObjectHideFlags: 0
@@ -12322,7 +12434,7 @@ GameObject:
   - component: {fileID: 2054115753}
   - component: {fileID: 2054115752}
   m_Layer: 0
-  m_Name: OFogoSimulator
+  m_Name: OFogoSimulatorTurbo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12473,6 +12585,7 @@ Transform:
   - {fileID: 1949782829}
   - {fileID: 1018258228}
   - {fileID: 18760426}
+  - {fileID: 2043617213}
   m_Father: {fileID: 969678025}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -19,9 +19,8 @@ namespace OFogo
 
         [Header("Simulation")]
         public SimulationSettings settings;
-        [SerializeField] float initialSpacing = 0.5f;
+        public float simulationSpeed = 1;
         [SerializeField] int numberThreadJob = 16;
-        [SerializeField] float simulationSpeed = 1;
         [SerializeField] int substeps = 4;
         [SerializeField] int maxSimulationPerFrame = 1;
 
@@ -71,11 +70,14 @@ namespace OFogo
         void SpawnParticles()
         {
             int particlePerCol = (int)math.sqrt(settings.particleCount);
+
+            int maxRow = settings.particleCount / particlePerCol;
             for (int i = 0; i < settings.particleCount; i++)
             {
                 int2 xy = new int2(i % particlePerCol, i / particlePerCol);
-                float3 pos = new float3((float2)xy * initialSpacing, 0f);
-                pos.x += (xy.y % 2 == 0) ? 0.5f * initialSpacing : 0f;
+                float2 xyRatio = xy / new float2(particlePerCol, maxRow);
+
+                float3 pos = math.lerp(settings.simulationBound.min, settings.simulationBound.max, new float3(xyRatio, 0));
 
                 FireParticle fireParticle = new FireParticle()
                 {
