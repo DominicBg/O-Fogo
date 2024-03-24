@@ -9,6 +9,7 @@ namespace OFogo
     public class OFogoController : MonoBehaviour
     {
         public static OFogoController Instance;
+        public bool isSingleton;
 
         [Header("Components")]
         [SerializeField] FireParticleSimulator simulator;
@@ -34,7 +35,14 @@ namespace OFogo
 
         private void Awake()
         {
-            Instance = this;
+            if(isSingleton)
+            {
+                if(Instance != null)
+                {
+                    Debug.LogError(nameof(OFogoController) + " has multiple Singletons");
+                }
+                Instance = this;
+            }
         }
 
         private void Start()
@@ -60,6 +68,7 @@ namespace OFogo
 
             vectorFieldRenderer.Init(vectorField);
         }
+
 
         static int2 CalculateNativeHashingGridSize(in SimulationSettings settings)
         {

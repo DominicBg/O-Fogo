@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -20,7 +18,7 @@ public class SerpenteDiFuoco : MonoBehaviour
     static float3 CalculatePos(float a, float f, float p, float r, float s, float t)
     {
         float3 y = math.up() * a * math.sin(t * f * math.PI * 2f + p);
-        float3 xz = math.mul(float3x3.RotateZ(math.radians(t * s)), math.up()) * r;
+        float3 xz = math.mul(float3x3.RotateZ(math.radians(s * t)), math.up()) * r;
         return y + xz;
     }
 }

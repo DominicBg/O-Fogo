@@ -8,7 +8,6 @@ namespace OFogo
     {
         [SerializeField] bool drawVectorFieldDebug;
         [SerializeField] bool drawBoundsDebug;
-        [SerializeField] bool drawCalentadorDebug;
         [SerializeField] float debugRayDist = 5;
         [SerializeField] NativeLeakDetectionMode nativeLeakDetectionMode;
 
@@ -17,8 +16,12 @@ namespace OFogo
         {      
             //stupid hack
             NativeLeakDetection.Mode = nativeLeakDetectionMode;
-            DrawDebugBounds(OFogoController.Instance.settings);
-            DrawVectorField(OFogoController.Instance.vectorField, OFogoController.Instance.settings);
+
+            if(drawBoundsDebug)
+                DrawDebugBounds(OFogoController.Instance.settings);
+
+            if(drawVectorFieldDebug)
+                DrawVectorField(OFogoController.Instance.vectorField, OFogoController.Instance.settings);
 
         }
         private void DrawDebugBounds(in SimulationSettings settings)

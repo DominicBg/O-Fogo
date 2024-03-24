@@ -184,7 +184,7 @@ MonoBehaviour:
     m_Value: 0.005
   spread:
     m_OverrideState: 1
-    m_Value: 1.68
+    m_Value: 1.79
 --- !u!114 &5377890408480631067
 MonoBehaviour:
   m_ObjectHideFlags: 3

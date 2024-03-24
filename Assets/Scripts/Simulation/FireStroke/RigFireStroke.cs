@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
 using UnityEngine;
 namespace OFogo
 {
     public class RigFireStroke : MonoBehaviour
     {
         [SerializeField] Transform rig;
+        [SerializeField] float lerpFactor = 1;
 
         LineFireStroke[] lineFireStrokes;
         Transform[] children;
@@ -27,10 +29,13 @@ namespace OFogo
 
         private void Update()
         {
+            float t = math.saturate(lerpFactor * Time.deltaTime);
             for (int i = 0; i < children.Length; i++)
             {
-                lineFireStrokes[i].fireStroke.posA = children[i].position;
-                lineFireStrokes[i].fireStroke.posB = children[i].parent.position;
+                float3 posA = math.lerp(lineFireStrokes[i].fireStroke.posA, children[i].position, t);
+                float3 posB = math.lerp(lineFireStrokes[i].fireStroke.posB, children[i].parent.position, t);
+                lineFireStrokes[i].fireStroke.posA = posA;
+                lineFireStrokes[i].fireStroke.posB = posB;
             }
         }
     }

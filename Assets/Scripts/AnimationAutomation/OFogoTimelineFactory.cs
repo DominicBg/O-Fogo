@@ -10,9 +10,10 @@ namespace OFogo.Animations
         [SerializeField] FireStrokeSimulator logoSimulator;
         [SerializeField] FireStrokeSimulator serpenteDiFuocoSimulator;
         [SerializeField] SerpenteDiFuoco serpenteDiFuocoMover;
+        [SerializeField] TrailStroke serpenteDiFuocoTrail;
         [SerializeField] OFogoSimulator ofogoSimulator;
         [SerializeField] OFogoSimulator feuNormal;
-        [SerializeField] SimulatorBlend solarPowerSimulator;
+        //[SerializeField] SimulatorBlend solarPowerSimulator;
 
         [Header("VectorField")]
         [SerializeField] RadialVectorField radialVectorField;
@@ -22,6 +23,7 @@ namespace OFogo.Animations
 
         [Header("Renderers")]
         [SerializeField] FogoParticleRenderer fogoParticleRenderer;
+        [SerializeField] VectorFieldRenderer vectorFieldParticleRenderer;
 
         [Header("Calentador")]
         [SerializeField] ParedesCalientes paredesCalientes;
@@ -32,11 +34,13 @@ namespace OFogo.Animations
         [SerializeField] GPUColorGradientScriptable fireGradient;
         [SerializeField] GPUColorGradientScriptable blueGradient;
 
+        [Header("Dancer")]
+        [SerializeField] OFogoController secondaryFogoController;
+        [SerializeField] Material dancerMaterial;
+        [SerializeField] Animator dancerAnimator;
+        [SerializeField] FogoParticleRenderer dancerRenderer;
+
         [Header("Video")]
-        [SerializeField] bool activateLogo;
-        [SerializeField] bool activateTornadoOfFuego;
-        [SerializeField] bool activateNormalFire;
-        [SerializeField] bool activateSolarPower;
         [SerializeField] AnimationCurve logoToFirstSimCurve;
 
         AnimationTimelineController animationTimelineController;
@@ -48,6 +52,8 @@ namespace OFogo.Animations
 
             animationTimelineController = new AnimationTimelineController(this);
             animationTimelineController.Start(cycleAnimations: true);
+
+            dancerMaterial.color = Color.clear;
         }
 
         void Update()
@@ -57,30 +63,15 @@ namespace OFogo.Animations
 
         public void CreateAnimationTimeLine(AnimationTimelineXVII timeline)
         {
-            if (activateLogo)
-                AddLogoSimulation(timeline);
-
-
-            if (activateTornadoOfFuego)
-                AddBlendToTornadoOfFire(timeline);
-
-            if (activateNormalFire)
-                AddBlendToNormalFire(timeline);
-
-            if (activateSolarPower)
-                AddBlendToSolarPower(timeline);
-
+            AddLogoSimulation(timeline);
+            AddBlendToTornadoOfFire(timeline);
+            AddBlendToNormalFire(timeline);
+            //AddBlendToSolarPower(timeline);
             AddBlendToSerpenteDiFuoco(timeline);
+            AddBlendToDanceFire(timeline);
+            AddVectorFieldFire(timeline);
 
-            timeline.AddGroup(
-                new SimulatorBlendTo(ofogoSimulator),
-                new OnUpdateAction(t => radialVectorField.angle = math.lerp(90, 120, t))
-            ).SetDuration(4).Wait(6);
-
-            timeline.AddGroup(
-                  new RendererAlpha(fogoParticleRenderer, 1, 0)
-            //add gradient n other
-            ).SetDuration(2).Wait(1);
+            AddFadeOff(timeline);
         }
 
         void AddLogoSimulation(AnimationTimelineXVII timeline)
@@ -111,10 +102,6 @@ namespace OFogo.Animations
             timeline.AddOnStart(() => radialVectorField.force = -1);
             timeline.AddOnStart(() => OFogoController.Instance.SetCalentador(paredesCalientes));
 
-            //timeline.Add(
-            //     new GradientBlendTo(volumeProfile, fireGradient.gpuGradient)
-            //  ).SetDuration(0);
-
             timeline.AddGroup(
                 new SimulatorBlendTo(ofogoSimulator),
                 new FireLineHeat(logoSimulator, 15, 5f, 0.75f, 0.75f),
@@ -135,41 +122,86 @@ namespace OFogo.Animations
             ).SetDuration(2).Wait(6);
         }
 
-        void AddBlendToSolarPower(AnimationTimelineXVII timeline)
-        {
-            timeline.AddOnStart(() => OFogoController.Instance.SetCalentador(paredesCalientes));
+        //void AddBlendToSolarPower(AnimationTimelineXVII timeline)
+        //{
+        //    timeline.AddOnStart(() => OFogoController.Instance.SetCalentador(paredesCalientes));
 
-            timeline.AddGroup(
-                new SimulatorBlendTo(solarPowerSimulator),
-                new VectorFieldBlendTo(radialTurbulenceVectorFieldGenerator),
-                new GradientBlendTo(volumeProfile, fireGradient.gpuGradient),
-                new OnUpdateAction(t => radialVectorField.force = -t * 4),
-                new OnUpdateAction(t => radialVectorField.angle = math.lerp(70, 90, t)),
-                new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(3, defaultSimulationSpeed, t))
-            ).SetDuration(2).Wait(6);
-        }
+        //    timeline.AddGroup(
+        //        new SimulatorBlendTo(solarPowerSimulator),
+        //        new VectorFieldBlendTo(radialTurbulenceVectorFieldGenerator),
+        //        new GradientBlendTo(volumeProfile, fireGradient.gpuGradient),
+        //        new OnUpdateAction(t => radialVectorField.force = -t * 4),
+        //        new OnUpdateAction(t => radialVectorField.angle = math.lerp(70, 90, t)),
+        //        new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(3, defaultSimulationSpeed, t))
+        //    ).SetDuration(2).Wait(6);
+        //}
 
         void AddBlendToSerpenteDiFuoco(AnimationTimelineXVII timeline)
         {
             timeline.AddOnStart(() => OFogoController.Instance.simulationSpeed = defaultSimulationSpeed);
+            timeline.AddOnStart(() => serpenteDiFuocoMover.radius = 1);
+            timeline.AddOnStart(() => serpenteDiFuocoMover.heightSinAmplitude = 0);
+            timeline.AddOnStart(() => serpenteDiFuocoMover.heightSinOffset = 0);
+            timeline.AddOnStart(() => serpenteDiFuocoMover.rotationSpeed = 180); ;
+            timeline.AddOnStart(() => serpenteDiFuocoTrail.ClearPoints());
 
-            timeline.Add(
-                  new SimulatorBlendTo(serpenteDiFuocoSimulator)
-            ).SetDuration(1);
+            timeline.AddGroup(
+                new SimulatorBlendTo(serpenteDiFuocoSimulator)
+            ).SetDuration(3);
 
             timeline.AddGroup(
                 new OnUpdateAction((t) => serpenteDiFuocoMover.radius = math.lerp(1, 9, t)),
-                new OnUpdateAction((t) => serpenteDiFuocoMover.rotationSpeed = math.lerp(0, 360, t))
-            ).SetDuration(5);
+                new OnUpdateAction((t) => serpenteDiFuocoMover.rotationSpeed = math.lerp(180, 360, t))
+            ).SetDuration(3);
 
             timeline.AddGroup(
                 new OnUpdateAction((t) => serpenteDiFuocoMover.heightSinAmplitude = math.lerp(0, 5.6f, t)),
                 new OnUpdateAction((t) => serpenteDiFuocoMover.radius = math.lerp(9, 5, t))
-            ).SetDuration(1);
+            ).SetDuration(3);
 
             timeline.Add(
                 new OnUpdateAction(t => serpenteDiFuocoMover.heightSinOffset = math.lerp(0, -math.PI * 6, t))
             ).SetDuration(6);
+        }
+
+        void AddBlendToDanceFire(AnimationTimelineXVII timeline)
+        {
+            timeline.AddOnStart(() => OFogoController.Instance.SetCalentador(pisoEsLava));
+            timeline.AddOnStart(() => secondaryFogoController.enabled = true);
+            timeline.AddOnStart(() => dancerAnimator.enabled = true);
+
+            timeline.AddGroup(
+                new SimulatorBlendTo(feuNormal),
+                new VectorFieldBlendTo(turbulenceVectorFieldGenerator),
+                new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(defaultSimulationSpeed, 3, t)),
+                new OnUpdateAction(t => dancerMaterial.color = Color.Lerp(Color.clear, Color.white * 0.25f, t)),
+                new RendererAlpha(dancerRenderer, 0, 1)
+            //new GradientBlendTo(volumeProfile, blueGradient.gpuGradient)
+            ).SetDuration(4).Wait(5);
+
+            timeline.AddOnStart(() => secondaryFogoController.SetSimulator(feuNormal)).Wait(2);
+
+            timeline.AddOnEnd(() => secondaryFogoController.enabled = false);
+            timeline.AddOnEnd(() => dancerAnimator.enabled = false);
+        }
+
+
+        void AddVectorFieldFire(AnimationTimelineXVII timeline)
+        {
+            timeline.AddGroup(
+                  new RendererAlpha(fogoParticleRenderer, 1, 0),
+                  new RendererAlpha(vectorFieldParticleRenderer, 0, 1)
+            //add gradient n other
+            ).SetDuration(2).Wait(1);
+        }
+
+        private void AddFadeOff(AnimationTimelineXVII timeline)
+        {
+            timeline.AddGroup(
+                new RendererAlpha(fogoParticleRenderer, 1, 0),
+                new RendererAlpha(vectorFieldParticleRenderer, 1, 0)
+            //add gradient n other
+            ).SetDuration(2).Wait(1);
         }
     }
 }

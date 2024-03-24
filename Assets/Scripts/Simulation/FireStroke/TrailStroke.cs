@@ -8,6 +8,7 @@ namespace OFogo
     {
         [SerializeField] float samplePointsInterval = 0.2f;
         [SerializeField] int maxPointCount = 100;
+        [SerializeField] bool drawDebug;
 
         protected NativeCircularBuffer<float3> circularPointList;
         float currentSamplePointsDuration = 0;
@@ -21,6 +22,11 @@ namespace OFogo
         {
             base.OnDestroy();
             circularPointList.Dispose();
+        }
+
+        public void ClearPoints()
+        {
+            circularPointList.Clear();
         }
 
         private void Update()
@@ -37,6 +43,11 @@ namespace OFogo
                 circularPointList.Add(transform.position);
             }
             CopyPointsToStroke(circularPointList);
+
+            if(drawDebug)
+            {
+                DebugDraw();
+            }
         }
 
         void DebugDraw()

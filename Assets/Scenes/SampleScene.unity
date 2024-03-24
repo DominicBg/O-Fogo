@@ -5354,22 +5354,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: Breakdance Freezes
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 60cd0739accb6274e8a9dac9a16f360f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2586065998465600510, guid: 60cd0739accb6274e8a9dac9a16f360f, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3853268898807207900, guid: 60cd0739accb6274e8a9dac9a16f360f, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3853268898807207900, guid: 60cd0739accb6274e8a9dac9a16f360f, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cc676cdc4154c764e95dded58fbd9f91, type: 2}
     - target: {fileID: 4549111882529890269, guid: 60cd0739accb6274e8a9dac9a16f360f, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6148737315974723067, guid: 60cd0739accb6274e8a9dac9a16f360f, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6148737315974723067, guid: 60cd0739accb6274e8a9dac9a16f360f, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cc676cdc4154c764e95dded58fbd9f91, type: 2}
     - target: {fileID: 6514210125699187276, guid: 60cd0739accb6274e8a9dac9a16f360f, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -5418,9 +5430,9 @@ MonoBehaviour:
   timeScale: 1
   burnSpeed: 1
   burnHeight: 10
-  noiseSpeed: 2
-  noiseAmplitude: 1
-  heatMultiplicator: 0.25
+  noiseSpeed: 1
+  noiseAmplitude: 0.59
+  heatMultiplicator: 0.141
 --- !u!114 &154388412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5434,6 +5446,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rig: {fileID: 154388409}
+  lerpFactor: 100
 --- !u!95 &154388413
 Animator:
   serializedVersion: 4
@@ -6155,11 +6168,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 913384034}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b57ab5c8d7de6a542b5e149005539342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isSingleton: 0
   simulator: {fileID: 154388411}
   calentador: {fileID: 1532565392}
   fogoRenderer: {fileID: 1517299684}
@@ -6398,13 +6412,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b57ab5c8d7de6a542b5e149005539342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simulator: {fileID: 2043617214}
+  isSingleton: 1
+  simulator: {fileID: 1200326467}
   calentador: {fileID: 1532565392}
   fogoRenderer: {fileID: 305926068}
   vectorFieldGenerator: {fileID: 191880983}
   vectorFieldRenderer: {fileID: 52611695}
   settings:
-    particleCount: 3000
+    particleCount: 2000
     simulationBound:
       m_Center: {x: 0, y: 0, z: 0}
       m_Extent: {x: 11, y: 14, z: 0}
@@ -6414,7 +6429,7 @@ MonoBehaviour:
     vectorFieldSize:
       x: 40
       y: 50
-  simulationSpeed: 4
+  simulationSpeed: 2
   numberThreadJob: 16
   substeps: 2
   maxSimulationPerFrame: 1
@@ -6486,7 +6501,7 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
-  radius: 2
+  radius: 1
   rotationSpeed: 360
   heightSinAmplitude: 0
   heightSinFrequency: 1.5
@@ -6505,6 +6520,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   samplePointsInterval: 0.005
   maxPointCount: 200
+  drawDebug: 0
 --- !u!1 &1008460229
 GameObject:
   m_ObjectHideFlags: 0
@@ -12004,6 +12020,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rig: {fileID: 708211101}
+  lerpFactor: 1
 --- !u!95 &1348461199
 Animator:
   serializedVersion: 4
@@ -12127,7 +12144,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1505357070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12135,7 +12152,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1505357069}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 49ae4a568d282b44bb289296d5da95df, type: 3}
   m_Name: 
@@ -12143,23 +12160,24 @@ MonoBehaviour:
   logoSimulator: {fileID: 1200326467}
   serpenteDiFuocoSimulator: {fileID: 18760427}
   serpenteDiFuocoMover: {fileID: 996385358}
+  serpenteDiFuocoTrail: {fileID: 996385359}
   ofogoSimulator: {fileID: 2054115752}
   feuNormal: {fileID: 2043617214}
-  solarPowerSimulator: {fileID: 1018258229}
   radialVectorField: {fileID: 574612068}
   fixedTurbulenceVectorFieldGenerator: {fileID: 1789090252}
   turbulenceVectorFieldGenerator: {fileID: 191880983}
   radialTurbulenceVectorFieldGenerator: {fileID: 86655484}
   fogoParticleRenderer: {fileID: 305926068}
+  vectorFieldParticleRenderer: {fileID: 52611695}
   paredesCalientes: {fileID: 1162405490}
   pisoEsLava: {fileID: 1532565392}
   volumeProfile: {fileID: 11400000, guid: 9702793403a57664481ffc277d6fed6e, type: 2}
   fireGradient: {fileID: 11400000, guid: fd0d055d60a6e2842a8073ef38a3229d, type: 2}
   blueGradient: {fileID: 11400000, guid: 59fa55694455de24dba7f5d0730729b8, type: 2}
-  activateLogo: 1
-  activateTornadoOfFuego: 1
-  activateNormalFire: 1
-  activateSolarPower: 1
+  secondaryFogoController: {fileID: 913384035}
+  dancerMaterial: {fileID: 2100000, guid: cc676cdc4154c764e95dded58fbd9f91, type: 2}
+  dancerAnimator: {fileID: 154388413}
+  dancerRenderer: {fileID: 1517299684}
   logoToFirstSimCurve:
     serializedVersion: 2
     m_Curve:
@@ -12697,7 +12715,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   drawVectorFieldDebug: 0
   drawBoundsDebug: 0
-  drawCalentadorDebug: 0
   debugRayDist: 0.5
   nativeLeakDetectionMode: 1
 --- !u!4 &1803425497
