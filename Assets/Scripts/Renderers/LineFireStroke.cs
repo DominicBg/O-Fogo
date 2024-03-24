@@ -5,14 +5,15 @@ namespace OFogo
     public class LineFireStroke : FireStroke
     {
         public LineFireStrokeContainer fireStroke;
+        public bool isWorldSpace;
         public override FireStrokeContainer CreateFireStrokeContainer()
         {
             var strokeCopy = fireStroke;
-
-            strokeCopy.posA *= transform.lossyScale.x;
-            strokeCopy.posB *= transform.lossyScale.x;
-            strokeCopy.posA += (float3)transform.position;
-            strokeCopy.posB += (float3)transform.position;
+            if(!isWorldSpace)
+            {
+                strokeCopy.posA = transform.TransformPoint(strokeCopy.posA);
+                strokeCopy.posB = transform.TransformPoint(strokeCopy.posB);
+            }
 
             return new FireStrokeContainer()
             {

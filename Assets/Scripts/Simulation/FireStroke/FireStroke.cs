@@ -4,7 +4,7 @@ using static OFogo.BezierFireStroke;
 using static OFogo.CircleFireStroke;
 using static OFogo.LineFireStroke;
 using static OFogo.PartialCircleFireStroke;
-using static OFogo.TrailStroke;
+using static OFogo.PointListStroke;
 
 namespace OFogo
 {

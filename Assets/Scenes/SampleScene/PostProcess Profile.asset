@@ -123,34 +123,34 @@ MonoBehaviour:
     m_Value: 0.59
   quantize:
     m_OverrideState: 1
-    m_Value: 0.723
+    m_Value: 1
   useDither:
     m_OverrideState: 1
     m_Value: 1
   diamondize:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   colorCount:
     m_OverrideState: 1
     m_Value: 6
   col0:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_Value: {r: 1, g: 1, b: 1, a: 0}
   col1:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 0.9111074, b: 0.51320755, a: 1}
+    m_Value: {r: 1, g: 0.9098039, b: 0.5137255, a: 0}
   col2:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 0.3806531, b: 0, a: 1}
+    m_Value: {r: 1, g: 0.38039216, b: 0, a: 0}
   col3:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 0.20353982, b: 0, a: 1}
+    m_Value: {r: 1, g: 0.20392157, b: 0, a: 0}
   col4:
     m_OverrideState: 1
-    m_Value: {r: 0.20754719, g: 0.025514653, b: 0.0223211, a: 1}
+    m_Value: {r: 0.0754717, g: 0.05484499, b: 0.054396585, a: 0}
   col5:
     m_OverrideState: 1
-    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    m_Value: {r: 0.028301895, g: 0.025471706, b: 0.025471706, a: 0}
   col6:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}
@@ -178,13 +178,13 @@ MonoBehaviour:
   active: 1
   gridCellCount:
     m_OverrideState: 1
-    m_Value: 15
+    m_Value: 25
   wideness:
     m_OverrideState: 1
     m_Value: 0.005
   spread:
     m_OverrideState: 1
-    m_Value: 2.46
+    m_Value: 1.68
 --- !u!114 &5377890408480631067
 MonoBehaviour:
   m_ObjectHideFlags: 3

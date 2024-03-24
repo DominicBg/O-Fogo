@@ -9,7 +9,7 @@ namespace OFogo.Animations
         [Header("Simulator")]
         [SerializeField] FireStrokeSimulator logoSimulator;
         [SerializeField] FireStrokeSimulator serpenteDiFuocoSimulator;
-        [SerializeField] AutoMover serpenteDiFuocoMover;
+        [SerializeField] SerpenteDiFuoco serpenteDiFuocoMover;
         [SerializeField] OFogoSimulator ofogoSimulator;
         [SerializeField] OFogoSimulator feuNormal;
         [SerializeField] SimulatorBlend solarPowerSimulator;
@@ -42,7 +42,7 @@ namespace OFogo.Animations
         AnimationTimelineController animationTimelineController;
         float defaultSimulationSpeed;
 
-        void Start()
+        void Awake()
         {
             defaultSimulationSpeed = OFogoController.Instance.simulationSpeed;
 
@@ -145,7 +145,7 @@ namespace OFogo.Animations
                 new GradientBlendTo(volumeProfile, fireGradient.gpuGradient),
                 new OnUpdateAction(t => radialVectorField.force = -t * 4),
                 new OnUpdateAction(t => radialVectorField.angle = math.lerp(70, 90, t)),
-                new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(4, defaultSimulationSpeed, t))
+                new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(3, defaultSimulationSpeed, t))
             ).SetDuration(2).Wait(6);
         }
 
@@ -159,7 +159,7 @@ namespace OFogo.Animations
 
             timeline.AddGroup(
                 new OnUpdateAction((t) => serpenteDiFuocoMover.radius = math.lerp(1, 9, t)),
-                new OnUpdateAction((t) => serpenteDiFuocoMover.rotationSpeed = math.lerp(360 + 180, 360, t))
+                new OnUpdateAction((t) => serpenteDiFuocoMover.rotationSpeed = math.lerp(0, 360, t))
             ).SetDuration(5);
 
             timeline.AddGroup(
