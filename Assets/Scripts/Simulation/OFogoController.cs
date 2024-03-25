@@ -106,11 +106,24 @@ namespace OFogo
             {
                 fogoRenderer.Render(in fireParticles, in settings);
             }
+            else if(fogoRenderer.HasStoppedRenderingThisFrame)
+            {
+                fogoRenderer.OnStopRendering(in fireParticles, in settings);
+                fogoRenderer.alpha = 0;
+                fogoRenderer.renderedLastFrame = false;
+            }
 
             if (vectorFieldRenderer.alpha > 0)
             {
                 vectorFieldRenderer.Render(in vectorField, in settings);
             }
+            else if(vectorFieldRenderer.HasStoppedRenderingThisFrame)
+            {
+                vectorFieldRenderer.OnStopRendering(in vectorField, in settings);
+                vectorFieldRenderer.alpha = 0;
+                vectorFieldRenderer.renderedLastFrame = false;
+            }
+
             calentador?.DrawDebug(transform.position, in settings);
 
             currentSimulationPerFrame = 0;

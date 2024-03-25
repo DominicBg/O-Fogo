@@ -375,11 +375,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alpha: 0
+  renderedLastFrame: 0
   ps: {fileID: 74523209}
-  particleScaleMultiplier: 1
-  maxForce: 2
+  particleScaleMultiplier: 0.5
+  maxForce: 0.2
   offsetRotationDeg: -90
-  baseColor: {r: 1, g: 0.14710616, b: 0, a: 0.5372549}
+  baseColor: {r: 1, g: 0.14710616, b: 0, a: 0.09411765}
 --- !u!1 &74523206
 GameObject:
   m_ObjectHideFlags: 0
@@ -5455,7 +5456,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 154388408}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: a7880e8e7c9b84742ba442682fb23750, type: 2}
   m_CullingMode: 0
@@ -5639,6 +5640,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alpha: 1
+  renderedLastFrame: 0
   ps: {fileID: 1008460231}
   heatGradient:
     serializedVersion: 2
@@ -6498,7 +6500,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startPos:
-    x: 0
+    x: 1
     y: 0
     z: 0
   radius: 1
@@ -12247,6 +12249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alpha: 1
+  renderedLastFrame: 0
   ps: {fileID: 1904035800}
   heatGradient:
     serializedVersion: 2

@@ -12,7 +12,7 @@ public class SerpenteDiFuoco : MonoBehaviour
 
     void Update()
     {
-        transform.position = CalculatePos(heightSinAmplitude, heightSinFrequency, heightSinOffset, radius, rotationSpeed, Time.time);
+        transform.position = startPos + CalculatePos(heightSinAmplitude, heightSinFrequency, heightSinOffset, radius, rotationSpeed, Time.time);
     }
 
     static float3 CalculatePos(float a, float f, float p, float r, float s, float t)

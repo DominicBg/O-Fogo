@@ -28,7 +28,7 @@ namespace OFogo
         }
 
 
-        public override void Render(in NativeGrid<float3> vectorField, in SimulationSettings settings)
+        protected override void OnRender(in NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             new CalculateParticleDataJob()
             {
@@ -88,7 +88,20 @@ namespace OFogo
 
         public override void Dispose()
         {
-            renderParticles.Dispose();
+            if (renderParticles.IsCreated)
+                renderParticles.Dispose();
+        }
+
+        public override void OnStopRendering(in NativeGrid<float3> vectorField, in SimulationSettings settings)
+        {
+            Debug.Log("STOP RENDERING triangle");
+
+            for (int i = 0; i < renderParticles.Length; i++)
+            {
+                ParticleSystem.Particle particle = renderParticles[i];
+                particle.startColor = Color.clear;
+                renderParticles[i] = particle;
+            }
         }
     }
 }

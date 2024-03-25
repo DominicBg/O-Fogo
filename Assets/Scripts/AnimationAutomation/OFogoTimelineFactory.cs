@@ -67,6 +67,7 @@ namespace OFogo.Animations
             AddBlendToTornadoOfFire(timeline);
             AddBlendToNormalFire(timeline);
             //AddBlendToSolarPower(timeline);
+
             AddBlendToSerpenteDiFuoco(timeline);
             AddBlendToDanceFire(timeline);
             AddVectorFieldFire(timeline);
@@ -142,7 +143,7 @@ namespace OFogo.Animations
             timeline.AddOnStart(() => serpenteDiFuocoMover.radius = 1);
             timeline.AddOnStart(() => serpenteDiFuocoMover.heightSinAmplitude = 0);
             timeline.AddOnStart(() => serpenteDiFuocoMover.heightSinOffset = 0);
-            timeline.AddOnStart(() => serpenteDiFuocoMover.rotationSpeed = 180); ;
+            //timeline.AddOnStart(() => serpenteDiFuocoMover.rotationSpeed = 180); ;
             timeline.AddOnStart(() => serpenteDiFuocoTrail.ClearPoints());
 
             timeline.AddGroup(
@@ -150,8 +151,8 @@ namespace OFogo.Animations
             ).SetDuration(3);
 
             timeline.AddGroup(
-                new OnUpdateAction((t) => serpenteDiFuocoMover.radius = math.lerp(1, 9, t)),
-                new OnUpdateAction((t) => serpenteDiFuocoMover.rotationSpeed = math.lerp(180, 360, t))
+                new OnUpdateAction((t) => serpenteDiFuocoMover.radius = math.lerp(1, 9, t))
+            //new OnUpdateAction((t) => serpenteDiFuocoMover.rotationSpeed = math.lerp(180, 360, t))
             ).SetDuration(3);
 
             timeline.AddGroup(
@@ -174,31 +175,42 @@ namespace OFogo.Animations
                 new SimulatorBlendTo(feuNormal),
                 new VectorFieldBlendTo(turbulenceVectorFieldGenerator),
                 new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(defaultSimulationSpeed, 3, t)),
-                new OnUpdateAction(t => dancerMaterial.color = Color.Lerp(Color.clear, Color.white * 0.25f, t)),
                 new RendererAlpha(dancerRenderer, 0, 1)
             //new GradientBlendTo(volumeProfile, blueGradient.gpuGradient)
-            ).SetDuration(4).Wait(5);
+            ).SetDuration(2);
 
-            timeline.AddOnStart(() => secondaryFogoController.SetSimulator(feuNormal)).Wait(2);
+            timeline.AddGroup(
+                    new OnUpdateAction(t => dancerMaterial.color = Color.Lerp(Color.clear, Color.white * 0.25f, t))
+            ).Wait(5);
 
-            timeline.AddOnEnd(() => secondaryFogoController.enabled = false);
-            timeline.AddOnEnd(() => dancerAnimator.enabled = false);
+            timeline.AddOnStart(() => secondaryFogoController.SetSimulator(feuNormal));
+            timeline.AddOnStart(() => dancerMaterial.color = Color.clear);
+            //timeline.AddGroup(
+            //       new OnUpdateAction(t => dancerMaterial.color = Color.Lerp(Color.white * 0.25f, Color.clear, t))
+            //).SetDuration(1);
+
+            //timeline.AddOnStart(() => dancerAnimator.enabled = false);
+            //timeline.AddOnStart(() => secondaryFogoController.enabled = false);
+            //timeline.AddOnStart(() => dancerMaterial.color = Color.clear);
         }
-
 
         void AddVectorFieldFire(AnimationTimelineXVII timeline)
         {
             timeline.AddGroup(
-                  new RendererAlpha(fogoParticleRenderer, 1, 0),
-                  new RendererAlpha(vectorFieldParticleRenderer, 0, 1)
+                //new OnUpdateAction(t => dancerMaterial.color = Color.Lerp(Color.white * 0.25f, Color.clear, t)),
+                new RendererAlpha(fogoParticleRenderer, 1, 0),
+                new RendererAlpha(dancerRenderer, 1, 0),
+                new RendererAlpha(vectorFieldParticleRenderer, 0, 1)
             //add gradient n other
-            ).SetDuration(2).Wait(1);
+            ).SetDuration(2);
+            timeline.AddOnStart(() => dancerAnimator.enabled = false);
+            timeline.AddOnStart(() => secondaryFogoController.enabled = false).Wait(4);
         }
 
         private void AddFadeOff(AnimationTimelineXVII timeline)
         {
             timeline.AddGroup(
-                new RendererAlpha(fogoParticleRenderer, 1, 0),
+                //new RendererAlpha(fogoParticleRenderer, 1, 0),
                 new RendererAlpha(vectorFieldParticleRenderer, 1, 0)
             //add gradient n other
             ).SetDuration(2).Wait(1);

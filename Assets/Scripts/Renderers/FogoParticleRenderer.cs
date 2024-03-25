@@ -22,7 +22,7 @@ namespace OFogo
             renderParticles = new NativeArray<ParticleSystem.Particle>(particleCount, Allocator.Persistent);
         }
 
-        public override void Render(in NativeArray<FireParticle> fireParticles, in SimulationSettings settings)
+        protected override void OnRender(in NativeArray<FireParticle> fireParticles, in SimulationSettings settings)
         {
             for (int i = 0; i < renderParticles.Length; i++)
             {
@@ -42,6 +42,18 @@ namespace OFogo
         {
             if(renderParticles.IsCreated)
                 renderParticles.Dispose();
+        }
+
+        public override void OnStopRendering(in NativeArray<FireParticle> fireParticles, in SimulationSettings settings)
+        {
+            Debug.Log("STOP RENDERING FOGO");
+            for (int i = 0; i < renderParticles.Length; i++)
+            {
+                ParticleSystem.Particle particle = renderParticles[i];
+                particle.startColor = Color.clear;
+                renderParticles[i] = particle;
+            }
+            ps.SetParticles(renderParticles);
         }
     }
 }

@@ -89,6 +89,16 @@ namespace OFogo.Animations
         public override void OnStart()
         {
             simulatorBlend.fireParticleSimulatorA = OFogoController.Instance.GetCurrentSimulator();
+            if(simulatorBlend.fireParticleSimulatorA is SimulatorBlend blend)
+            {
+                //Prevent overflow when blend blend on blend blend blend blend blend blend blend blend blend
+                if (blend.ratio < 0.5f)
+                    simulatorBlend.fireParticleSimulatorA = blend.fireParticleSimulatorA;
+                else
+                    simulatorBlend.fireParticleSimulatorA = blend.fireParticleSimulatorB;
+
+            }
+
             simulatorBlend.fireParticleSimulatorB = simulatorBlendTo;
 
             OFogoController.Instance.SetSimulator(simulatorBlend);
