@@ -60,6 +60,9 @@ namespace OFogo
 
         public float CalculateLength(UnsafeList<float3> points, ref UnsafeList<float> cumulativeRatio)
         {
+            if (points.Length == 0)
+                return 0;
+
             cumulativeRatio.Length = points.Length;
             cumulativeRatio[0] = 0;
 

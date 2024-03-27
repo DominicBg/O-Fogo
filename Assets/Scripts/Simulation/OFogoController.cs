@@ -35,9 +35,9 @@ namespace OFogo
 
         private void Awake()
         {
-            if(isSingleton)
+            if (isSingleton)
             {
-                if(Instance != null)
+                if (Instance != null)
                 {
                     Debug.LogError(nameof(OFogoController) + " has multiple Singletons");
                 }
@@ -106,7 +106,7 @@ namespace OFogo
             {
                 fogoRenderer.Render(in fireParticles, in settings);
             }
-            else if(fogoRenderer.HasStoppedRenderingThisFrame)
+            else if (fogoRenderer.HasStoppedRenderingThisFrame)
             {
                 fogoRenderer.OnStopRendering(in fireParticles, in settings);
                 fogoRenderer.alpha = 0;
@@ -117,7 +117,7 @@ namespace OFogo
             {
                 vectorFieldRenderer.Render(in vectorField, in settings);
             }
-            else if(vectorFieldRenderer.HasStoppedRenderingThisFrame)
+            else if (vectorFieldRenderer.HasStoppedRenderingThisFrame)
             {
                 vectorFieldRenderer.OnStopRendering(in vectorField, in settings);
                 vectorFieldRenderer.alpha = 0;
@@ -133,7 +133,7 @@ namespace OFogo
         {
             JobUtility.numberOfThread = numberThreadJob;
 
-            if(currentSimulationPerFrame > maxSimulationPerFrame)
+            if (currentSimulationPerFrame > maxSimulationPerFrame)
             {
                 return;
             }
@@ -240,18 +240,26 @@ namespace OFogo
             }
             vectorFieldGenerator.Dispose();
             fogoRenderer.Dispose();
+
             vectorFieldRenderer.Dispose();
 
-            fireParticles.Dispose();
+            if (fireParticles.IsCreated)
+                fireParticles.Dispose();
+
             for (int x = 0; x < nativeHashingGrid.Size.x; x++)
             {
                 for (int y = 0; y < nativeHashingGrid.Size.y; y++)
                 {
-                    nativeHashingGrid[x, y].Dispose();
+                    if (nativeHashingGrid[x, y].IsCreated)
+                        nativeHashingGrid[x, y].Dispose();
                 }
             }
-            nativeHashingGrid.Dispose();
-            vectorField.Dispose();
+
+            if (nativeHashingGrid.IsCreated)
+                nativeHashingGrid.Dispose();
+
+            if (vectorField.IsCreated)
+                vectorField.Dispose();
         }
     }
 }

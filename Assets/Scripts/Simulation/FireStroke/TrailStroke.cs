@@ -9,7 +9,7 @@ namespace OFogo
         [SerializeField] float samplePointsInterval = 0.2f;
         [SerializeField] int maxPointCount = 100;
         [SerializeField] bool drawDebug;
-
+        
         protected NativeCircularBuffer<float3> circularPointList;
         float currentSamplePointsDuration = 0;
 
@@ -36,7 +36,8 @@ namespace OFogo
             {
                 currentSamplePointsDuration -= samplePointsInterval;
 
-                if(currentSamplePointsDuration > samplePointsInterval)
+                //prevent oversampling in lagspike
+                if (currentSamplePointsDuration > samplePointsInterval)
                 {
                     currentSamplePointsDuration = 0;
                 }

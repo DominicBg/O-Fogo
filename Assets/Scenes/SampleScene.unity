@@ -377,10 +377,13 @@ MonoBehaviour:
   alpha: 0
   renderedLastFrame: 0
   ps: {fileID: 74523209}
+  minForce: 0.39
+  maxForce: 4.23
+  showEveryStep: 5
+  offsetRotationDeg: 90
+  offsetRotationDegPerSec: 22.5
+  baseColor: {r: 1, g: 1, b: 1, a: 0.09411765}
   particleScaleMultiplier: 0.5
-  maxForce: 0.2
-  offsetRotationDeg: -90
-  baseColor: {r: 1, g: 0.14710616, b: 0, a: 0.09411765}
 --- !u!1 &74523206
 GameObject:
   m_ObjectHideFlags: 0
@@ -6418,7 +6421,7 @@ MonoBehaviour:
   simulator: {fileID: 1200326467}
   calentador: {fileID: 1532565392}
   fogoRenderer: {fileID: 305926068}
-  vectorFieldGenerator: {fileID: 191880983}
+  vectorFieldGenerator: {fileID: 86655484}
   vectorFieldRenderer: {fileID: 52611695}
   settings:
     particleCount: 2000
@@ -6503,11 +6506,13 @@ MonoBehaviour:
     x: 1
     y: 0
     z: 0
-  radius: 1
+  radius: 3
   rotationSpeed: 360
   heightSinAmplitude: 0
   heightSinFrequency: 1.5
   heightSinOffset: 0
+  subStep: 2
+  maxPointCount: 100
 --- !u!114 &996385359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6515,14 +6520,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 996385356}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 031c8ddb3708adf459cc23fe660fb626, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  samplePointsInterval: 0.005
+  samplePointsInterval: 0
   maxPointCount: 200
-  drawDebug: 0
+  drawDebug: 1
 --- !u!1 &1008460229
 GameObject:
   m_ObjectHideFlags: 0
@@ -12162,7 +12167,6 @@ MonoBehaviour:
   logoSimulator: {fileID: 1200326467}
   serpenteDiFuocoSimulator: {fileID: 18760427}
   serpenteDiFuocoMover: {fileID: 996385358}
-  serpenteDiFuocoTrail: {fileID: 996385359}
   ofogoSimulator: {fileID: 2054115752}
   feuNormal: {fileID: 2043617214}
   radialVectorField: {fileID: 574612068}
@@ -12170,7 +12174,7 @@ MonoBehaviour:
   turbulenceVectorFieldGenerator: {fileID: 191880983}
   radialTurbulenceVectorFieldGenerator: {fileID: 86655484}
   fogoParticleRenderer: {fileID: 305926068}
-  vectorFieldParticleRenderer: {fileID: 52611695}
+  triangleParticleRenderer: {fileID: 52611695}
   paredesCalientes: {fileID: 1162405490}
   pisoEsLava: {fileID: 1532565392}
   volumeProfile: {fileID: 11400000, guid: 9702793403a57664481ffc277d6fed6e, type: 2}
