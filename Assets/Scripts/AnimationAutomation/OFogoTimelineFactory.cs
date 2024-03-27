@@ -167,6 +167,7 @@ namespace OFogo.Animations
             timeline.AddOnStart(() => OFogoController.Instance.SetCalentador(pisoEsLava));
             timeline.AddOnStart(() => secondaryFogoController.enabled = true);
             timeline.AddOnStart(() => dancerAnimator.enabled = true);
+            timeline.AddOnStart(() => dancerRenderer.alpha = 0);
 
             timeline.AddGroup(
                 new SimulatorBlendTo(feuNormal),
@@ -181,17 +182,11 @@ namespace OFogo.Animations
 
             timeline.AddOnStart(() => secondaryFogoController.SetSimulator(feuNormal));
             timeline.AddOnStart(() => dancerMaterial.color = Color.clear);
-            //timeline.AddGroup(
-            //       new OnUpdateAction(t => dancerMaterial.color = Color.Lerp(Color.white * 0.25f, Color.clear, t))
-            //).SetDuration(1);
-
-            //timeline.AddOnStart(() => dancerAnimator.enabled = false);
-            //timeline.AddOnStart(() => secondaryFogoController.enabled = false);
-            //timeline.AddOnStart(() => dancerMaterial.color = Color.clear);
         }
 
         void AddVectorFieldFire(AnimationTimelineXVII timeline)
         {
+            timeline.AddOnStart(() => triangleParticleRenderer.particleScaleMultiplier = 0.5f);
             timeline.AddGroup(
                 new VectorFieldBlendTo(radialTurbulenceVectorFieldGenerator),
                 new RendererAlpha(fogoParticleRenderer, 1, 0),
