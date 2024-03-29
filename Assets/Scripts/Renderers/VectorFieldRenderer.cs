@@ -1,5 +1,4 @@
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace OFogo
 {
@@ -8,7 +7,7 @@ namespace OFogo
         public void Render(in NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
             OnRender(vectorField, settings);
-            renderedLastFrame = false;
+            renderedLastFrame = true;
         }
 
         public abstract void Init(in NativeGrid<float3> vectorField);

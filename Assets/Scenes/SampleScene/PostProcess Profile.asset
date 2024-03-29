@@ -15,10 +15,10 @@ MonoBehaviour:
   active: 0
   blend:
     m_OverrideState: 1
-    m_Value: 0.202
+    m_Value: 0.767
   sinAmplitude:
     m_OverrideState: 1
-    m_Value: {x: 0.01, y: 107.6}
+    m_Value: {x: 0.01, y: 91.96}
   sinFrequency:
     m_OverrideState: 1
     m_Value: {x: 5, y: 7.26}
@@ -130,6 +130,15 @@ MonoBehaviour:
   diamondize:
     m_OverrideState: 1
     m_Value: 0
+  minNoise:
+    m_OverrideState: 1
+    m_Value: 0.764
+  noiseDirection:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 1, z: 2}
+  noiseScale:
+    m_OverrideState: 1
+    m_Value: {x: 45.87, y: 7.4}
   colorCount:
     m_OverrideState: 1
     m_Value: 6
@@ -178,13 +187,13 @@ MonoBehaviour:
   active: 1
   gridCellCount:
     m_OverrideState: 1
-    m_Value: 25
+    m_Value: 10
   wideness:
     m_OverrideState: 1
     m_Value: 0.005
   spread:
     m_OverrideState: 1
-    m_Value: 1.79
+    m_Value: 2
 --- !u!114 &5377890408480631067
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -216,7 +225,7 @@ MonoBehaviour:
   active: 1
   blend:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0.715
 --- !u!114 &8367976965437951557
 MonoBehaviour:
   m_ObjectHideFlags: 3

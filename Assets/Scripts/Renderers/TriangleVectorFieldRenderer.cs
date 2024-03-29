@@ -119,6 +119,7 @@ namespace OFogo
             {
                 ParticleSystem.Particle particle = renderParticles[i];
                 particle.startColor = Color.clear;
+                particle.startSize = 0;
                 renderParticles[i] = particle;
             }
         }

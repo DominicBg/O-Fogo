@@ -59,6 +59,10 @@ public class MagicRenderPass : ScriptableRenderPass
         material.SetFloat("_MinRemap", magicSettings.minRemap.value);
         material.SetFloat("_MaxRemap", magicSettings.maxRemap.value);
 
+        material.SetVector("_NoiseDirection", magicSettings.noiseDirection.value);
+        material.SetVector("_NoiseScale", magicSettings.noiseScale.value);
+        material.SetFloat("_MinNoise", magicSettings.minNoise.value);
+
         material.SetFloat("_LumPow", magicSettings.luminocityPower.value);
         float quantizeValue = 1 - magicSettings.quantize.value * maxScreenSize;
         material.SetFloat("_Quantize", quantizeValue);

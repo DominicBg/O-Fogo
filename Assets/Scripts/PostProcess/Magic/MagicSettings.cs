@@ -6,14 +6,20 @@ using UnityEngine.Rendering.Universal;
 [System.Serializable, VolumeComponentMenu("Magic")]
 public class MagicSettings : VolumeComponent, IPostProcessComponent
 {
+    [Header("Intensity")]
     public ClampedFloatParameter minRemap = new ClampedFloatParameter(0.0f, 0.0f, 1.0f);
     public ClampedFloatParameter maxRemap = new ClampedFloatParameter(1.0f, 0.0f, 1.0f);
-
     public FloatParameter luminocityPower = new FloatParameter(0.25f);
 
+    [Header("Style")]
     public ClampedFloatParameter quantize = new ClampedFloatParameter(0.01f, 0.0f, 1.0f);
     public BoolParameter useDither = new BoolParameter(false);
     public BoolParameter diamondize = new BoolParameter(false);
+
+    [Header("Noise")]
+    public ClampedFloatParameter minNoise = new ClampedFloatParameter(0.7f, 0.0f, 1.0f);
+    public Vector3Parameter noiseDirection = new Vector3Parameter(new Vector3(0, 0, 1));
+    public Vector2Parameter noiseScale = new Vector2Parameter(new Vector3(1, 1));
 
     [Header("Colors")]
     public IntParameter colorCount = new IntParameter(3);

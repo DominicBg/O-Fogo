@@ -68,8 +68,6 @@ namespace OFogo.Animations
             AddBlendToSerpenteDiFuoco(timeline);
             AddBlendToDanceFire(timeline);
             AddVectorFieldFire(timeline);
-
-            AddFadeOff(timeline);
         }
 
         void AddLogoSimulation(AnimationTimelineXVII timeline)
@@ -155,11 +153,11 @@ namespace OFogo.Animations
             timeline.AddGroup(
                 new OnUpdateAction((t) => serpenteDiFuocoMover.heightSinAmplitude = math.lerp(0, 5.6f, t)),
                 new OnUpdateAction((t) => serpenteDiFuocoMover.radius = math.lerp(9, 5, t))
-            ).SetDuration(3);
+            ).SetDuration(2);
 
             timeline.Add(
                 new OnUpdateAction(t => serpenteDiFuocoMover.heightSinOffset = math.lerp(0, -math.PI * 6, t))
-            ).SetDuration(6);
+            ).SetDuration(4);
         }
 
         void AddBlendToDanceFire(AnimationTimelineXVII timeline)
@@ -187,27 +185,30 @@ namespace OFogo.Animations
         void AddVectorFieldFire(AnimationTimelineXVII timeline)
         {
             timeline.AddOnStart(() => triangleParticleRenderer.particleScaleMultiplier = 0.5f);
+           // timeline.AddOnStart(() => OFogoController.Instance.SetVectorFieldGenerator(radialTurbulenceVectorFieldGenerator));
+
             timeline.AddGroup(
-                new VectorFieldBlendTo(radialTurbulenceVectorFieldGenerator),
                 new RendererAlpha(fogoParticleRenderer, 1, 0),
                 new RendererAlpha(dancerRenderer, 1, 0),
                 new RendererAlpha(triangleParticleRenderer, 0, 1)
             ).SetDuration(1);
 
+
             timeline.AddOnStart(() => dancerAnimator.enabled = false);
             timeline.AddOnStart(() => secondaryFogoController.enabled = false);
 
-             timeline.AddGroup(
-                new OnUpdateAction((t) => triangleParticleRenderer.particleScaleMultiplier = math.lerp(0.5f, 5f, t))
-            ).SetDuration(4);
+            timeline.AddGroup(
+                new VectorFieldBlendTo(radialTurbulenceVectorFieldGenerator)
+            ).SetDuration(1);
+
+            timeline.AddGroup(
+               new OnUpdateAction((t) => triangleParticleRenderer.particleScaleMultiplier = math.lerp(0.5f, 4.5f, t))
+           ).SetDuration(4);
+
+            timeline.AddGroup(
+                new RendererAlpha(triangleParticleRenderer, 1, 0)
+            ).SetDuration(2).Wait(1);
         }
 
-        private void AddFadeOff(AnimationTimelineXVII timeline)
-        {
-            timeline.AddGroup(
-                //new RendererAlpha(fogoParticleRenderer, 1, 0),
-                new RendererAlpha(triangleParticleRenderer, 1, 0)
-            ).SetDuration(1).Wait(1);
-        }
     }
 }
