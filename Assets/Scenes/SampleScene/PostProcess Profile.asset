@@ -132,13 +132,13 @@ MonoBehaviour:
     m_Value: 0
   minNoise:
     m_OverrideState: 1
-    m_Value: 0.764
+    m_Value: 0.75
   noiseDirection:
     m_OverrideState: 1
     m_Value: {x: 0, y: 1, z: 2}
   noiseScale:
     m_OverrideState: 1
-    m_Value: {x: 45.87, y: 7.4}
+    m_Value: {x: 44.7, y: 14.3}
   colorCount:
     m_OverrideState: 1
     m_Value: 6
@@ -187,13 +187,13 @@ MonoBehaviour:
   active: 1
   gridCellCount:
     m_OverrideState: 1
-    m_Value: 10
+    m_Value: 250
   wideness:
     m_OverrideState: 1
-    m_Value: 0.005
+    m_Value: 1
   spread:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 3
 --- !u!114 &5377890408480631067
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -225,7 +225,7 @@ MonoBehaviour:
   active: 1
   blend:
     m_OverrideState: 1
-    m_Value: 0.715
+    m_Value: 0.75
 --- !u!114 &8367976965437951557
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -244,7 +244,7 @@ MonoBehaviour:
     m_Value: 0.68
   intensity:
     m_OverrideState: 1
-    m_Value: 4.99
+    m_Value: 6
   scatter:
     m_OverrideState: 1
     m_Value: 0.713

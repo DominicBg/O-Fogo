@@ -163,8 +163,8 @@ namespace OFogo
                     heatRatio *= t;
                 }
 
-                particle.prevPosition = particle.position;
                 particle.position += math.up() * heatRatio * burnHeight;
+                particle.prevPosition = particle.position;//just canceling weird side effect of lerping simulations
                 particle.temperature = heatRatio * settings.maxTemperature;
 
                 particle.radius = math.lerp(settings.minParticleSize, settings.maxParticleSize, heatRatio);

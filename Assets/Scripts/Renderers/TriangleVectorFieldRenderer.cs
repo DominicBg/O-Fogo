@@ -115,7 +115,7 @@ namespace OFogo
         {
             Debug.Log("STOP RENDERING triangle");
 
-            for (int i = 0; i < renderParticles.Length; i++)
+             for (int i = 0; i < renderParticles.Length; i++)
             {
                 ParticleSystem.Particle particle = renderParticles[i];
                 particle.startColor = Color.clear;

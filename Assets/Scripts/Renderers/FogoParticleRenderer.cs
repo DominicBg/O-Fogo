@@ -46,7 +46,6 @@ namespace OFogo
 
         public override void OnStopRendering(in NativeArray<FireParticle> fireParticles, in SimulationSettings settings)
         {
-            Debug.Log("STOP RENDERING FOGO");
             for (int i = 0; i < renderParticles.Length; i++)
             {
                 ParticleSystem.Particle particle = renderParticles[i];

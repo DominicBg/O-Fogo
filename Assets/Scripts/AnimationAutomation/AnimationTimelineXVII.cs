@@ -7,6 +7,8 @@ using UnityEngine;
 public class AnimationTimelineXVII
 {
     public List<AnimationXVII> AnimationParts => animations;
+    public AnimationXVII LastAnimation => animations[animations.Count - 1];
+
     public EaseXVII.Ease defaultEase = EaseXVII.Ease.InOutQuad;
     public float defaultDuration = 1;
 
@@ -19,19 +21,25 @@ public class AnimationTimelineXVII
     }
     public AnimationTimelineXVII Add(AnimationXVII animation)
     {
-        animation.duration = defaultDuration;
-        animation.easeCurve = defaultEase;
         animation.OnCreated();
         animations.Add(animation);
         return this;
     }
 
-    public AnimationTimelineXVII AddGroup(params AnimationXVII[] animations)
+    public AnimationTimelineXVII Add(List<AnimationXVII> animations)
+    {
+        for (int i = 0; i < animations.Count; i++)
+        {
+            animations[i].OnCreated();
+        }
+        this.animations.Add(new GroupAnimationPart(animations.ToList()));
+        return this;
+    }
+
+    public AnimationTimelineXVII Add(params AnimationXVII[] animations)
     {
         for (int i = 0; i < animations.Length; i++)
         {
-            animations[i].duration = defaultDuration;
-            animations[i].easeCurve = defaultEase;
             animations[i].OnCreated();
         }
         this.animations.Add(new GroupAnimationPart(animations.ToList()));
@@ -40,23 +48,25 @@ public class AnimationTimelineXVII
 
     public AnimationTimelineXVII SetAnimationCurve(AnimationCurve animationCurve)
     {
-        AnimationXVII animation = animations[animations.Count - 1];
-        animation.animationCurve = animationCurve;
-        animation.useAnimationCurve = true;
+        LastAnimation.SetAnimationCurve(animationCurve);
         return this;
     }
 
     public AnimationTimelineXVII SetEaseCurve(EaseXVII.Ease easeCurve)
     {
-        AnimationXVII animation = animations[animations.Count - 1];
-        animation.easeCurve = easeCurve;
-        animation.useAnimationCurve = false; 
+        LastAnimation.SetEaseCurve(easeCurve);
         return this;
     }
 
     public AnimationTimelineXVII SetDuration(float duration)
     {
-        animations[animations.Count - 1].duration = duration;
+        LastAnimation.SetDuration(duration);
+        return this;
+    }
+
+    public AnimationTimelineXVII WithDelay(float delay)
+    {
+        LastAnimation.SetDelay(delay);
         return this;
     }
 
@@ -83,6 +93,12 @@ public class AnimationTimelineXVII
         animations.AddRange(otherTimeline.AnimationParts);
         return this;
     }
+
+    public AnimationTimelineXVII WithSubAnimation(params AnimationXVII[] subAnimations)
+    {
+        LastAnimation.AddSubAnimation(subAnimations.ToList());
+        return this;
+    }
 }
 
 public interface AnimationTimelineFactory
@@ -92,15 +108,123 @@ public interface AnimationTimelineFactory
 
 public abstract class AnimationXVII
 {
-    public float duration = 1;
-    public AnimationCurve animationCurve = AnimationCurve.Linear(0, 0, 1, 1);
-    public EaseXVII.Ease easeCurve;
-    public bool useAnimationCurve = false;
+    public float TotalDuration => duration + delay;
+    public const float InvalidDuration = -1;
 
-    public abstract void OnStart();
-    public abstract void UpdateAnimation(float timeRatio);
-    public abstract void OnEnd();
+    public float duration = InvalidDuration;
+    public float delay = 0;
+    public AnimationCurve animationCurve = null;
+    public EaseXVII.Ease easeCurve = EaseXVII.Ease.None;
+    public bool useAnimationCurve = false;
+    public bool isSubAnimation;
+
+    private bool isStarted;
+    private bool isCompleted;
+
+    public void UpdateAnimation(float timer)
+    {
+        float timeRatio = math.saturate((timer - delay) / duration);
+        if (!isStarted && timeRatio > 0)
+        {
+            OnStart();
+            isStarted = true;
+        }
+
+        timeRatio =
+           useAnimationCurve ?
+           animationCurve.Evaluate(timeRatio) :
+           EaseXVII.Evaluate(timeRatio, easeCurve);
+
+        OnUpdateAnimation(timeRatio);
+
+        if (timeRatio >= 1 && !isCompleted)
+        {
+            OnEnd();
+            isCompleted = true;
+        }
+
+        for (int i = 0; i < subAnimations.Count; i++)
+        {
+            subAnimations[i].UpdateAnimation(timer);
+        }
+    }
+
+    public void Reset()
+    {
+        isStarted = false;
+        isCompleted = false;
+        for (int i = 0; i < subAnimations.Count; i++)
+        {
+            subAnimations[i].Reset();
+        }
+    }
+
+    protected abstract void OnStart();
+    protected abstract void OnUpdateAnimation(float timeRatio);
+    protected abstract void OnEnd();
     public virtual void OnCreated() { }
+
+    public AnimationXVII SetDuration(float duration)
+    {
+        this.duration = duration;
+        for (int i = 0; i < subAnimations.Count; i++)
+        {
+           subAnimations[i].duration = math.clamp(subAnimations[i].duration, 0, duration - subAnimations[i].delay);
+        }
+        return this;
+    }
+    public AnimationXVII SetDelay(float delay)
+    {
+        this.delay = delay;
+        for (int i = 0; i < subAnimations.Count; i++)
+        {
+            subAnimations[i].SetDelay(delay);
+        }
+        return this;
+    }
+
+    public AnimationXVII SetAnimationCurve(AnimationCurve animationCurve)
+    {
+        this.animationCurve = animationCurve;
+        useAnimationCurve = true;
+
+        for (int i = 0; i < subAnimations.Count; i++)
+        {
+            subAnimations[i].SetAnimationCurve(animationCurve);
+        }
+        return this;
+    }
+    public AnimationXVII SetEaseCurve(EaseXVII.Ease easeCurve)
+    {
+        this.easeCurve = easeCurve;
+        useAnimationCurve = false;
+
+        for (int i = 0; i < subAnimations.Count; i++)
+        {
+            subAnimations[i].SetEaseCurve(easeCurve);
+        }
+        return this;
+    }
+
+    public AnimationXVII AddSubAnimation(List<AnimationXVII> subAnimations)
+    {
+        if (isSubAnimation)
+        {
+            Debug.LogError("SubAnimations can't contains subanimations");
+            return this;
+        }
+
+        subAnimations.AddRange(subAnimations);
+        for (int i = 0; i < subAnimations.Count; i++)
+        {
+            subAnimations[i].isSubAnimation = true;
+            duration = math.max(duration, subAnimations[i].duration + subAnimations[i].delay);
+        }
+
+        return this;
+    }
+
+    public List<AnimationXVII> subAnimations = new List<AnimationXVII>();
 }
 
 public class WaitAnimationPart : AnimationXVII
@@ -110,54 +234,50 @@ public class WaitAnimationPart : AnimationXVII
         this.duration = duration;
     }
 
-    public override void OnEnd()
+    protected override void OnEnd()
     {
     }
 
-    public override void OnStart()
+    protected override void OnStart()
     {
     }
 
-    public override void UpdateAnimation(float timeRatio)
+    protected override void OnUpdateAnimation(float timeRatio)
     {
     }
 }
 
 public class GroupAnimationPart : AnimationXVII
 {
-    List<AnimationXVII> animations;
-
     public GroupAnimationPart(List<AnimationXVII> animations)
     {
-        this.animations = animations;
-        for (int i = 0; i < animations.Count; i++)
+        if (isSubAnimation)
         {
-            duration = math.max(duration, animations[i].duration);
+            Debug.LogError("SubAnimations can't contains subanimations");
+            return;
+        }
+
+        subAnimations.AddRange(animations);
+        for (int i = 0; i < subAnimations.Count; i++)
+        {
+            duration = math.max(duration, TotalDuration);
+            subAnimations[i].isSubAnimation = true;
         }
     }
 
-    public override void OnStart()
+    protected override void OnEnd()
     {
-        for (int i = 0; i < animations.Count; i++)
-        {
-            animations[i].OnStart();
-        }
+        //handled in subanim
     }
 
-    public override void UpdateAnimation(float timeRatio)
+    protected override void OnStart()
     {
-        for (int i = 0; i < animations.Count; i++)
-        {
-            animations[i].UpdateAnimation(timeRatio);
-        }
+        //handled in subanim
     }
 
-    public override void OnEnd()
+    protected override void OnUpdateAnimation(float timeRatio)
     {
-        for (int i = 0; i < animations.Count; i++)
-        {
-            animations[i].OnEnd();
-        }
+        //handled in subanim
     }
 }
 
@@ -170,16 +290,16 @@ public class OnStartAction : AnimationXVII
         duration = 0;
     }
 
-    public override void OnEnd()
+    protected override void OnEnd()
     {
     }
 
-    public override void OnStart()
+    protected override void OnStart()
     {
         action.Invoke();
     }
 
-    public override void UpdateAnimation(float timeRatio)
+    protected override void OnUpdateAnimation(float timeRatio)
     {
     }
 }
@@ -193,16 +313,17 @@ public class OnUpdateAction : AnimationXVII
         duration = 0;
     }
 
-    public override void OnEnd()
+    protected override void OnEnd()
     {
     }
 
-    public override void OnStart()
+    protected override void OnStart()
     {
     }
 
-    public override void UpdateAnimation(float timeRatio)
+    protected override void OnUpdateAnimation(float timeRatio)
     {
+        Debug.Log(timeRatio);
         action.Invoke(timeRatio);
     }
 }
@@ -216,16 +337,16 @@ public class OnEndAction : AnimationXVII
         duration = 0;
     }
 
-    public override void OnEnd()
+    protected override void OnEnd()
     {
         action.Invoke();
     }
 
-    public override void OnStart()
+    protected override void OnStart()
     {
     }
 
-    public override void UpdateAnimation(float timeRatio)
+    protected override void OnUpdateAnimation(float timeRatio)
     {
     }
 }
@@ -252,13 +373,35 @@ public class AnimationTimelineController
         for (int i = 0; i < animations.Count; i++)
         {
             TotalDuration += animations[i].duration;
+            TryCreateDefaultSettings(animations[i]);
+            for (int j = 0; j < animations[i].subAnimations.Count; j++)
+            {
+                TryCreateDefaultSettings(animations[i].subAnimations[j]);
+            }
+        }
+    }
+
+    void TryCreateDefaultSettings(AnimationXVII animation)
+    {
+        if(animation.duration == AnimationXVII.InvalidDuration)
+        {
+            animation.duration = timeline.defaultDuration;
+        }
+
+        if(animation.easeCurve == EaseXVII.Ease.None && !animation.useAnimationCurve)
+        {
+            animation.easeCurve = timeline.defaultEase;
+        }
+
+        if(animation.animationCurve == null && animation.useAnimationCurve)
+        {
+            animation.animationCurve = AnimationCurve.EaseInOut(0, 1, 0, 1);
         }
     }
 
     public void Start(bool cycleAnimations = false)
     {
         this.cycleAnimations = cycleAnimations;
-        animations[currentAnimationIndex].OnStart();
         IsRunning = true;
     }
 
@@ -273,32 +416,31 @@ public class AnimationTimelineController
         internalTimer += deltaTime;
 
         var animationAutomation = animations[currentAnimationIndex];
+        animationAutomation.UpdateAnimation(internalTimer);
 
-        float timeRatio = animationAutomation.animationCurve.Evaluate(math.saturate(internalTimer / animationAutomation.duration));
-        timeRatio = 
-            animationAutomation.useAnimationCurve ?
-            animationAutomation.animationCurve.Evaluate(timeRatio) :
-            EaseXVII.Evaluate(timeRatio, animationAutomation.easeCurve);
-
-        animationAutomation.UpdateAnimation(timeRatio);
-
-        if (internalTimer > animationAutomation.duration)
+        if (internalTimer > animationAutomation.TotalDuration)
         {
-            internalTimer -= animationAutomation.duration;
-            animationAutomation.OnEnd();
+            internalTimer -= animationAutomation.TotalDuration;
 
             currentAnimationIndex++;
             if (cycleAnimations)
             {
                 currentAnimationIndex = currentAnimationIndex % animations.Count;
+
+                bool justReset = currentAnimationIndex == 0;
+                if (justReset)
+                {
+                    for (int i = 0; i < animations.Count; i++)
+                    {
+                        animations[i].Reset();
+                    }
+                }
             }
             if (currentAnimationIndex >= animations.Count)
             {
                 IsRunning = false;
                 return;
             }
-
-            animations[currentAnimationIndex].OnStart();
         }
     }
 }

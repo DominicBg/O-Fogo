@@ -18,7 +18,8 @@ public static class EaseXVII
         InExpo, OutExpo, InOutExpo,
         InBack, OutBack, InOutBack,
         InElastic, OutElastic, InOutElastic,
-        InBounce, OutBounce, InOutBounce
+        InBounce, OutBounce, InOutBounce,
+        None
     };
 
     public static float Evaluate(float x, Ease ease)

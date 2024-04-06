@@ -51,7 +51,6 @@ public class BlurRenderPass : ScriptableRenderPass
 
         CommandBuffer cmd = CommandBufferPool.Get("Blur Post Process");
 
-        //float maxScreenSize = math.max(Screen.width, Screen.height);
         int gridSize = blurSettings.gridCellCount.value;
 
         if(gridSize % 2 == 0)

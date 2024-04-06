@@ -23,15 +23,15 @@ namespace OFogo.Animations
             this.maxHeatMultiplicator = maxHeatMultiplicator;
         }
 
-        public override void OnEnd()
+        protected override void OnEnd()
         {
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
         }
 
-        public override void UpdateAnimation(float timeRatio)
+        protected override void OnUpdateAnimation(float timeRatio)
         {
             fireStrokeSimulator.burnHeight = math.lerp(minHeatHeight, maxHeatHeight, timeRatio);
             fireStrokeSimulator.heatMultiplicator = math.lerp(minHeatMultiplicator, maxHeatMultiplicator, timeRatio);
@@ -50,15 +50,15 @@ namespace OFogo.Animations
             this.alphaTo = alphaTo;
         }
 
-        public override void OnEnd()
+        protected override void OnEnd()
         {
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
         }
 
-        public override void UpdateAnimation(float timeRatio)
+        protected override void OnUpdateAnimation(float timeRatio)
         {
             alphaRenderer.alpha = math.remap(0, 1, alphaFrom, alphaTo, timeRatio);
         }
@@ -75,18 +75,17 @@ namespace OFogo.Animations
             this.simulatorBlendTo = simulatorBlendTo;
         }
 
-        // Start is called before the first frame update
         public override void OnCreated()
         {
             var blendToAnim = new GameObject("SimulatorBlendToAnimation");
             simulatorBlend = blendToAnim.AddComponent<SimulatorBlend>();
         }
 
-        public override void OnEnd()
+        protected override void OnEnd()
         {
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
             simulatorBlend.fireParticleSimulatorA = OFogoController.Instance.GetCurrentSimulator();
             if(simulatorBlend.fireParticleSimulatorA is SimulatorBlend blend)
@@ -104,7 +103,7 @@ namespace OFogo.Animations
             OFogoController.Instance.SetSimulator(simulatorBlend);
         }
 
-        public override void UpdateAnimation(float timeRatio)
+        protected override void OnUpdateAnimation(float timeRatio)
         {
             simulatorBlend.ratio = timeRatio;
         }
@@ -127,11 +126,11 @@ namespace OFogo.Animations
             vectorFieldBlend = blendToAnim.AddComponent<BlendVectorField>();
         }
 
-        public override void OnEnd()
+        protected override void OnEnd()
         {
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
             vectorFieldBlend.vectorFieldGeneratorA = OFogoController.Instance.GetCurrentVectorFieldGenerator();
             vectorFieldBlend.vectorFieldGeneratorB = vectorFieldBlendTo;
@@ -139,7 +138,7 @@ namespace OFogo.Animations
             OFogoController.Instance.SetVectorFieldGenerator(vectorFieldBlend);
         }
 
-        public override void UpdateAnimation(float timeRatio)
+        protected override void OnUpdateAnimation(float timeRatio)
         {
             vectorFieldBlend.ratio = timeRatio;
         }
@@ -159,16 +158,16 @@ namespace OFogo.Animations
             volumeProfile.TryGet(out settings);
         }
 
-        public override void OnEnd()
+        protected override void OnEnd()
         {
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
             settings.SetGradientIntoList(ref fromGradient);
         }
 
-        public override void UpdateAnimation(float timeRatio)
+        protected override void OnUpdateAnimation(float timeRatio)
         {
             settings.SetGradient(LerpGradient(fromGradient, toGradient, timeRatio));     
         }

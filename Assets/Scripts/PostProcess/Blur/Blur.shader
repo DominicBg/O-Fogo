@@ -72,12 +72,14 @@ Shader "PostProcessing/Blur"
 
 				int upper = ((_GridSize - 1) / 2);
 				int lower = -upper;
+				float uvWideness = _Wideness / _GridSize;
 
+				//[unroll(100)]
 				for (int x = lower; x <= upper; ++x)
 				{
 					float gauss = gaussian(x);
 					gridSum += gauss;
-					float2 uv = i.uv + float2(_Wideness * x, 0.0f);
+					float2 uv = i.uv + float2(uvWideness * float(x), 0.0f);
 					col += gauss * tex2D(_MainTex, uv).xyz;
 				}
 
@@ -103,12 +105,14 @@ Shader "PostProcessing/Blur"
 
 				int upper = ((_GridSize - 1) / 2);
 				int lower = -upper;
+				float uvWideness = _Wideness / _GridSize;
 
+				//[unroll(100)]
 				for (int y = lower; y <= upper; ++y)
 				{
 					float gauss = gaussian(y);
 					gridSum += gauss;
-					float2 uv = i.uv + float2(0.0f, _Wideness * y);
+					float2 uv = i.uv + float2(0.0f, uvWideness * float(y));
 					col += gauss * tex2D(_MainTex, uv).xyz;
 				}
 
