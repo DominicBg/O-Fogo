@@ -196,7 +196,7 @@ namespace OFogo
                 calentador?.HeatParticles(in simData, ref fireParticles, settings);
             }
 
-            if (simulator.NeedsVectorField())
+            if (simulator.NeedsVectorField() || vectorFieldRenderer.alpha > 0)
             {
 #if UNITY_EDITOR
                 //for drag n drop support

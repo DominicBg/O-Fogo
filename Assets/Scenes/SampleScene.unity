@@ -5696,7 +5696,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f391ca5d872ff6e4fbb5d104c2db349e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alpha: 1
+  alpha: 0
   renderedLastFrame: 0
   ps: {fileID: 1008460231}
   heatGradient:
@@ -6911,7 +6911,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isSingleton: 1
-  simulator: {fileID: 954478888}
+  simulator: {fileID: 1200326467}
   calentador: {fileID: 1532565392}
   fogoRenderer: {fileID: 305926068}
   vectorFieldGenerator: {fileID: 86655484}

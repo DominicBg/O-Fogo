@@ -169,7 +169,14 @@ public abstract class AnimationXVII
         this.duration = duration;
         for (int i = 0; i < subAnimations.Count; i++)
         {
-           subAnimations[i].duration = math.clamp(subAnimations[i].duration, 0, duration - subAnimations[i].delay);
+            if(subAnimations[i].duration == InvalidDuration)
+            {
+                subAnimations[i].duration = math.clamp(duration, 0, duration - subAnimations[i].delay);
+            }
+            else
+            {
+                subAnimations[i].duration = math.clamp(subAnimations[i].duration, 0, duration - subAnimations[i].delay);
+            }
         }
         return this;
     }
@@ -323,7 +330,6 @@ public class OnUpdateAction : AnimationXVII
 
     protected override void OnUpdateAnimation(float timeRatio)
     {
-        Debug.Log(timeRatio);
         action.Invoke(timeRatio);
     }
 }

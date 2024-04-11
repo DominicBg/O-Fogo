@@ -78,7 +78,8 @@ namespace OFogo.Animations
         {
             StartCleanup(timeline);
 
-            AddChurrascoDoFogo(timeline);
+            //   AddChurrascoDoFogo(timeline);
+            AddVectorFieldFire(timeline);
 
             AddLogoSimulation(timeline);
             AddBlendToTornadoOfFire(timeline);
@@ -86,7 +87,6 @@ namespace OFogo.Animations
 
             AddBlendToSerpenteDiFuoco(timeline);
             AddBlendToDanceFire(timeline);
-            AddVectorFieldFire(timeline);
         }
 
         void StartCleanup(AnimationTimelineXVII timeline)
@@ -94,6 +94,36 @@ namespace OFogo.Animations
             timeline.AddOnStart(() => secondaryFogoController.enabled = false);
             timeline.AddOnStart(() => dancerAnimator.enabled = false);
             timeline.AddOnStart(() => dancerRenderer.alpha = 0);
+            timeline.AddOnStart(() => magicSettings.minNoise.value = blackLineHigh);
+
+        }
+
+        void AddVectorFieldFire(AnimationTimelineXVII timeline)
+        {
+            timeline.AddOnStart(() => triangleParticleRenderer.particleScaleMultiplier = 0.5f);
+            timeline.AddOnStart(() => fogoParticleRenderer.alpha = 0);
+
+            //timeline.AddGroup(
+            //  new RendererAlpha(fogoParticleRenderer, 1, 0),
+            //  new RendererAlpha(dancerRenderer, 1, 0)
+            //).SetDuration(2);
+
+            //timeline.AddOnStart(() => dancerAnimator.enabled = false);
+            //timeline.AddOnStart(() => secondaryFogoController.enabled = false);
+
+            //timeline.AddGroup(
+            //    new VectorFieldBlendTo(radialTurbulenceVectorFieldGenerator)
+            //).SetDuration(1);
+            timeline.AddOnStart(() => OFogoController.Instance.SetVectorFieldGenerator(radialTurbulenceVectorFieldGenerator));
+
+            timeline.Add(
+                new RendererAlpha(triangleParticleRenderer, 0, 1),
+                new OnUpdateAction((t) => triangleParticleRenderer.particleScaleMultiplier = math.lerp(0.25f, 2.5f, t))
+            ).SetDuration(4).Wait(4);
+
+            //timeline.Add(
+            //    new RendererAlpha(triangleParticleRenderer, 1, 0)
+            //).SetDuration(4);
         }
 
         void AddChurrascoDoFogo(AnimationTimelineXVII timeline)
@@ -137,14 +167,16 @@ namespace OFogo.Animations
             timeline.AddOnStart(() => OFogoController.Instance.simulationSpeed = defaultSimulationSpeed);
             timeline.AddOnStart(() => magicSettings.minNoise.value = blackLineHigh);
 
-            timeline.Add(
-               new GradientBlendTo(volumeProfile, fireGradient.gpuGradient)
-            ).SetDuration(0);
+            //timeline.Add(
+            //   new GradientBlendTo(volumeProfile, fireGradient.gpuGradient)
+            //).SetDuration(0);
 
             timeline.Add(
-                new RendererAlpha(fogoParticleRenderer, .2f, 1),
-                new FireLineHeat(logoSimulator, startBurnHeight, endBurnHeight, logoSimulator.heatMultiplicator, 0.75f)
-            ).SetDuration(4).SetEaseCurve(EaseXVII.Ease.InQuint);
+                new RendererAlpha(fogoParticleRenderer, 0f, 1f).SetEaseCurve(EaseXVII.Ease.InQuad).SetDuration(2),
+                new RendererAlpha(triangleParticleRenderer, 1, 0).SetEaseCurve(EaseXVII.Ease.OutCubic).SetDelay(1).SetDuration(2),
+                new FireLineHeat(logoSimulator, startBurnHeight, endBurnHeight, logoSimulator.heatMultiplicator, 0.75f).SetEaseCurve(EaseXVII.Ease.InOutQuad),
+                new SimulatorBlendTo(ofogoSimulator).SetDelay(3).SetEaseCurve(EaseXVII.Ease.InQuad)
+            ).SetDuration(8);
         }
 
         void AddBlendToTornadoOfFire(AnimationTimelineXVII timeline)
@@ -153,12 +185,14 @@ namespace OFogo.Animations
             timeline.AddOnStart(() => radialVectorField.force = -1);
             timeline.AddOnStart(() => OFogoController.Instance.SetCalentador(paredesCalientes));
 
-            timeline.Add(
-                new SimulatorBlendTo(ofogoSimulator)
-            //new FireLineHeat(logoSimulator, 15, 5f, 0.75f, 0.75f),
-            //new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(4, defaultSimulationSpeed, t))
-            //add gradient n other
-            ).SetDuration(1f).SetAnimationCurve(logoToFirstSimCurve).Wait(7);
+            timeline.Wait(8);
+
+            //timeline.Add(
+            //    new SimulatorBlendTo(ofogoSimulator)
+            ////new FireLineHeat(logoSimulator, 15, 5f, 0.75f, 0.75f),
+            ////new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(4, defaultSimulationSpeed, t))
+            ////add gradient n other
+            //).SetDuration(0f).SetAnimationCurve(logoToFirstSimCurve).Wait(7);
         }
 
         void AddBlendToNormalFire(AnimationTimelineXVII timeline)
@@ -232,32 +266,32 @@ namespace OFogo.Animations
             timeline.AddOnStart(() => secondaryFogoController.enabled = false);
         }
 
-        void AddVectorFieldFire(AnimationTimelineXVII timeline)
-        {
-            timeline.AddOnStart(() => triangleParticleRenderer.particleScaleMultiplier = 0.5f);
+        //void AddVectorFieldFire(AnimationTimelineXVII timeline)
+        //{
+        //    timeline.AddOnStart(() => triangleParticleRenderer.particleScaleMultiplier = 0.5f);
 
-            //timeline.AddGroup(
-            //  new RendererAlpha(fogoParticleRenderer, 1, 0),
-            //  new RendererAlpha(dancerRenderer, 1, 0)
-            //).SetDuration(2);
+        //    //timeline.AddGroup(
+        //    //  new RendererAlpha(fogoParticleRenderer, 1, 0),
+        //    //  new RendererAlpha(dancerRenderer, 1, 0)
+        //    //).SetDuration(2);
 
-            //timeline.AddOnStart(() => dancerAnimator.enabled = false);
-            //timeline.AddOnStart(() => secondaryFogoController.enabled = false);
+        //    //timeline.AddOnStart(() => dancerAnimator.enabled = false);
+        //    //timeline.AddOnStart(() => secondaryFogoController.enabled = false);
 
-            //timeline.AddGroup(
-            //    new VectorFieldBlendTo(radialTurbulenceVectorFieldGenerator)
-            //).SetDuration(1);
-            timeline.AddOnStart(() => OFogoController.Instance.SetVectorFieldGenerator(radialTurbulenceVectorFieldGenerator));
+        //    //timeline.AddGroup(
+        //    //    new VectorFieldBlendTo(radialTurbulenceVectorFieldGenerator)
+        //    //).SetDuration(1);
+        //    timeline.AddOnStart(() => OFogoController.Instance.SetVectorFieldGenerator(radialTurbulenceVectorFieldGenerator));
 
-            timeline.Add(
-                new RendererAlpha(triangleParticleRenderer, 0, 1),
-                new OnUpdateAction((t) => triangleParticleRenderer.particleScaleMultiplier = math.lerp(0.25f, 2.5f, t))
-            ).SetDuration(4);
+        //    timeline.Add(
+        //        new RendererAlpha(triangleParticleRenderer, 0, 1),
+        //        new OnUpdateAction((t) => triangleParticleRenderer.particleScaleMultiplier = math.lerp(0.25f, 2.5f, t))
+        //    ).SetDuration(4);
 
-            timeline.Add(
-                new RendererAlpha(triangleParticleRenderer, 1, 0)
-            ).SetDuration(3).Wait(1);
-        }
+        //    timeline.Add(
+        //        new RendererAlpha(triangleParticleRenderer, 1, 0)
+        //    ).SetDuration(3).Wait(1);
+        //}
 
     }
 }
