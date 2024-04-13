@@ -11,6 +11,6 @@ All particle are also affected by a vector field.
 
 ![](Medias/ofogo_demo3.gif)
 
-![](Medias/ofogo_demo.gif)
+![](Medias/ofogo_demo2.gif)
 
 The rest of the animations are particle positions controlled by some other rules to have more control 
