@@ -113,9 +113,7 @@ namespace OFogo
 
         public override void OnStopRendering(in NativeGrid<float3> vectorField, in SimulationSettings settings)
         {
-            Debug.Log("STOP RENDERING triangle");
-
-             for (int i = 0; i < renderParticles.Length; i++)
+            for (int i = 0; i < renderParticles.Length; i++)
             {
                 ParticleSystem.Particle particle = renderParticles[i];
                 particle.startColor = Color.clear;

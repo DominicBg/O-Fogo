@@ -9,9 +9,6 @@ public class AnimationTimelineXVII
     public List<AnimationXVII> AnimationParts => animations;
     public AnimationXVII LastAnimation => animations[animations.Count - 1];
 
-    public EaseXVII.Ease defaultEase = EaseXVII.Ease.InOutQuad;
-    public float defaultDuration = 1;
-
     List<AnimationXVII> animations = new List<AnimationXVII>();
 
     public AnimationTimelineXVII Wait(float seconds)
@@ -114,7 +111,7 @@ public abstract class AnimationXVII
     public float duration = InvalidDuration;
     public float delay = 0;
     public AnimationCurve animationCurve = null;
-    public EaseXVII.Ease easeCurve = EaseXVII.Ease.None;
+    public EaseXVII.Ease easeCurve = EaseXVII.Ease.InOutQuad;
     public bool useAnimationCurve = false;
     public bool isSubAnimation;
 
@@ -317,7 +314,6 @@ public class OnUpdateAction : AnimationXVII
     public OnUpdateAction(Action<float> action)
     {
         this.action = action;
-        duration = 0;
     }
 
     protected override void OnEnd()
@@ -391,17 +387,8 @@ public class AnimationTimelineController
     {
         if(animation.duration == AnimationXVII.InvalidDuration)
         {
-            animation.duration = timeline.defaultDuration;
-        }
-
-        if(animation.easeCurve == EaseXVII.Ease.None && !animation.useAnimationCurve)
-        {
-            animation.easeCurve = timeline.defaultEase;
-        }
-
-        if(animation.animationCurve == null && animation.useAnimationCurve)
-        {
-            animation.animationCurve = AnimationCurve.EaseInOut(0, 1, 0, 1);
+            Debug.LogError(animation + " has a unset duration, will be of 0 secs");
+            animation.duration = 0;
         }
     }
 

@@ -103,27 +103,12 @@ namespace OFogo.Animations
             timeline.AddOnStart(() => triangleParticleRenderer.particleScaleMultiplier = 0.5f);
             timeline.AddOnStart(() => fogoParticleRenderer.alpha = 0);
 
-            //timeline.AddGroup(
-            //  new RendererAlpha(fogoParticleRenderer, 1, 0),
-            //  new RendererAlpha(dancerRenderer, 1, 0)
-            //).SetDuration(2);
-
-            //timeline.AddOnStart(() => dancerAnimator.enabled = false);
-            //timeline.AddOnStart(() => secondaryFogoController.enabled = false);
-
-            //timeline.AddGroup(
-            //    new VectorFieldBlendTo(radialTurbulenceVectorFieldGenerator)
-            //).SetDuration(1);
             timeline.AddOnStart(() => OFogoController.Instance.SetVectorFieldGenerator(radialTurbulenceVectorFieldGenerator));
 
             timeline.Add(
                 new RendererAlpha(triangleParticleRenderer, 0, 1),
                 new OnUpdateAction((t) => triangleParticleRenderer.particleScaleMultiplier = math.lerp(0.25f, 2.5f, t))
-            ).SetDuration(4).Wait(4);
-
-            //timeline.Add(
-            //    new RendererAlpha(triangleParticleRenderer, 1, 0)
-            //).SetDuration(4);
+            ).SetDuration(2).Wait(2);
         }
 
         void AddChurrascoDoFogo(AnimationTimelineXVII timeline)
@@ -174,9 +159,9 @@ namespace OFogo.Animations
             timeline.Add(
                 new RendererAlpha(fogoParticleRenderer, 0f, 1f).SetEaseCurve(EaseXVII.Ease.InQuad).SetDuration(2),
                 new RendererAlpha(triangleParticleRenderer, 1, 0).SetEaseCurve(EaseXVII.Ease.OutCubic).SetDelay(1).SetDuration(2),
-                new FireLineHeat(logoSimulator, startBurnHeight, endBurnHeight, logoSimulator.heatMultiplicator, 0.75f).SetEaseCurve(EaseXVII.Ease.InOutQuad),
+                new FireLineHeat(logoSimulator, startBurnHeight, endBurnHeight, logoSimulator.heatMultiplicator, 0.75f).SetEaseCurve(EaseXVII.Ease.InOutQuad).SetDelay(2),
                 new SimulatorBlendTo(ofogoSimulator).SetDelay(3).SetEaseCurve(EaseXVII.Ease.InQuad)
-            ).SetDuration(8);
+            ).SetDuration(4);
         }
 
         void AddBlendToTornadoOfFire(AnimationTimelineXVII timeline)
@@ -205,7 +190,7 @@ namespace OFogo.Animations
                 new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(defaultSimulationSpeed, 3, t)),
                 new OnUpdateAction(t => magicSettings.minNoise.value = math.lerp(blackLineHigh, blackLineMid, t))
             //new GradientBlendTo(volumeProfile, blueGradient.gpuGradient)
-            ).SetDuration(2).Wait(4);
+            ).SetDuration(2).Wait(6);
         }
 
         void AddBlendToSerpenteDiFuoco(AnimationTimelineXVII timeline)
@@ -219,21 +204,21 @@ namespace OFogo.Animations
             timeline.Add(
                 new SimulatorBlendTo(serpenteDiFuocoSimulator),
                 new OnUpdateAction(t => magicSettings.minNoise.value = math.lerp(blackLineMid, blackLineLow, t))
-            ).SetEaseCurve(EaseXVII.Ease.InQuint).SetDuration(2);
+            ).SetEaseCurve(EaseXVII.Ease.InQuint).SetDuration(2.5f);
 
             timeline.Add(
-                new OnUpdateAction((t) => serpenteDiFuocoMover.radius = math.lerp(3, 9, t))
-            ).SetDuration(4);
+                new OnUpdateAction(t => serpenteDiFuocoMover.radius = math.lerp(3, 9, t))
+            ).SetDuration(2.5f);
 
             timeline.Add(
-                new OnUpdateAction((t) => serpenteDiFuocoMover.heightSinAmplitude = math.lerp(0, 5.6f, t)),
-                new OnUpdateAction((t) => serpenteDiFuocoMover.radius = math.lerp(9, 5, t)),
-                new OnUpdateAction(t => magicSettings.minNoise.value = math.lerp(blackLineLow, blackLineMid, t))
-            ).SetDuration(2);
-
-            timeline.Add(
+                new OnUpdateAction(t => serpenteDiFuocoMover.heightSinAmplitude = math.lerp(0, 5.6f, t)),
+                new OnUpdateAction(t => serpenteDiFuocoMover.radius = math.lerp(9, 5, t)),
+                new OnUpdateAction(t => magicSettings.minNoise.value = math.lerp(blackLineLow, blackLineMid, t)),
                 new OnUpdateAction(t => serpenteDiFuocoMover.heightSinOffset = math.lerp(0, -math.PI * 6, t))
-            ).SetDuration(2);
+            ).SetDuration(3);
+
+            //timeline.Add(
+            //).SetDuration(2);
         }
 
         void AddBlendToDanceFire(AnimationTimelineXVII timeline)
@@ -244,23 +229,20 @@ namespace OFogo.Animations
             timeline.AddOnStart(() => dancerRenderer.alpha = 0);
 
             timeline.Add(
-                new SimulatorBlendTo(feuNormal),
-                new VectorFieldBlendTo(turbulenceVectorFieldGenerator),
-                new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(defaultSimulationSpeed, 3, t)),
-                new RendererAlpha(dancerRenderer, 0, 1)
-            ).SetDuration(3);
-
-            timeline.Add(
-                    new OnUpdateAction(t => dancerMaterial.color = Color.Lerp(Color.clear, Color.white * 0.25f, t))
-            ).Wait(4.5f);
+                new SimulatorBlendTo(feuNormal).SetDuration(3),
+                new VectorFieldBlendTo(turbulenceVectorFieldGenerator).SetDuration(1),
+                new OnUpdateAction(t => OFogoController.Instance.simulationSpeed = math.lerp(defaultSimulationSpeed, 3, t)).SetDuration(1),
+                new RendererAlpha(dancerRenderer, 0, 1).SetDuration(2),
+                new OnUpdateAction(t => dancerMaterial.color = Color.Lerp(Color.clear, Color.white * 0.25f, t)).SetDuration(2)
+            ).SetDuration(8);
 
             timeline.AddOnStart(() => dancerMaterial.color = Color.clear);
-            timeline.AddOnStart(() => secondaryFogoController.SetSimulator(feuNormal)).Wait(5.5f);
+            timeline.AddOnStart(() => secondaryFogoController.SetSimulator(feuNormal)).Wait(1f);
 
             timeline.Add(
                  new RendererAlpha(fogoParticleRenderer, 1, 0),
                  new RendererAlpha(dancerRenderer, 1, 0)
-            ).SetDuration(8);
+            ).SetDuration(8 + 4 - 1);
 
             timeline.AddOnStart(() => dancerAnimator.enabled = false);
             timeline.AddOnStart(() => secondaryFogoController.enabled = false);

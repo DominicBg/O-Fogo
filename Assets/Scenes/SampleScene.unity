@@ -383,7 +383,7 @@ MonoBehaviour:
   offsetRotationDeg: 90
   offsetRotationDegPerSec: 22.5
   baseColor: {r: 1, g: 1, b: 1, a: 0.09411765}
-  particleScaleMultiplier: 0.5
+  particleScaleMultiplier: 0.7
 --- !u!1 &55177989
 GameObject:
   m_ObjectHideFlags: 0
